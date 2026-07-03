@@ -259,6 +259,12 @@ function initContactForm() {
       if (result.success === "true" || result.success === true) {
         alert(texts.success);
         form.reset();
+      } else if (result.message && result.message.toLowerCase().includes('activation')) {
+        const activationMsg = isArmenian 
+          ? "Ձեր էլ. փոստին (hayko16140@gmail.com) ուղարկվել է ակտիվացման հղում: Խնդրում ենք ստուգել Ձեր inbox-ը և սեղմել 'Activate Form' կոճակը՝ կապն ակտիվացնելու համար:"
+          : "An activation link has been sent to your email (hayko16140@gmail.com). Please check your inbox and click 'Activate Form' to start receiving messages!";
+        alert(activationMsg);
+        form.reset();
       } else {
         alert(texts.error);
       }
