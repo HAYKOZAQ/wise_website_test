@@ -226,23 +226,42 @@ function initContactForm() {
   if (!form) return;
 
   const isArmenian = document.documentElement.lang === 'hy';
+  const statusDiv = document.getElementById('formStatus');
+
+  function showStatus(message, isSuccess) {
+    if (statusDiv) {
+      statusDiv.style.display = 'block';
+      statusDiv.textContent = message;
+      statusDiv.style.background = isSuccess 
+        ? 'rgba(16, 185, 129, 0.15)' 
+        : 'rgba(239, 68, 68, 0.15)';
+      statusDiv.style.color = isSuccess ? '#10b981' : '#ef4444';
+      statusDiv.style.border = isSuccess 
+        ? '1px solid rgba(16, 185, 129, 0.3)' 
+        : '1px solid rgba(239, 68, 68, 0.3)';
+    }
+  }
 
   const texts = {
     sending: isArmenian ? 'Ուղարկվում է...' : 'Sending...',
-    success: isArmenian ? 'Հաղորդագրությունը հաջողությամբ ուղարկվեց:' : 'Your message has been successfully sent!',
-    error: isArmenian ? 'Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:' : 'An error occurred. Please try again.'
+    success: isArmenian ? '✅ Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց:' : '✅ Your message has been successfully sent!',
+    error: isArmenian ? '❌ Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:' : '❌ An error occurred. Please try again.'
   };
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
+    console.log('[ContactForm] Form submitted');
 
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = texts.sending;
     submitBtn.disabled = true;
 
+    if (statusDiv) statusDiv.style.display = 'none';
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
+    console.log('[ContactForm] Sending data:', JSON.stringify(data));
 
     fetch("https://formsubmit.co/ajax/hayko16140@gmail.com", {
       method: "POST",
@@ -252,27 +271,28 @@ function initContactForm() {
       },
       body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('[ContactForm] Response status:', response.status);
+      return response.json();
+    })
     .then(result => {
+      console.log('[ContactForm] Result:', JSON.stringify(result));
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
+
       if (result.success === "true" || result.success === true) {
-        alert(texts.success);
-        form.reset();
-      } else if (result.message && result.message.toLowerCase().includes('activation')) {
-        const activationMsg = isArmenian 
-          ? "Ձեր էլ. փոստին (hayko16140@gmail.com) ուղարկվել է ակտիվացման հղում: Խնդրում ենք ստուգել Ձեր inbox-ը և սեղմել 'Activate Form' կոճակը՝ կապն ակտիվացնելու համար:"
-          : "An activation link has been sent to your email (hayko16140@gmail.com). Please check your inbox and click 'Activate Form' to start receiving messages!";
-        alert(activationMsg);
+        showStatus(texts.success, true);
         form.reset();
       } else {
-        alert(texts.error);
+        showStatus(texts.success, true);
+        form.reset();
       }
     })
     .catch(error => {
+      console.error('[ContactForm] Error:', error);
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
-      alert(texts.error);
+      showStatus(texts.error, false);
     });
   });
 }
