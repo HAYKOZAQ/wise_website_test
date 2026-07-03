@@ -123,6 +123,21 @@ function initBlogModal() {
   const title = document.getElementById('modalTitle');
   const closeBtn = document.getElementById('modalClose');
 
+  let blogData = null;
+
+  async function loadBlogData() {
+    if (blogData) return blogData;
+    try {
+      const res = await fetch('../assets/data/blog-posts.json');
+      if (!res.ok) throw new Error('Failed to load local database');
+      blogData = await res.json();
+      return blogData;
+    } catch (err) {
+      console.error('[BlogModal] Error loading local blog data:', err);
+      return null;
+    }
+  }
+
   function closeModal() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
@@ -150,37 +165,20 @@ function initBlogModal() {
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
 
-      try {
-        const res = await fetch(url, { mode: 'cors' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const html = await res.text();
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        const article = doc.querySelector('article') ||
-                        doc.querySelector('.entry-content') ||
-                        doc.querySelector('.post-content') ||
-                        doc.querySelector('main');
-
-        if (article) {
-          article.querySelectorAll('script, style, iframe, .sharedaddy, .jp-relatedposts').forEach(el => el.remove());
-          body.innerHTML = article.innerHTML;
-        } else {
-          const contentDiv = doc.body;
-          contentDiv.querySelectorAll('script, style, iframe, nav, header, footer').forEach(el => el.remove());
-          body.innerHTML = contentDiv.innerHTML.substring(0, 10000);
-        }
-
-        body.querySelectorAll('a').forEach(a => {
-          a.setAttribute('target', '_blank');
-          a.setAttribute('rel', 'noopener');
-        });
-      } catch (err) {
+      const db = await loadBlogData();
+      if (db && db[url]) {
+        const post = db[url];
+        body.innerHTML = post.content;
+      } else {
         body.innerHTML = '<div class="modal__error">' +
           'Չհաջողվեց բեռնել հոդվածը։ <a href="' + url + '" target="_blank" rel="noopener">Բացել օրիգինալ էջում</a>' +
           '</div>';
       }
+
+      body.querySelectorAll('a').forEach(a => {
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener');
+      });
     });
   });
 }
