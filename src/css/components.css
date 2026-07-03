@@ -10,7 +10,7 @@
 }
 
 .header.scrolled {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--color-glass-bg);
   backdrop-filter: var(--blur-lg);
   -webkit-backdrop-filter: var(--blur-lg);
   border-bottom: 1px solid var(--color-glass-border);
@@ -35,9 +35,52 @@
 }
 
 .header__logo img {
-  height: 48px;
+  height: 60px;
   width: auto;
 }
+
+/* ===== THEME SWITCHER ===== */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-glass-bg);
+  border: 1.5px solid var(--color-glass-border);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+}
+
+.theme-toggle:hover {
+  background: var(--color-glass-hover);
+  color: var(--color-accent-gold);
+  transform: scale(1.05);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-toggle .theme-toggle__sun {
+  display: none;
+}
+.theme-toggle .theme-toggle__moon {
+  display: block;
+}
+
+html[data-theme="dark"] .theme-toggle .theme-toggle__sun {
+  display: block;
+}
+html[data-theme="dark"] .theme-toggle .theme-toggle__moon {
+  display: none;
+}
+
 
 .nav {
   display: flex;
@@ -207,7 +250,7 @@
   justify-content: center;
   padding: 120px 24px 80px;
   text-align: center;
-  background: linear-gradient(135deg, #ffffff 0%, #f5f2eb 50%, #ede8dd 100%);
+  background: linear-gradient(135deg, var(--hero-grad-start) 0%, var(--hero-grad-mid) 50%, var(--hero-grad-end) 100%);
 }
 
 .hero__bg-image {

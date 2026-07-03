@@ -227,6 +227,35 @@ function initContactForm() {
 
   const statusDiv = document.getElementById('formStatus');
 
+  // Pre-fill subject if provided in URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const serviceKey = urlParams.get('service');
+  if (serviceKey) {
+    const subjectInput = form.querySelector('input[name="subject"]');
+    if (subjectInput) {
+      const serviceNames = {
+        s1: { hy: 'ՏՀ նախագծում և սպասարկում', en: 'IS Design & Maintenance' },
+        s2: { hy: 'Տեղեկատվական համակարգերի բովանդակային սպասարկում', en: 'IS Content Maintenance' },
+        s3: { hy: 'Տվյալների մշակում և վերլուծում', en: 'Data Processing & Analysis' },
+        s4: { hy: 'Կրթական ծրագրերի նախագծում, իրականացում', en: 'Educational Programs Design & Implementation' },
+        s5: { hy: 'Կիբեռանվտանգություն և ցանցային ապահովում', en: 'Cybersecurity & Network Security' },
+        s6: { hy: 'Տեխնիկական սպասարկում', en: 'Technical Support' },
+        p1: { hy: 'Ընտանիքի անապահովության գնահատման համակարգ', en: 'Family Vulnerability Assessment System' },
+        p2: { hy: 'Սոցիալական արագ արձագանքման ՏՀ', en: 'Social Rapid Response IS' },
+        p3: { hy: 'Տվյալների փոխանակման ՏՀ', en: 'Data Exchange IS' },
+        p4: { hy: '«Գործ» զբաղվածության ՏՀ', en: '"Gorts" Employment IS' },
+        p5: { hy: 'Պրոթեզաօրթոպեդիկ պարագաների ՏՀ', en: 'Prosthetic-Orthopedic Devices IS' },
+        p6: { hy: '«Մանուկ» երեխաների հաշվառման ՏՀ', en: '"Manuk" Child Registration IS' }
+      };
+      
+      const service = serviceNames[serviceKey];
+      if (service) {
+        const isArmenian = document.documentElement.lang !== 'en';
+        subjectInput.value = isArmenian ? service.hy : service.en;
+      }
+    }
+  }
+
   function showStatus(message, isSuccess) {
     if (statusDiv) {
       statusDiv.style.display = 'block';
@@ -295,6 +324,41 @@ function initContactForm() {
   });
 }
 
+function initBlogSearch() {
+  const searchInput = document.getElementById('blogSearch');
+  if (!searchInput) return;
+
+  const cards = document.querySelectorAll('.blog-card');
+  const featured = document.getElementById('featuredPost');
+  const pagination = document.querySelector('.pagination');
+
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+
+    if (query === '') {
+      if (pagination) pagination.style.display = 'flex';
+      if (featured) featured.style.display = 'block';
+      const activeBtn = pagination ? pagination.querySelector('.pagination__btn--active') : null;
+      const activePage = activeBtn ? activeBtn.getAttribute('data-page') : '1';
+      cards.forEach(card => {
+        const p = card.getAttribute('data-page');
+        card.classList.toggle('pagination-hidden', p !== activePage);
+      });
+    } else {
+      if (pagination) pagination.style.display = 'none';
+      if (featured) featured.style.display = 'none';
+
+      cards.forEach(card => {
+        const title = card.querySelector('.blog-card__title').textContent.toLowerCase();
+        const excerpt = card.querySelector('.blog-card__excerpt').textContent.toLowerCase();
+        const match = title.includes(query) || excerpt.includes(query);
+
+        card.classList.toggle('pagination-hidden', !match);
+      });
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initHeaderScroll();
@@ -305,4 +369,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initBlogModal();
   initBlogPagination();
   initContactForm();
+  initBlogSearch();
 });

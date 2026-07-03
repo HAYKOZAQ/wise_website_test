@@ -9,6 +9,10 @@
 (function () {
   'use strict';
 
+  // Immediately set theme to avoid flashing
+  const initialTheme = localStorage.getItem('wisef_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', initialTheme);
+
   /* ══════════════════════════════════════════════════════
      TRANSLATIONS — Clean, correct Armenian Unicode & English
   ══════════════════════════════════════════════════════ */
@@ -105,6 +109,7 @@
     'blog.loading':    { hy: 'Բեռնվում է...', en: 'Loading...' },
     'blog.close':      { hy: 'Փակել', en: 'Close' },
     'blog.open_orig':  { hy: 'Բացել օրիգինալ էջում', en: 'Open Original Article' },
+    'blog.search_ph':  { hy: 'Որոնել հոդվածներ...', en: 'Search articles...' },
     'blog.featured_date': { hy: 'Հուլիս 24, 2024', en: 'July 24, 2024' },
     'blog.featured_title':{ hy: 'Պատրաստ է գործարկման «Աշխատանք առանց սահմանների» որոնման միասնական համակարգ»-ը', en: '"Work Without Borders" Unified Search System Launched' },
     'blog.featured_text': { hy: '«Աշխատանքի էլեկտրոնային բորսա» ծրագրի ֆինանսական աուդիտի հաշվետվությունները', en: 'Financial audit reports of the Electronic Labor Exchange program' },
@@ -283,13 +288,57 @@
   }
 
   /* ══════════════════════════════════════════════════════
+     THEME SWITCHER
+  ══════════════════════════════════════════════════════ */
+  function buildThemeToggle() {
+    const btn = document.createElement('button');
+    btn.className = 'theme-toggle';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Toggle theme');
+    btn.innerHTML = `
+      <svg class="theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <svg class="theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    `;
+    btn.addEventListener('click', () => {
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('wisef_theme', theme);
+    });
+    return btn;
+  }
+
+  /* ══════════════════════════════════════════════════════
      INIT
   ══════════════════════════════════════════════════════ */
   function init() {
     cacheOriginals();
 
     document.querySelectorAll('.nav__lang-btn').forEach(old => {
-      old.parentNode.replaceChild(buildToggle(), old);
+      const container = document.createElement('div');
+      container.className = 'header-controls';
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.gap = '16px';
+      
+      const langToggle = buildToggle();
+      const themeToggle = buildThemeToggle();
+      
+      container.appendChild(langToggle);
+      container.appendChild(themeToggle);
+      
+      old.parentNode.replaceChild(container, old);
     });
 
     if (lang === 'en') applyLang('en');
