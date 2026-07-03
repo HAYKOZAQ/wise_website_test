@@ -10,100 +10,104 @@
   'use strict';
 
   /* ══════════════════════════════════════════════════════
-     TRANSLATIONS — actual Armenian Unicode + English
+     TRANSLATIONS — Clean, correct Armenian Unicode & English
   ══════════════════════════════════════════════════════ */
   const T = {
 
     /* Navigation */
-    'nav.home':       { hy: 'Գлхаворр',  en: 'Home' },
-    'nav.about':      { hy: 'Մer masun', en: 'About' },
-    'nav.services':   { hy: 'Ծarayajutyunner', en: 'Services' },
-    'nav.partners':   { hy: 'Gortsunkerner', en: 'Partners' },
-    'nav.contact':    { hy: 'Hetadards kap', en: 'Contact' },
-    'nav.blog':       { hy: 'Blok', en: 'Blog' },
+    'nav.home':       { hy: 'Գլխավոր',  en: 'Home' },
+    'nav.about':      { hy: 'Մեր մասին', en: 'About' },
+    'nav.services':   { hy: 'Ծառայություններ', en: 'Services' },
+    'nav.partners':   { hy: 'Գործընկերներ', en: 'Partners' },
+    'nav.contact':    { hy: 'Հետադարձ կապ', en: 'Contact' },
+    'nav.blog':       { hy: 'Բլոգ', en: 'Blog' },
 
     /* Hero – Home */
-    'home.badge':        { hy: '🌟 23 տarri texnologianeri olvortum', en: '🌟 23 years in information technology' },
-    'home.hero_span':    { hy: 'թvajin luzumner', en: 'Digital Solutions' },
-    'home.hero_p':       { hy: '«Բarekecotyun texekatvacan hamakargneri dzernarkutyun» himnedram — Hayastanum arajadar texnologiakan kentron ՝ 20+ tarva parovogh',
+    'home.badge':        { hy: '🌟 23 տարի տեխնոլոգիաների ոլորտում', en: '🌟 23 years in information technology' },
+    'home.hero_h1a':     { hy: 'Մենք ստեղծում ենք', en: 'We Create' },
+    'home.hero_h1b':     { hy: 'թվային լուծումներ', en: 'Digital Solutions' },
+    'home.hero_p':       { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ — Հայաստանում առաջատար տեխնոլոգիական կենտրոն՝ 20+ տարվա փորձով',
                            en: 'Welfare Information Systems Enterprise Foundation — Armenia\'s leading technology center with 20+ years of experience in government and private sector IT solutions' },
-    'home.btn_services': { hy: 'Ditel tsarayutjunner', en: 'Our Services' },
-    'home.btn_contact':  { hy: 'Kapnel mez het', en: 'Contact Us' },
+    'home.btn_services': { hy: 'Դիտել ծառայությունները', en: 'Our Services' },
+    'home.btn_contact':  { hy: 'Կապնվել մեզ հետ', en: 'Contact Us' },
 
     /* Why section */
-    'why.label':     { hy: 'Мer uuzhutjunner', en: 'Our Approach' },
-    'why.title':     { hy: 'Yerazek, steghdzhek, kisek mez het', en: 'Dream, Create, Share with Us' },
-    'why.subtitle':  { hy: 'Миасин карузум енк tvajin апагха', en: 'Together we build the digital future' },
-    'why.c1_title':  { hy: 'Yerazek mez het', en: 'Dream with Us' },
-    'why.c1_text':   { hy: 'Yerazek mez het norarutyun yev tvajin apaghi masin', en: 'Dream with us about innovation and a digital future' },
-    'why.c2_title':  { hy: 'Steghdzhek mez het', en: 'Create with Us' },
-    'why.c2_text':   { hy: 'Steghdzhek mez het tvajin apaghi norarakan luzumner', en: 'Create innovative digital solutions with us' },
-    'why.c3_title':  { hy: 'Kisek mez het', en: 'Share with Us' },
-    'why.c3_text':   { hy: 'Kisek mez het Dzer yerazankner tvajin apaghi katarelaguorcman hamar', en: 'Share your dreams for improving the digital future' },
+    'why.label':     { hy: 'Մեր ուղղությունները', en: 'Our Approach' },
+    'why.title':     { hy: 'Երազեք, ստեղծեք, կիսվեք մեզ հետ', en: 'Dream, Create, Share with Us' },
+    'why.subtitle':  { hy: 'Միասին կառուցում ենք թվային ապագան', en: 'Together we build the digital future' },
+    'why.c1_title':  { hy: 'Երազեք մեզ հետ', en: 'Dream with Us' },
+    'why.c1_text':   { hy: 'Երազեք մեզ հետ նորարության և թվային ապագայի մասին', en: 'Dream with us about innovation and a digital future' },
+    'why.c2_title':  { hy: 'Ստեղծեք մեզ հետ', en: 'Create with Us' },
+    'why.c2_text':   { hy: 'Ստեղծեք մեզ հետ թվային ապագայի նորարական լուծումներ', en: 'Create innovative digital solutions with us' },
+    'why.c3_title':  { hy: 'Կիսվեք մեզ հետ', en: 'Share with Us' },
+    'why.c3_text':   { hy: 'Կիսվեք մեզ հետ Ձեր երազանքներով թվային ապագայի կատարելագործման համար', en: 'Share your dreams for improving the digital future' },
 
     /* Services preview */
-    'svc.label':     { hy: 'Ծarayajutyunner', en: 'Services' },
-    'svc.title':     { hy: 'Мer tsarayajutyunner', en: 'Our Services' },
-    'svc.subtitle':  { hy: 'Texekatvacan hamakargneri, nor tsragreri ev tvjalneri naxagdsum ev spasarkarum', en: 'Design and maintenance of information systems, new programs, and databases' },
-    'svc.s1_title':  { hy: 'TH naxagdsum ev spasarkarum', en: 'IS Design & Maintenance' },
-    'svc.s1_text':   { hy: 'Texekatvacan hamakargneri, nor tsragreri ev tvjalneri naxagdsum ev spasarkarum', en: 'Full-cycle design and maintenance of information systems, software, and databases' },
-    'svc.s2_title':  { hy: 'Tvjalneri mshakoum', en: 'Data Processing' },
-    'svc.s2_text':   { hy: 'Texekatvacan hamakargneri bovandakajin spasarkarum, tvjalneri mshakoum ev verluzum', en: 'Content maintenance, data processing, and analysis of information systems' },
-    'svc.s3_title':  { hy: 'Krthakar tsragrer', en: 'Educational Programs' },
-    'svc.s3_text':   { hy: 'Krthakar tsragreri naxagdsum ev irakanacirum', en: 'Design and implementation of educational programs in IT' },
-    'svc.s4_title':  { hy: 'Kiberjankavtangoutyun', en: 'Cybersecurity' },
-    'svc.s4_text':   { hy: 'Kiberjankavtangoutyun ev cankajin apahovjum', en: 'Cybersecurity and network security solutions' },
-    'svc.s5_title':  { hy: 'Texnikakan spasarkarum', en: 'Technical Support' },
-    'svc.s5_text':   { hy: 'Hamakargnichner ev harakic texnikaji spasarkarum', en: 'Computer and related equipment maintenance (13,000+ units)' },
-    'svc.s6_title':  { hy: 'Integraciajon luzumner', en: 'Integration Solutions' },
-    'svc.s6_text':   { hy: 'Hamakargneri integracian ev tvjalneri pokhanaklutyun', en: 'System integration and data exchange solutions' },
-    'svc.btn_all':   { hy: 'Bolor tsarayajutyunner', en: 'All Services' },
+    'svc.label':     { hy: 'Ծառայություններ', en: 'Services' },
+    'svc.title':     { hy: 'Մեր ծառայությունները', en: 'Our Services' },
+    'svc.subtitle':  { hy: 'Տեղեկատվական համակարգերի, նոր ծրագրերի և տվյալների շտեմարանների նախագծում և սպասարկում', en: 'Design and maintenance of information systems, new programs, and databases' },
+    'svc.s1_title':  { hy: 'ՏՀ նախագծում և սպասարկում', en: 'IS Design & Maintenance' },
+    'svc.s1_text':   { hy: 'Տեղեկատվական համակարգերի, նոր ծրագրերի և տվյալների շտեմարանների նախագծում և սպասարկում', en: 'Full-cycle design and maintenance of information systems, software, and databases' },
+    'svc.s2_title':  { hy: 'Տվյալների մշակում', en: 'Data Processing' },
+    'svc.s2_text':   { hy: 'Տեղեկատվական համակարգերի բովանդակային սպասարկում, տվյալների մշակում և վերլուծում', en: 'Content maintenance, data processing, and analysis of information systems' },
+    'svc.s3_title':  { hy: 'Կրթական ծրագրեր', en: 'Educational Programs' },
+    'svc.s3_text':   { hy: 'Կրթական ծրագրերի նախագծում և իրականացում', en: 'Design and implementation of educational programs in IT' },
+    'svc.s4_title':  { hy: 'Կիբեռանվտանգություն', en: 'Cybersecurity' },
+    'svc.s4_text':   { hy: 'Կիբեռանվտանգություն և ցանցային ապահովում', en: 'Cybersecurity and network security solutions' },
+    'svc.s5_title':  { hy: 'Տեխնիկական սպասարկում', en: 'Technical Support' },
+    'svc.s5_text':   { hy: 'Համակարգիչների և հարակից տեխնիկայի սպասարկում', en: 'Computer and related equipment maintenance (13,000+ units)' },
+    'svc.s6_title':  { hy: 'Ինտեգրացիոն լուծումներ', en: 'Integration Solutions' },
+    'svc.s6_text':   { hy: 'Համակարգերի ինտեգրացիա և տվյալների փոխանակման ապահովում', en: 'System integration and data exchange solutions' },
+    'svc.btn_all':   { hy: 'Բոլոր ծառայությունները', en: 'All Services' },
 
     /* Stats */
-    'stats.label':   { hy: 'Мer nvachumnere', en: 'Our Achievements' },
-    'stats.title':   { hy: '23 tarri texekatvacan texnologianeri olvortum', en: '23 Years in Information Technology' },
-    'stats.s1':      { hy: 'Tarri texnologianeri olvortum', en: 'Years in IT' },
-    'stats.s2':      { hy: 'Aktiv shaharraju', en: 'Active Beneficiaries' },
-    'stats.s3':      { hy: 'Naxagdzvadz texekatvacan hamakargnner', en: 'IS Systems Designed' },
-    'stats.s4':      { hy: 'Spasarkvadz sarakavoroumnner', en: 'Serviced Equipment' },
+    'stats.label':   { hy: 'Մեր նվաճումները', en: 'Our Achievements' },
+    'stats.title':   { hy: '23 տարի տեղեկատվական տեխնոլոգիաների ոլորտում', en: '23 Years in Information Technology' },
+    'stats.s1':      { hy: 'Տարի տեխնոլոգիաների ոլորտում', en: 'Years in IT' },
+    'stats.s2':      { hy: 'Ակտիվ շահառու', en: 'Active Beneficiaries' },
+    'stats.s3':      { hy: 'Նախագծված տեղեկատվական համակարգեր', en: 'IS Systems Designed' },
+    'stats.s4':      { hy: 'Սպասարկվող սարքավորումներ', en: 'Serviced Equipment' },
 
     /* About preview */
-    'aboutprev.label': { hy: 'Мer masin', en: 'About Us' },
-    'aboutprev.title': { hy: '«Barekecotyun texekatvacan hamakargneri dzernarkutyun» himnedram', en: 'Welfare Information Systems Enterprise Foundation' },
-    'aboutprev.p1':    { hy: 'Menk himnadvvel enk 2001 tvakanum: 23 tarri arach, HH karavarutyun khordmamb steghdzvec HH azhatanki ev sociaakan hartseri naxararutyun.',
+    'aboutprev.label': { hy: 'Մեր մասին', en: 'About Us' },
+    'aboutprev.title': { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ', en: 'Welfare Information Systems Enterprise Foundation' },
+    'aboutprev.p1':    { hy: 'Մենք հիմնադրվել ենք 2001 թվականին։ 23 տարի առաջ, ՀՀ կառավարության որոշմամբ ստեղծվեց ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության ենթակայությամբ գործող հիմնադրամ։',
                          en: 'We were founded in 2001, by decree of the Government of the Republic of Armenia, under the Ministry of Labor and Social Affairs.' },
-    'aboutprev.p2':    { hy: 'Hayastanum arajadar texnologiakan kentron e, vor irakanacirum e petakan ev masnavor olvortum texekatvacan ev herrahaghordakcutyunneri texnologianeri nerdrumen ev spasarkarum.',
+    'aboutprev.p2':    { hy: 'Հայաստանում առաջատար տեխնոլոգիական կենտրոն է, որն իրականացնում է պետական և մասնավոր ոլորտի տեղեկատվական և հեռահաղորդակցության տեխնոլոգիաների ենթակառուցվածքների ներդրում և սպասարկում։',
                          en: 'Armenia\'s leading technology center implementing information and telecommunication infrastructure for public and private sectors.' },
-    'aboutprev.btn':   { hy: 'Imanel avelin', en: 'Learn More' },
+    'aboutprev.btn':   { hy: 'Իմանալ ավելին', en: 'Learn More' },
 
     /* Contact preview */
-    'contactprev.label': { hy: 'Hetadards kap', en: 'Contact' },
-    'contactprev.title': { hy: 'Steghdzenk miassin', en: 'Let\'s Build Together' },
-    'contactprev.sub':   { hy: 'Patrasht enk lusel Dzer gaghaparner', en: 'We are ready to hear your ideas' },
-    'contactprev.email': { hy: 'El. post', en: 'Email' },
-    'contactprev.phone': { hy: 'Herakhoss', en: 'Phone' },
-    'contactprev.btn':   { hy: 'Grel namak', en: 'Send Message' },
+    'contactprev.label': { hy: 'Հետադարձ կապ', en: 'Contact' },
+    'contactprev.title': { hy: 'Ստեղծենք միասին', en: 'Let\'s Build Together' },
+    'contactprev.sub':   { hy: 'Պատրաստ ենք լսել Ձեր գաղափարները', en: 'We are ready to hear your ideas' },
+    'contactprev.email': { hy: 'Էլ. փոստ', en: 'Email' },
+    'contactprev.phone': { hy: 'Հեռախոս', en: 'Phone' },
+    'contactprev.btn':   { hy: 'Գրել նամակ', en: 'Send Message' },
 
     /* Footer */
-    'footer.brand':      { hy: '«Barekecotyun texekatvacan hamakargneri dzernarkutyun» himnedram', en: 'Welfare Information Systems Enterprise Foundation' },
-    'footer.site':       { hy: 'Kayk', en: 'Site' },
-    'footer.contact':    { hy: 'Kap', en: 'Contact' },
-    'footer.follow':     { hy: 'Hetevek mez', en: 'Follow Us' },
-    'footer.home':       { hy: 'Glkhavorr', en: 'Home' },
-    'footer.about':      { hy: 'Мer masin', en: 'About' },
-    'footer.services':   { hy: 'Tsarayajutyunner', en: 'Services' },
-    'footer.partners':   { hy: 'Gortsunkerner', en: 'Partners' },
-    'footer.blog':       { hy: 'Blok', en: 'Blog' },
-    'footer.contact_us': { hy: 'Hetadards kap', en: 'Contact Us' },
-    'footer.copyright':  { hy: '© 2026 Dzevagordvats «WISE» himnedramum', en: '© 2026 Designed by «WISE» foundation' },
+    'footer.brand':      { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ', en: 'Welfare Information Systems Enterprise Foundation' },
+    'footer.site':       { hy: 'Կայք', en: 'Site' },
+    'footer.contact':    { hy: 'Կապ', en: 'Contact' },
+    'footer.follow':     { hy: 'Հետևեք մեզ', en: 'Follow Us' },
+    'footer.home':       { hy: 'Գլխավոր', en: 'Home' },
+    'footer.about':      { hy: 'Մեր մասին', en: 'About' },
+    'footer.services':   { hy: 'Ծառայություններ', en: 'Services' },
+    'footer.partners':   { hy: 'Գործընկերներ', en: 'Partners' },
+    'footer.blog':       { hy: 'Բլոգ', en: 'Blog' },
+    'footer.contact_us': { hy: 'Հետադարձ կապ', en: 'Contact Us' },
+    'footer.copyright':  { hy: '© 2026 Designed by «WISE» foundation', en: '© 2026 Designed by «WISE» foundation' },
 
     /* Blog page */
-    'blog.pagetitle':  { hy: 'Blok', en: 'Blog' },
-    'blog.breadcrumb': { hy: 'Glkhavorr / Blok', en: 'Home / Blog' },
-    'blog.readmore':   { hy: 'Kartal avelin', en: 'Read More' },
-    'blog.loading':    { hy: 'Bervum e...', en: 'Loading...' },
-    'blog.close':      { hy: 'Kogel', en: 'Close' },
-    'blog.open_orig':  { hy: 'Bac bnabanasnoren', en: 'Open Original Article' },
+    'blog.pagetitle':  { hy: 'Բլոգ', en: 'Blog' },
+    'blog.breadcrumb': { hy: 'Գլխավոր / Բլոգ', en: 'Home / Blog' },
+    'blog.readmore':   { hy: 'Կարդալ ավելին', en: 'Read More' },
+    'blog.loading':    { hy: 'Բեռնվում է...', en: 'Loading...' },
+    'blog.close':      { hy: 'Փակել', en: 'Close' },
+    'blog.open_orig':  { hy: 'Բացել օրիգինալ էջում', en: 'Open Original Article' },
+    'blog.featured_date': { hy: 'Հուլիս 24, 2024', en: 'July 24, 2024' },
+    'blog.featured_title':{ hy: 'Պատրաստ է գործարկման «Աշխատանք առանց սահմանների» որոնման միասնական համակարգ»-ը', en: '"Work Without Borders" Unified Search System Launched' },
+    'blog.featured_text': { hy: '«Աշխատանքի էլեկտրոնային բորսա» ծրագրի ֆինանսական աուդիտի հաշվետվությունները', en: 'Financial audit reports of the Electronic Labor Exchange program' },
 
     /* About page */
     'about.pagetitle':  { hy: 'Մեր մասին', en: 'About' },
@@ -184,28 +188,12 @@
     'contactpage.subj_ph':    { hy: 'Թեմա', en: 'Subject' },
     'contactpage.msg_ph':     { hy: 'Ձեր հաղորդագրությունը', en: 'Your Message' },
     'contactpage.send_btn':   { hy: 'Ուղարկել', en: 'Send' },
-
-  };
-
-  // ── Real Armenian Unicode text ─────────────────────────
-  // The values above use transliterations as fallback.
-  // The real Armenian text is set as the default textContent
-  // in the HTML elements (data-i18n elements keep HY text by default).
-  // When lang='en', we translate; when lang='hy' we restore from this map.
-  const HY = {
-    'nav.home':       'Գлхаворр',
-    'nav.about':      'Մеr masun',
-    'nav.services':   'Ծarajуtjунner',
-    'nav.partners':   'Горцункернер',
-    'nav.contact':    'Хетадарц кап',
-    'nav.blog':       'Блог',
   };
 
   /* ══════════════════════════════════════════════════════
      CACHE — Save original Armenian textContent on first run
-     so we can restore it when switching back to HY.
   ══════════════════════════════════════════════════════ */
-  const cache = new Map(); // key → original Armenian text
+  const cache = new Map();
 
   function cacheOriginals() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -239,10 +227,8 @@
       let text;
 
       if (newLang === 'hy') {
-        // Restore original Armenian (cached from initial HTML)
         text = cache.get(key);
       } else {
-        // Get English translation
         const entry = T[key];
         text = entry ? entry.en : undefined;
       }
@@ -300,15 +286,12 @@
      INIT
   ══════════════════════════════════════════════════════ */
   function init() {
-    // 1. Cache all original Armenian text from the DOM
     cacheOriginals();
 
-    // 2. Replace every .nav__lang-btn with the new toggle
     document.querySelectorAll('.nav__lang-btn').forEach(old => {
       old.parentNode.replaceChild(buildToggle(), old);
     });
 
-    // 3. If saved language is English, apply it now
     if (lang === 'en') applyLang('en');
   }
 
@@ -318,7 +301,6 @@
     init();
   }
 
-  // Public API
   window.wisefI18n = {
     t:       (key) => { const e = T[key]; return e ? (e[lang] || e.en) : key; },
     getLang: ()    => lang,
