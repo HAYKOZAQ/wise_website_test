@@ -264,7 +264,8 @@
       let text;
 
       if (newLang === 'hy') {
-        text = cache.get(key);
+        const entry = T[key];
+        text = (entry && entry.hy) ? entry.hy : cache.get(key);
       } else {
         const entry = T[key];
         text = entry ? entry.en : undefined;
