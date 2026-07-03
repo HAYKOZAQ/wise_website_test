@@ -1,0 +1,10 @@
+{
+  "name": "wisef-am-redesign",
+  "private": true,
+  "version": "1.0.0",
+  "description": "WISE Foundation website redesign — Liquid Glass Minimalism",
+  "scripts": {
+    "dev": "npx serve src/pages",
+    "start": "npx serve src/pages"
+  }
+}
