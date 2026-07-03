@@ -27,11 +27,11 @@
     'nav.blog':       { hy: 'Բլոգ', en: 'Blog' },
 
     /* Hero – Home */
-    'home.badge':        { hy: '🌟 23 տարի տեխնոլոգիաների ոլորտում', en: '🌟 23 years in information technology' },
+    'home.badge':        { hy: '🌟 25 տարի տեխնոլոգիաների ոլորտում', en: '🌟 25 years in information technology' },
     'home.hero_h1a':     { hy: 'Մենք ստեղծում ենք', en: 'We Create' },
     'home.hero_h1b':     { hy: 'թվային լուծումներ', en: 'Digital Solutions' },
-    'home.hero_p':       { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ — Հայաստանում առաջատար տեխնոլոգիական կենտրոն՝ 20+ տարվա փորձով',
-                           en: 'Welfare Information Systems Enterprise Foundation — Armenia\'s leading technology center with 20+ years of experience in government and private sector IT solutions' },
+    'home.hero_p':       { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ — Հայաստանում առաջատար տեխնոլոգիական կենտրոն՝ 25+ տարվա փորձով',
+                           en: 'Welfare Information Systems Enterprise Foundation — Armenia\'s leading technology center with 25+ years of experience in government and private sector IT solutions' },
     'home.btn_services': { hy: 'Դիտել ծառայությունները', en: 'Our Services' },
     'home.btn_contact':  { hy: 'Կապնվել մեզ հետ', en: 'Contact Us' },
 
@@ -66,7 +66,7 @@
 
     /* Stats */
     'stats.label':   { hy: 'Մեր նվաճումները', en: 'Our Achievements' },
-    'stats.title':   { hy: '23 տարի տեղեկատվական տեխնոլոգիաների ոլորտում', en: '23 Years in Information Technology' },
+    'stats.title':   { hy: '25 տարի տեղեկատվական տեխնոլոգիաների ոլորտում', en: '25 Years in Information Technology' },
     'stats.s1':      { hy: 'Տարի տեխնոլոգիաների ոլորտում', en: 'Years in IT' },
     'stats.s2':      { hy: 'Ակտիվ շահառու', en: 'Active Beneficiaries' },
     'stats.s3':      { hy: 'Նախագծված տեղեկատվական համակարգեր', en: 'IS Systems Designed' },
@@ -75,7 +75,7 @@
     /* About preview */
     'aboutprev.label': { hy: 'Մեր մասին', en: 'About Us' },
     'aboutprev.title': { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ', en: 'Welfare Information Systems Enterprise Foundation' },
-    'aboutprev.p1':    { hy: 'Մենք հիմնադրվել ենք 2001 թվականին։ 23 տարի առաջ, ՀՀ կառավարության որոշմամբ ստեղծվեց ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության ենթակայությամբ գործող հիմնադրամ։',
+    'aboutprev.p1':    { hy: 'Մենք հիմնադրվել ենք 2001 թվականին։ 25 տարի առաջ, ՀՀ կառավարության որոշմամբ ստեղծվեց ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության ենթակայությամբ գործող հիմնադրամ։',
                          en: 'We were founded in 2001, by decree of the Government of the Republic of Armenia, under the Ministry of Labor and Social Affairs.' },
     'aboutprev.p2':    { hy: 'Հայաստանում առաջատար տեխնոլոգիական կենտրոն է, որն իրականացնում է պետական և մասնավոր ոլորտի տեղեկատվական և հեռահաղորդակցության տեխնոլոգիաների ենթակառուցվածքների ներդրում և սպասարկում։',
                          en: 'Armenia\'s leading technology center implementing information and telecommunication infrastructure for public and private sectors.' },
@@ -88,6 +88,39 @@
     'contactprev.email': { hy: 'Էլ. փոստ', en: 'Email' },
     'contactprev.phone': { hy: 'Հեռախոս', en: 'Phone' },
     'contactprev.btn':   { hy: 'Գրել նամակ', en: 'Send Message' },
+
+    /* About page */
+    'about.exp_label': { hy: '25 տարվա փորձ', en: '25 Years of Experience' },
+    'about.exp_title': { hy: 'Մենք երազում ենք, ստեղծում ենք, կիսվում ենք', en: 'We dream, create, and share' },
+    'about.exp_p1': { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամը Հայաստանում առաջատար տեխնոլոգիական կենտրոն է, որն իրականացնում է պետական և մասնավոր ոլորտի տեղեկատվական և հեռահաղորդակցության տեխնոլոգիաների ենթակառուցվածքների ներդրում և սպասարկում։', en: 'Welfare Information Systems Enterprise Foundation is a leading technological center in Armenia, carrying out implementation and maintenance of IT infrastructure for public and private sectors.' },
+    'about.exp_p2': { hy: 'Մոտ 1,109,493 ակտիվ շահառու ստանում է ծառայություններ ՀՀ սոցիալական պաշտպանության ոլորտում մեր կողմից տրամադրված տեղեկատվական համակարգերի միջոցով։', en: 'Around 1,109,493 active beneficiaries receive social protection services through the information systems provided by us.' },
+    'about.way_label': { hy: 'Պատմություն', en: 'History' },
+    'about.way_title': { hy: 'Մեր ճանապարհը', en: 'Our Journey' },
+    'about.t1_title': { hy: 'Հիմնադրում', en: 'Foundation' },
+    'about.t1_text': { hy: 'ՀՀ կառավարության որոշմամբ ստեղծվեց ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության ենթակայությամբ գործող հիմնադրամը։', en: 'By the decision of the RA Government, a foundation operating under the Ministry of Labor and Social Affairs was established.' },
+    'about.t2_title': { hy: 'Զարգացում և ընդլայնում', en: 'Development & Expansion' },
+    'about.t2_text': { hy: 'Նախագծվեցին և զարգացվեցին ՀՀ սոցիալական պաշտպանության ոլորտում գործող 23 տեղեկատվական համակարգեր։', en: '23 information systems operating in the RA social protection sector were designed and developed.' },
+    'about.t3_title': { hy: 'Նոր հորիզոններ', en: 'New Horizons' },
+    'about.t3_text': { hy: 'Շարունակում ենք նորարարական լուծումների ներդրումը և միջազգային համագործակցության ընդլայնումը։', en: 'We continue the implementation of innovative solutions and expansion of international cooperation.' },
+    'about.t4_title': { hy: 'Այսօր', en: 'Today' },
+    'about.t4_text': { hy: '25+ տարի տեղեկատվական տեխնոլոգիաների ոլորտում, 1 000 000+ ակտիվ շահառու։', en: '25+ years in information technology, 1,000,000+ active beneficiaries.' },
+    'about.val_label': { hy: 'Արժեքներ', en: 'Values' },
+    'about.val_title': { hy: 'Մեր մոտեցումը', en: 'Our Approach' },
+    'about.val1_title': { hy: 'ՍՏԵՂԾԱԳՈՐԾԱԿԱՆ ՄՈՏԵՑՈՒՄ ՅՈՒՐԱՔԱՆՉՅՈՒՐ ՆԱԽԱԳԾԻՆ', en: 'CREATIVE APPROACH TO EACH PROJECT' },
+    'about.val1_text':  { hy: 'Ստեղծագործական մոտեցում յուրաքանչյուր նախագծին', en: 'Creative approach to each project' },
+    'about.val2_title': { hy: 'ՊԱՀԱՆՋՆԵՐԻ ՀՍՏԱԿ ՍԱՀՄԱՆՈՒՄ', en: 'CLEAR DEFINITION OF REQUIREMENTS' },
+    'about.val2_text':  { hy: 'Պահանջների հստակ սահմանում', en: 'Clear definition of requirements' },
+    'about.val3_title': { hy: 'ՃՇԳՐԻՏ ՊԼԱՆԱՎՈՐՈՒՄ ԵՎ ՎԵՐԱՀՍԿՈՂՈՒԹՅՈՒՆ', en: 'ACCURATE PLANNING AND CONTROL' },
+    'about.val3_text':  { hy: 'Ճշգրիտ պլանավորում և վերահսկողություն', en: 'Accurate planning and control' },
+    'about.val4_title': { hy: 'ԱՐԴՅՈՒՆԱՎԵՏ ԿԱՌԱՎԱՐՈՒՄ', en: 'EFFECTIVE MANAGEMENT' },
+    'about.val4_text':  { hy: 'Արդյունավետ կառավարում որակի ապահովման նպատակով', en: 'Effective management ensuring quality' },
+    'about.val5_title': { hy: 'ՀԵՌԱՀԱՐ ԶԱՐԳԱՑՄԱՆ ՏԵՍԼԱԿԱՆ', en: 'VISION OF DISTANCE DEVELOPMENT' },
+    'about.val5_text':  { hy: 'Հեռահար զարգացման տեսլական', en: 'Vision of distance development' },
+    'about.val6_title': { hy: 'ԳՈՐԾԱՌՆԱԿԱՆ ԱՋԱԿՑՈՒԹՅՈՒՆ ԵՎ ԽՈՐՀՐԴԱՏՎՈՒԹՅՈՒՆ', en: 'OPERATION SUPPORT AND CONSULTING' },
+    'about.val6_text':  { hy: 'Գործառնական աջակցություն և խորհրդատվություն', en: 'Operation support and consulting' },
+    'about.num_label': { hy: 'Մեր նվաճումները', en: 'Our Achievements' },
+    'about.num_title': { hy: 'Թվերով', en: 'In Numbers' },
+    'about.num_stat3': { hy: 'Պաշտոնական կայքեր', en: 'Official Websites' },
 
     /* Footer */
     'footer.brand':      { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ', en: 'Welfare Information Systems Enterprise Foundation' },
@@ -113,29 +146,6 @@
     'blog.featured_date': { hy: 'Հուլիս 24, 2024', en: 'July 24, 2024' },
     'blog.featured_title':{ hy: 'Պատրաստ է գործարկման «Աշխատանք առանց սահմանների» որոնման միասնական համակարգ»-ը', en: '"Work Without Borders" Unified Search System Launched' },
     'blog.featured_text': { hy: '«Աշխատանքի էլեկտրոնային բորսա» ծրագրի ֆինանսական աուդիտի հաշվետվությունները', en: 'Financial audit reports of the Electronic Labor Exchange program' },
-
-    /* About page */
-    'about.pagetitle':  { hy: 'Մեր մասին', en: 'About' },
-    'about.breadcrumb': { hy: 'Գլխավոր / Մեր մասին', en: 'Home / About' },
-    'about.exp_label': { hy: '23 տարվա փորձ', en: '23 Years of Experience' },
-    'about.exp_title': { hy: 'Մենք երազում ենք, ստեղծում ենք, կիսվում ենք', en: 'We dream, create, and share' },
-    'about.exp_p1': { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամը Հայաստանում առաջատար տեխնոլոգիական կենտրոն է, որն իրականացնում է պետական և մասնավոր ոլորտի տեղեկատվական և հեռահաղորդակցության տեխնոլոգիաների ենթակառուցվածքների ներդրում և սպասարկում։', en: 'Welfare Information Systems Enterprise Foundation is a leading technological center in Armenia, carrying out implementation and maintenance of IT infrastructure for public and private sectors.' },
-    'about.exp_p2': { hy: 'Մոտ 1,109,493 ակտիվ շահառու ստանում է ծառայություններ ՀՀ սոցիալական պաշտպանության ոլորտում մեր կողմից տրամադրված տեղեկատվական համակարգերի միջոցով։', en: 'Around 1,109,493 active beneficiaries receive social protection services through the information systems provided by us.' },
-    'about.way_label': { hy: 'Պատմություն', en: 'History' },
-    'about.way_title': { hy: 'Մեր ճանապարհը', en: 'Our Journey' },
-    'about.t1_title': { hy: 'Հիմնադրում', en: 'Foundation' },
-    'about.t1_text': { hy: 'ՀՀ կառավարության որոշմամբ ստեղծվեց ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության ենթակայությամբ գործող հիմնադրամը։', en: 'By the decision of the RA Government, a foundation operating under the Ministry of Labor and Social Affairs was established.' },
-    'about.t2_title': { hy: 'Զարգացում և ընդլայնում', en: 'Development & Expansion' },
-    'about.t2_text': { hy: 'Նախագծվեցին և զարգացվեցին ՀՀ սոցիալական պաշտպանության ոլորտում գործող 23 տեղեկատվական համակարգեր։', en: '23 information systems operating in the RA social protection sector were designed and developed.' },
-    'about.t3_title': { hy: 'Նոր հորիզոններ', en: 'New Horizons' },
-    'about.t3_text': { hy: 'Շարունակում ենք նորարարական լուծումների ներդրումը և միջազգային համագործակցության ընդլայնումը։', en: 'We continue the implementation of innovative solutions and expansion of international cooperation.' },
-    'about.t4_title': { hy: 'Այսօր', en: 'Today' },
-    'about.t4_text': { hy: '23+ տարի տեղեկատվական տեխնոլոգիաների ոլորտում, 1 000 000+ ակտիվ շահառու։', en: '23+ years in information technology, 1,000,000+ active beneficiaries.' },
-    'about.val_label': { hy: 'Արժեքներ', en: 'Values' },
-    'about.val_title': { hy: 'Մեր մոտեցումը', en: 'Our Approach' },
-    'about.num_label': { hy: 'Մեր նվաճումները', en: 'Our Achievements' },
-    'about.num_title': { hy: 'Թվերով', en: 'In Numbers' },
-    'about.num_stat3': { hy: 'Պաշտոնական կայքեր', en: 'Official Websites' },
 
     /* Services page */
     'svcpage.pagetitle':  { hy: 'Ծառայություններ', en: 'Services' },
@@ -193,6 +203,28 @@
     'contactpage.subj_ph':    { hy: 'Թեմա', en: 'Subject' },
     'contactpage.msg_ph':     { hy: 'Ձեր հաղորդագրությունը', en: 'Your Message' },
     'contactpage.send_btn':   { hy: 'Ուղարկել', en: 'Send' },
+
+    /* Partner Names */
+    'part.p1': { hy: 'ՀՀ Կառավարություն', en: 'Government of RA' },
+    'part.p2': { hy: 'Ազգային անվտանգության ծառայություն', en: 'National Security Service' },
+    'part.p3': { hy: 'Ասոցիալական հետազոտությունների ինստիտուտ', en: 'National Institute of Labor and Social Research' },
+    'part.p4': { hy: 'ՀՀ Ոստիկանություն', en: 'Police of RA' },
+    'part.p5': { hy: 'Հայփոստ', en: 'Haypost' },
+    'part.p6': { hy: 'Յուքոմ', en: 'Ucom' },
+    'part.p7': { hy: 'UNFPA', en: 'UNFPA' },
+    'part.p8': { hy: 'Հայաստանի Ամերիկյան Համալսարան', en: 'American University of Armenia' },
+    'part.p9': { hy: 'USAID', en: 'USAID' },
+    'part.p10': { hy: 'WFP', en: 'WFP' },
+    'part.p11': { hy: 'UITE', en: 'UITE' },
+    'part.p12': { hy: 'IBM', en: 'IBM' },
+    'part.p13': { hy: 'Microsoft', en: 'Microsoft' },
+    'part.p14': { hy: 'Համաշխարհային Բանկ', en: 'World Bank' },
+    'part.p15': { hy: 'Ամերիաբանկ', en: 'Ameriabank' },
+    'part.p16': { hy: 'Էվոկա բանկ', en: 'Evocabank' },
+    'part.p17': { hy: 'Ակբա բանկ', en: 'Acba Bank' },
+    'part.p18': { hy: 'Կոնվերս բանկ', en: 'Converse Bank' },
+    'part.p19': { hy: 'Յունիբանկ', en: 'Unibank' },
+    'part.p20': { hy: 'Արդշինբանկ', en: 'Ardshinbank' }
   };
 
   /* ══════════════════════════════════════════════════════
