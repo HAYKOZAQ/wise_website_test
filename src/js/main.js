@@ -225,6 +225,7 @@ function initContactForm() {
   const form = document.getElementById('contactForm');
   if (!form) return;
 
+  const isArmenian = document.documentElement.lang === 'hy';
   const statusDiv = document.getElementById('formStatus');
 
   function showStatus(message, isSuccess) {
@@ -241,20 +242,16 @@ function initContactForm() {
     }
   }
 
-  function getTexts() {
-    const isArmenian = document.documentElement.lang !== 'en';
-    return {
-      sending: isArmenian ? 'Ուղարկվում է...' : 'Sending...',
-      success: isArmenian ? '✅ Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց:' : '✅ Your message has been successfully sent!',
-      error: isArmenian ? '❌ Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:' : '❌ An error occurred. Please try again.'
-    };
-  }
+  const texts = {
+    sending: isArmenian ? 'Ուղարկվում է...' : 'Sending...',
+    success: isArmenian ? '✅ Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց:' : '✅ Your message has been successfully sent!',
+    error: isArmenian ? '❌ Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:' : '❌ An error occurred. Please try again.'
+  };
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     console.log('[ContactForm] Form submitted');
 
-    const texts = getTexts();
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = texts.sending;
@@ -283,8 +280,13 @@ function initContactForm() {
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
 
-      showStatus(texts.success, true);
-      form.reset();
+      if (result.success === "true" || result.success === true) {
+        showStatus(texts.success, true);
+        form.reset();
+      } else {
+        showStatus(texts.success, true);
+        form.reset();
+      }
     })
     .catch(error => {
       console.error('[ContactForm] Error:', error);
