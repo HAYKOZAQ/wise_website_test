@@ -21,12 +21,12 @@
         <img src="../assets/logos/wisef-logo.svg" alt="WISE Foundation" style="height: 50px;">
       </a>
       <nav class="nav" role="navigation" aria-label="Հիմնական նավիգացիա">
-        <a href="index.html" class="nav__link">Գլխավոր</a>
-        <a href="about.html" class="nav__link nav__link--active">Մեր մասին</a>
-        <a href="services.html" class="nav__link">Ծառայություններ</a>
-        <a href="partners.html" class="nav__link">Գործընկերներ</a>
-        <a href="contact.html" class="nav__link">Հետադարձ կապ</a>
-        <a href="blog.html" class="nav__link">Բլոգ</a>
+        <a href="index.html" class="nav__link" data-i18n="nav.home">Գլխավոր</a>
+        <a href="about.html" class="nav__link nav__link--active" data-i18n="nav.about">Մեր մասին</a>
+        <a href="services.html" class="nav__link" data-i18n="nav.services">Ծառայություններ</a>
+        <a href="partners.html" class="nav__link" data-i18n="nav.partners">Գործընկերներ</a>
+        <a href="contact.html" class="nav__link" data-i18n="nav.contact">Հետադարձ կապ</a>
+        <a href="blog.html" class="nav__link" data-i18n="nav.blog">Բլոգ</a>
         <button class="nav__lang-btn" aria-label="Switch to English">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
@@ -44,22 +44,22 @@
   </header>
 
   <section class="page-header fade-in">
-    <h1 class="page-header__title">Մեր մասին</h1>
-    <p class="page-header__breadcrumb"><a href="index.html">Գլխավոր</a> / Մեր մասին</p>
+    <h1 class="page-header__title" data-i18n="about.pagetitle">Մեր մասին</h1>
+    <p class="page-header__breadcrumb"><a href="index.html" data-i18n="footer.home">Գլխավոր</a> / <span data-i18n="about.pagetitle">Մեր մասին</span></p>
   </section>
 
   <section class="section">
     <div class="container">
       <div class="grid-2" style="align-items: center; gap: 48px;">
         <div class="fade-in-left">
-          <span class="section__label">23 տարվա փորձ</span>
-          <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: 20px; line-height: 1.3;">
+          <span class="section__label" data-i18n="about.exp_label">23 տարվա փորձ</span>
+          <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: 20px; line-height: 1.3;" data-i18n="about.exp_title">
             Մենք երազում ենք, ստեղծում ենք, կիսվում ենք
           </h2>
-          <p style="color: var(--color-text-light); line-height: 1.8; margin-bottom: 16px;">
+          <p style="color: var(--color-text-light); line-height: 1.8; margin-bottom: 16px;" data-i18n="about.exp_p1">
             «Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամը Հայաստանում առաջատար տեխնոլոգիական կենտրոն է, որն իրականացնում է պետական և մասնավոր ոլորտի տեղեկատվական և հեռահաղորդակցության տեխնոլոգիաների ենթակառուցվածքների ներդրում և սպասարկում:
           </p>
-          <p style="color: var(--color-text-light); line-height: 1.8;">
+          <p style="color: var(--color-text-light); line-height: 1.8;" data-i18n="about.exp_p2">
             Մոտ 1,109,493 ակտիվ շահառու ստանում է ծառայություններ ՀՀ սոցիալական պաշտպանության ոլորտում մեր կողմից տրամադրված տեղեկատվական համակարգերի միջոցով:
           </p>
         </div>
@@ -77,33 +77,33 @@
   <section class="section section--alt">
     <div class="container">
       <div class="section__header fade-in">
-        <span class="section__label">Պատմություն</span>
-        <h2 class="section__title">Մեր ճանապարհը</h2>
+        <span class="section__label" data-i18n="about.way_label">Պատմություն</span>
+        <h2 class="section__title" data-i18n="about.way_title">Մեր ճանապարհը</h2>
       </div>
 
       <div class="timeline fade-in" style="max-width: 700px; margin: 0 auto;">
         <div class="timeline-item glass">
           <div class="timeline-item__year">2001</div>
-          <div class="timeline-item__title">Հիմնադրում</div>
-          <div class="timeline-item__text">ՀՀ կառավարության որոշմամբ ստեղծվեց ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության ենթակայությամբ գործող հիմնադրամը:</div>
+          <div class="timeline-item__title" data-i18n="about.t1_title">Հիմնադրում</div>
+          <div class="timeline-item__text" data-i18n="about.t1_text">ՀՀ կառավարության որոշմամբ ստեղծվեց ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության ենթակայությամբ գործող հիմնադրամը:</div>
         </div>
 
         <div class="timeline-item glass">
           <div class="timeline-item__year">2010-2020</div>
-          <div class="timeline-item__title">Զարգացում և ընդլայնում</div>
-          <div class="timeline-item__text">Նախագծվեցին և զարգացվեցին ՀՀ սոցիալական պաշտպանության ոլորտում գործող 23 տեղեկատվական համակարգեր:</div>
+          <div class="timeline-item__title" data-i18n="about.t2_title">Զարգացում և ընդլայնում</div>
+          <div class="timeline-item__text" data-i18n="about.t2_text">Նախագծվեցին և զարգացվեցին ՀՀ սոցիալական պաշտպանության ոլորտում գործող 23 տեղեկատվական համակարգեր:</div>
         </div>
 
         <div class="timeline-item glass">
           <div class="timeline-item__year">2024</div>
-          <div class="timeline-item__title">Նոր հորիզոններ</div>
-          <div class="timeline-item__text">Շարունակում ենք նորարարական լուծումների ներդրումը և միջազգային համագործակցության ընդլայնումը:</div>
+          <div class="timeline-item__title" data-i18n="about.t3_title">Նոր հորիզոններ</div>
+          <div class="timeline-item__text" data-i18n="about.t3_text">Շարունակում ենք նորարարական լուծումների ներդրումը և միջազգային համագործակցության ընդլայնումը:</div>
         </div>
 
         <div class="timeline-item glass">
           <div class="timeline-item__year">2026</div>
-          <div class="timeline-item__title">Այսօր</div>
-          <div class="timeline-item__text">23+ տարի տեղեկատվական տեխնոլոգիաների ոլորտում, 1 000 000+ ակտիվ շահառու:</div>
+          <div class="timeline-item__title" data-i18n="about.t4_title">Այսօր</div>
+          <div class="timeline-item__text" data-i18n="about.t4_text">23+ տարի տեղեկատվական տեխնոլոգիաների ոլորտում, 1 000 000+ ակտիվ շահառու:</div>
         </div>
       </div>
     </div>
@@ -112,8 +112,8 @@
   <section class="section">
     <div class="container">
       <div class="section__header fade-in">
-        <span class="section__label">Արժեքներ</span>
-        <h2 class="section__title">Մեր մոտեցումը</h2>
+        <span class="section__label" data-i18n="about.val_label">Արժեքներ</span>
+        <h2 class="section__title" data-i18n="about.val_title">Մեր մոտեցումը</h2>
       </div>
 
       <div class="values-grid">
@@ -159,26 +159,26 @@
   <section class="section section--alt">
     <div class="container">
       <div class="section__header fade-in">
-        <span class="section__label">Մեր նվաճումները</span>
-        <h2 class="section__title">Թվերով</h2>
+        <span class="section__label" data-i18n="about.num_label">Մեր նվաճումները</span>
+        <h2 class="section__title" data-i18n="about.num_title">Թվերով</h2>
       </div>
 
       <div class="stats-banner fade-in">
         <div class="glass-stat">
           <div class="glass-stat__value" data-counter="23" data-suffix="">23</div>
-          <div class="glass-stat__label">Տարի տեխնոլոգիաների ոլորտում</div>
+          <div class="glass-stat__label" data-i18n="stats.s1">Տարի տեխնոլոգիաների ոլորտում</div>
         </div>
         <div class="glass-stat">
           <div class="glass-stat__value" data-counter="24" data-suffix="+">0</div>
-          <div class="glass-stat__label">Նախագծված տեղեկատվական համակարգեր</div>
+          <div class="glass-stat__label" data-i18n="stats.s3">Նախագծված տեղեկատվական համակարգեր</div>
         </div>
         <div class="glass-stat">
           <div class="glass-stat__value" data-counter="6" data-suffix="">0</div>
-          <div class="glass-stat__label">Պաշտոնական կայքեր</div>
+          <div class="glass-stat__label" data-i18n="about.num_stat3">Պաշտոնական կայքեր</div>
         </div>
         <div class="glass-stat">
           <div class="glass-stat__value" data-counter="13000" data-suffix="+">0</div>
-          <div class="glass-stat__label">Սպասարկվող սարքավորումներ</div>
+          <div class="glass-stat__label" data-i18n="stats.s4">Սպասարկվող սարքավորումներ</div>
         </div>
       </div>
     </div>
@@ -188,8 +188,8 @@
     <div class="footer__inner">
       <div class="footer__brand">
         <img src="../assets/logos/wisef-logo-white.svg" alt="WISE Foundation" style="height: 32px;">
-        <p>«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ</p>
-                <div class="footer__social">
+        <p data-i18n="footer.brand">«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ</p>
+        <div class="footer__social">
           <a href="https://www.facebook.com/norktechnologycenter/" target="_blank" rel="noopener" aria-label="Facebook">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 8H7v3h2v9h3v-9h3l.5-3H12V6c0-.88.39-1 1-1h2V2h-3c-2.9 0-4 1.55-4 4v2z"/>
@@ -208,25 +208,25 @@
         </div>
       </div>
       <div>
-        <h3 class="footer__heading">Կայք</h3>
+        <h3 class="footer__heading" data-i18n="footer.site">Կայք</h3>
         <div class="footer__links">
-          <a href="index.html">Գլխավոր</a>
-          <a href="about.html">Մեր մասին</a>
-          <a href="services.html">Ծառայություններ</a>
-          <a href="partners.html">Գործընկերներ</a>
-          <a href="blog.html">Բլոգ</a>
+          <a href="index.html" data-i18n="footer.home">Գլխավոր</a>
+          <a href="about.html" data-i18n="footer.about">Մեր մասին</a>
+          <a href="services.html" data-i18n="footer.services">Ծառայություններ</a>
+          <a href="partners.html" data-i18n="footer.partners">Գործընկերներ</a>
+          <a href="blog.html" data-i18n="footer.blog">Բլոգ</a>
         </div>
       </div>
       <div>
-        <h3 class="footer__heading">Կապ</h3>
+        <h3 class="footer__heading" data-i18n="footer.contact">Կապ</h3>
         <div class="footer__links">
-          <a href="contact.html">Հետադարձ կապ</a>
+          <a href="contact.html" data-i18n="footer.contact_us">Հետադարձ կապ</a>
           <a href="mailto:info@wisef.am">info@wisef.am</a>
           <a href="tel:+37411501801">+374 11 50 18 01</a>
         </div>
       </div>
       <div>
-        <h3 class="footer__heading">Հետևեք մեզ</h3>
+        <h3 class="footer__heading" data-i18n="footer.follow">Հետևեք մեզ</h3>
         <div class="footer__links">
           <a href="https://www.facebook.com/norktechnologycenter/" target="_blank" rel="noopener">Facebook</a>
           <a href="https://www.linkedin.com/company/welfare-information-system-enterprise-foundation/" target="_blank" rel="noopener">LinkedIn</a>
@@ -234,7 +234,7 @@
         </div>
       </div>
     </div>
-    <div class="footer__bottom">
+    <div class="footer__bottom" data-i18n="footer.copyright">
       © 2026 Designed by «WISE» foundation
     </div>
   </footer>

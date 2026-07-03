@@ -88,25 +88,84 @@
 }
 
 .nav__lang-btn {
-  display: none;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text);
-  background: var(--color-glass-bg);
-  border: 1px solid var(--color-glass-border);
-  border-radius: var(--radius-sm);
-  backdrop-filter: var(--blur-sm);
-  -webkit-backdrop-filter: var(--blur-sm);
-  transition: all var(--transition-fast);
-  cursor: pointer;
+  display: none; /* hidden — replaced by .lang-toggle via JS */
 }
 
-.nav__lang-btn:hover {
-  background: var(--color-glass-hover);
+/* ── Language Toggle Switch ────────────────────────────── */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background var(--transition-fast);
+  flex-shrink: 0;
+  outline: none;
 }
+
+.lang-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.lang-toggle__hy,
+.lang-toggle__en {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-text-light);
+  transition: color var(--transition-fast);
+  line-height: 1;
+  user-select: none;
+}
+
+/* Active side is highlighted */
+.lang-toggle:not(.lang-toggle--en) .lang-toggle__hy,
+.lang-toggle.lang-toggle--en .lang-toggle__en {
+  color: var(--color-accent);
+}
+
+.lang-toggle__track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--color-glass-bg);
+  border: 1.5px solid var(--color-glass-border);
+  border-radius: 999px;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.lang-toggle.lang-toggle--en .lang-toggle__track {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.lang-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.lang-toggle.lang-toggle--en .lang-toggle__thumb {
+  transform: translateX(16px);
+  background: white;
+}
+
+.lang-toggle:hover .lang-toggle__track {
+  border-color: var(--color-accent);
+}
+
+
 
 .mobile-toggle {
   display: none;
@@ -1002,6 +1061,21 @@
 
   .mobile-toggle {
     display: flex;
+  }
+
+  .lang-toggle {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 18px;
+    gap: 12px;
+    margin-top: 4px;
+    background: var(--color-glass-bg);
+    border-radius: var(--radius-sm);
+  }
+
+  .lang-toggle__hy,
+  .lang-toggle__en {
+    font-size: 0.875rem;
   }
 
   .grid-2, .grid-3, .grid-4 {

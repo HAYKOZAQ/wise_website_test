@@ -22,12 +22,12 @@
         <img src="../assets/logos/wisef-logo.svg" alt="WISE Foundation" style="height: 50px;">
       </a>
       <nav class="nav" role="navigation">
-        <a href="index.html" class="nav__link">Գլխավոր</a>
-        <a href="about.html" class="nav__link">Մեր մասին</a>
-        <a href="services.html" class="nav__link">Ծառայություններ</a>
-        <a href="partners.html" class="nav__link">Գործընկերներ</a>
-        <a href="contact.html" class="nav__link nav__link--active">Հետադարձ կապ</a>
-        <a href="blog.html" class="nav__link">Բլոգ</a>
+        <a href="index.html" class="nav__link" data-i18n="nav.home">Գլխավոր</a>
+        <a href="about.html" class="nav__link" data-i18n="nav.about">Մեր մասին</a>
+        <a href="services.html" class="nav__link" data-i18n="nav.services">Ծառայություններ</a>
+        <a href="partners.html" class="nav__link" data-i18n="nav.partners">Գործընկերներ</a>
+        <a href="contact.html" class="nav__link nav__link--active" data-i18n="nav.contact">Հետադարձ կապ</a>
+        <a href="blog.html" class="nav__link" data-i18n="nav.blog">Բլոգ</a>
         <button class="nav__lang-btn" aria-label="Switch to English">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
@@ -46,11 +46,11 @@
 
   <section class="hero hero--small glass-hero" style="--glass-x: 50%; --glass-y: 50%;">
     <div class="hero__content">
-      <div class="hero__badge fade-in">Կապ</div>
-      <h1 class="hero__title fade-in delay-1">
+      <div class="hero__badge fade-in" data-i18n="contact.badge">Կապ</div>
+      <h1 class="hero__title fade-in delay-1" data-i18n="contact.hero_title">
         Ստեղծենք միասին
       </h1>
-      <p class="hero__text fade-in delay-2">
+      <p class="hero__text fade-in delay-2" data-i18n="contact.hero_text">
         Պատրաստ ենք լսել Ձեր գաղափարները և առաջարկությունները
       </p>
     </div>
@@ -61,14 +61,14 @@
       <div class="contact-grid">
         <div class="fade-in-left">
           <div class="section__header" style="text-align: left; margin-bottom: 32px;">
-            <span class="section__label">Կապնվել</span>
-            <h2 class="section__title" style="font-size: 1.75rem;">Կապնվեք մեզ հետ</h2>
+            <span class="section__label" data-i18n="contact.label">Կապնվել</span>
+            <h2 class="section__title" style="font-size: 1.75rem;" data-i18n="contact.title">Կապնվեք մեզ հետ</h2>
           </div>
 
           <div class="contact-info__item glass">
             <div class="contact-info__icon">📧</div>
             <div>
-              <div style="font-size: 0.875rem; color: var(--color-text-light);">Էլ. փոստ</div>
+              <div style="font-size: 0.875rem; color: var(--color-text-light);" data-i18n="contactprev.email">Էլ. փոստ</div>
               <a href="mailto:info@wisef.am" style="font-weight: 600; font-size: 1.125rem; display: block;">info@wisef.am</a>
               <a href="mailto:hayko16140@gmail.com" style="font-weight: 600; font-size: 1.125rem; display: block; margin-top: 4px;">hayko16140@gmail.com</a>
             </div>
@@ -77,7 +77,7 @@
           <div class="contact-info__item glass">
             <div class="contact-info__icon">📞</div>
             <div>
-              <div style="font-size: 0.875rem; color: var(--color-text-light);">Հեռախոս</div>
+              <div style="font-size: 0.875rem; color: var(--color-text-light);" data-i18n="contactprev.phone">Հեռախոս</div>
               <a href="tel:+37411501801" style="font-weight: 600; font-size: 1.125rem;">+374 11 50 18 01</a>
             </div>
           </div>
@@ -85,14 +85,14 @@
           <div class="contact-info__item glass">
             <div class="contact-info__icon">📍</div>
             <div>
-              <div style="font-size: 0.875rem; color: var(--color-text-light);">Հասցե</div>
-              <div style="font-size: 1rem;">Երևան, Հայաստան</div>
+              <div style="font-size: 0.875rem; color: var(--color-text-light);" data-i18n="contact.address">Հասցե</div>
+              <div style="font-size: 1rem;" data-i18n="contact.address_val">Երևան, Հայաստան</div>
             </div>
           </div>
 
           <div style="margin-top: 24px;">
-            <h3 style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-text-light); margin-bottom: 12px;">Հետևեք մեզ</h3>
-            <div style="display: flex; gap: 12px;">
+            <h3 style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-text-light); margin-bottom: 12px;" data-i18n="footer.follow">Հետևեք մեզ</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
               <a href="https://www.facebook.com/norktechnologycenter/" target="_blank" rel="noopener" class="glass-btn" style="padding: 12px 20px; font-size: 0.875rem; display: inline-flex; align-items: center;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
                   <path d="M9 8H7v3h2v9h3v-9h3l.5-3H12V6c0-.88.39-1 1-1h2V2h-3c-2.9 0-4 1.55-4 4v2z"/>
@@ -116,14 +116,14 @@
         </div>
 
         <div class="glass contact-form fade-in-right">
-          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Գրել նամակ</h3>
-          <p style="font-size: 0.9375rem; color: var(--color-text-light); margin-bottom: 8px;">Լրացրեք ձևը և մենք կպատասխանենք առաջիկա օրերին</p>
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;" data-i18n="contactpage.form_title">Գրել նամակ</h3>
+          <p style="font-size: 0.9375rem; color: var(--color-text-light); margin-bottom: 8px;" data-i18n="contactpage.form_sub">Լրացրեք ձևը և մենք կպատասխանենք առաջիկա օրերին</p>
           <form id="contactForm">
-            <input type="text" name="name" class="glass-input" placeholder="Ձեր անունը" required>
-            <input type="email" name="email" class="glass-input" placeholder="Ձեր էլ. փոստը" required>
-            <input type="text" name="subject" class="glass-input" placeholder="Թեմա">
-            <textarea name="message" class="glass-input" placeholder="Ձեր հաղորդագրությունը" required></textarea>
-            <button type="submit" class="glass-btn glass-btn--primary" style="width: 100%;">Ուղարկել</button>
+            <input type="text" name="name" class="glass-input" placeholder="Ձեր անունը" data-i18n="contactpage.name_ph" data-i18n-attr="placeholder" required>
+            <input type="email" name="email" class="glass-input" placeholder="Ձեր էլ. փոստը" data-i18n="contactpage.email_ph" data-i18n-attr="placeholder" required>
+            <input type="text" name="subject" class="glass-input" placeholder="Թեմա" data-i18n="contactpage.subj_ph" data-i18n-attr="placeholder">
+            <textarea name="message" class="glass-input" placeholder="Ձեր հաղորդագրությունը" data-i18n="contactpage.msg_ph" data-i18n-attr="placeholder" required></textarea>
+            <button type="submit" class="glass-btn glass-btn--primary" style="width: 100%;" data-i18n="contactpage.send_btn">Ուղարկել</button>
             <div id="formStatus" style="margin-top: 12px; padding: 12px 16px; border-radius: 8px; display: none; font-size: 0.9375rem; font-weight: 500;"></div>
           </form>
         </div>
@@ -135,45 +135,39 @@
     <div class="footer__inner">
       <div class="footer__brand">
         <img src="../assets/logos/wisef-logo-white.svg" alt="WISE Foundation" style="height: 32px;">
-        <p>«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ</p>
-                <div class="footer__social">
+        <p data-i18n="footer.brand">«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ</p>
+        <div class="footer__social">
           <a href="https://www.facebook.com/norktechnologycenter/" target="_blank" rel="noopener" aria-label="Facebook">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 8H7v3h2v9h3v-9h3l.5-3H12V6c0-.88.39-1 1-1h2V2h-3c-2.9 0-4 1.55-4 4v2z"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8H7v3h2v9h3v-9h3l.5-3H12V6c0-.88.39-1 1-1h2V2h-3c-2.9 0-4 1.55-4 4v2z"/></svg>
           </a>
           <a href="https://www.linkedin.com/company/welfare-information-system-enterprise-foundation/" target="_blank" rel="noopener" aria-label="LinkedIn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.79 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.79 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
           </a>
           <a href="https://instagram.com/nork.technologycenter" target="_blank" rel="noopener" aria-label="Instagram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
           </a>
         </div>
       </div>
       <div>
-        <h3 class="footer__heading">Կայք</h3>
+        <h3 class="footer__heading" data-i18n="footer.site">Կայք</h3>
         <div class="footer__links">
-          <a href="index.html">Գլխավոր</a>
-          <a href="about.html">Մեր մասին</a>
-          <a href="services.html">Ծառայություններ</a>
-          <a href="partners.html">Գործընկերներ</a>
-          <a href="blog.html">Բլոգ</a>
+          <a href="index.html" data-i18n="footer.home">Գլխավոր</a>
+          <a href="about.html" data-i18n="footer.about">Մեր մասին</a>
+          <a href="services.html" data-i18n="footer.services">Ծառայություններ</a>
+          <a href="partners.html" data-i18n="footer.partners">Գործընկերներ</a>
+          <a href="blog.html" data-i18n="footer.blog">Բլոգ</a>
         </div>
       </div>
       <div>
-        <h3 class="footer__heading">Կապ</h3>
+        <h3 class="footer__heading" data-i18n="footer.contact">Կապ</h3>
         <div class="footer__links">
-          <a href="contact.html">Հետադարձ կապ</a>
+          <a href="contact.html" data-i18n="footer.contact_us">Հետադարձ կապ</a>
           <a href="mailto:info@wisef.am">info@wisef.am</a>
           <a href="tel:+37411501801">+374 11 50 18 01</a>
         </div>
       </div>
       <div>
-        <h3 class="footer__heading">Հետևեք մեզ</h3>
+        <h3 class="footer__heading" data-i18n="footer.follow">Հետևեք մեզ</h3>
         <div class="footer__links">
           <a href="https://www.facebook.com/norktechnologycenter/" target="_blank" rel="noopener">Facebook</a>
           <a href="https://www.linkedin.com/company/welfare-information-system-enterprise-foundation/" target="_blank" rel="noopener">LinkedIn</a>
@@ -181,7 +175,7 @@
         </div>
       </div>
     </div>
-    <div class="footer__bottom">
+    <div class="footer__bottom" data-i18n="footer.copyright">
       © 2026 Designed by «WISE» foundation
     </div>
   </footer>
