@@ -15,7 +15,7 @@
   --color-overlay: rgba(24, 57, 96, 0.6);
 
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-armenian: 'GHEA Grapalat', 'Noto Sans Armenian', var(--font-primary);
+  --font-armenian: 'Noto Sans Armenian', 'GHEA Grapalat', var(--font-primary);
 
   --radius-sm: 12px;
   --radius-md: 16px;
