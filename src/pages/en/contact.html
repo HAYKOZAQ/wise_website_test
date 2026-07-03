@@ -113,11 +113,11 @@
         <div class="glass contact-form fade-in-right">
           <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Send a Message</h3>
           <p style="font-size: 0.9375rem; color: var(--color-text-light); margin-bottom: 8px;">Fill out the form and we will get back to you soon</p>
-          <form action="mailto:hayko16140@gmail.com" method="POST" enctype="text/plain">
-            <input type="text" class="glass-input" placeholder="Your name" required>
-            <input type="email" class="glass-input" placeholder="Your email" required>
-            <input type="text" class="glass-input" placeholder="Subject">
-            <textarea class="glass-input" placeholder="Your message" required></textarea>
+          <form action="mailto:hayko16140@gmail.com" method="POST" enctype="text/plain" id="contactForm">
+            <input type="text" name="name" class="glass-input" placeholder="Your name" required>
+            <input type="email" name="email" class="glass-input" placeholder="Your email" required>
+            <input type="text" name="subject" class="glass-input" placeholder="Subject">
+            <textarea name="message" class="glass-input" placeholder="Your message" required></textarea>
             <button type="submit" class="glass-btn glass-btn--primary" style="width: 100%;">Send</button>
           </form>
         </div>

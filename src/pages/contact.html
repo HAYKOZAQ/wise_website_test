@@ -118,11 +118,11 @@
         <div class="glass contact-form fade-in-right">
           <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Գրել նամակ</h3>
           <p style="font-size: 0.9375rem; color: var(--color-text-light); margin-bottom: 8px;">Լրացրեք ձևը և մենք կպատասխանենք առաջիկա օրերին</p>
-          <form action="mailto:hayko16140@gmail.com" method="POST" enctype="text/plain">
-            <input type="text" class="glass-input" placeholder="Ձեր անունը" required>
-            <input type="email" class="glass-input" placeholder="Ձեր էլ. փոստը" required>
-            <input type="text" class="glass-input" placeholder="Թեմա">
-            <textarea class="glass-input" placeholder="Ձեր հաղորդագրությունը" required></textarea>
+          <form action="mailto:hayko16140@gmail.com" method="POST" enctype="text/plain" id="contactForm">
+            <input type="text" name="name" class="glass-input" placeholder="Ձեր անունը" required>
+            <input type="email" name="email" class="glass-input" placeholder="Ձեր էլ. փոստը" required>
+            <input type="text" name="subject" class="glass-input" placeholder="Թեմա">
+            <textarea name="message" class="glass-input" placeholder="Ձեր հաղորդագրությունը" required></textarea>
             <button type="submit" class="glass-btn glass-btn--primary" style="width: 100%;">Ուղարկել</button>
           </form>
         </div>

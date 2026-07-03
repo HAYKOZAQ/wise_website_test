@@ -221,6 +221,56 @@ function initBlogPagination() {
   showPage('1');
 }
 
+function initContactForm() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+
+  const isArmenian = document.documentElement.lang === 'hy';
+
+  const texts = {
+    sending: isArmenian ? 'Ուղարկվում է...' : 'Sending...',
+    success: isArmenian ? 'Հաղորդագրությունը հաջողությամբ ուղարկվեց:' : 'Your message has been successfully sent!',
+    error: isArmenian ? 'Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:' : 'An error occurred. Please try again.'
+  };
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = texts.sending;
+    submitBtn.disabled = true;
+
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch("https://formsubmit.co/ajax/hayko16140@gmail.com", {
+      method: "POST",
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      if (result.success === "true" || result.success === true) {
+        alert(texts.success);
+        form.reset();
+      } else {
+        alert(texts.error);
+      }
+    })
+    .catch(error => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      alert(texts.error);
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initHeaderScroll();
@@ -230,4 +280,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initPageTransitions();
   initBlogModal();
   initBlogPagination();
+  initContactForm();
 });
