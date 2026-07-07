@@ -224,7 +224,20 @@
     'part.p17': { hy: 'Ակբա բանկ', en: 'Acba Bank' },
     'part.p18': { hy: 'Կոնվերս բանկ', en: 'Converse Bank' },
     'part.p19': { hy: 'Յունիբանկ', en: 'Unibank' },
-    'part.p20': { hy: 'Արդշինբանկ', en: 'Ardshinbank' }
+    'part.p20': { hy: 'Արդշինբանկ', en: 'Ardshinbank' },
+    
+    /* Chat Assistant translations */
+    'chat.title':          { hy: 'WISE AI Օգնական (Gemma 2)', en: 'WISE AI Assistant (Gemma 2)' },
+    'chat.placeholder':    { hy: 'Հարցրեք MLSA սոցիալական ծրագրերի մասին...', en: 'Ask about MLSA social programs...' },
+    'chat.welcome':        { hy: 'Ողջույն! Ես WISE AI օգնականն եմ: Կարող եմ տրամադրել տեղեկատվություն ՀՀ սոցիալական ապահովության և նպաստների ծրագրերի մասին:', en: 'Hello! I am the WISE AI Assistant. I can provide information about social welfare and benefit programs of MLSA.' },
+    'chat.err_offline':    { hy: 'Կապի սխալ: Խնդրում ենք համոզվել, որ RAG սերվերը միացված է:', en: 'Connection error: Please ensure the RAG server is running.' },
+    'chat.status_active':  { hy: 'Ակտիվ (Vector)', en: 'Active (Vector)' },
+    'chat.status_keyword': { hy: 'Ակտիվ (Keyword)', en: 'Active (Keyword)' },
+    'chat.status_offline': { hy: 'Անցանց', en: 'Offline' },
+    'chat.suggest1':       { hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
+    'chat.suggest2':       { hy: 'Ծննդյան միանվագ նպաստ', en: 'One-time childbirth benefit' },
+    'chat.suggest3':       { hy: 'Ընտանեկան նպաստներ', en: 'Family vulnerability benefits' },
+    'chat.suggest4':       { hy: 'Տարիքային կենսաթոշակ', en: 'State pension eligibility' }
   };
 
   /* ══════════════════════════════════════════════════════
