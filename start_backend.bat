@@ -31,6 +31,13 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/3] Starting FastAPI Uvicorn Server on http://127.0.0.1:8000...
 echo.
+
+:: Automatically release port 8000 if occupied by another instance
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr /r /c:":8000 *[^ ]* *[^ ]* *LISTENING"') do (
+    echo [INFO] Terminating process %%a holding port 8000 to prevent socket binding error...
+    taskkill /f /pid %%a >nul 2>&1
+)
+
 echo ========================================================
 echo NOTE: Ensure Ollama is running locally with 'gemma2' loaded!
 echo Command to run in terminal: ollama run gemma2
