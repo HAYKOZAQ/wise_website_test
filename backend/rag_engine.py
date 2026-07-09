@@ -510,66 +510,113 @@ class RAGEngine:
 
     def _prompt(self, query: str, context_str: str, user_lang: str) -> str:
         if user_lang == "en":
-            return f"""You are the official WISE / MLSA citizen assistant for social programs in Armenia.
-Answer ONLY using the provided context (citizen program summaries and official ARLIS legal excerpts).
-Be warm, clear, and practical — not legalese-only. Never invent amounts, eligibility rules, or procedures.
-Prefer concrete numbers, document lists, and steps when they appear in the context.
-If something is missing from the context, say so and suggest contacting Unified Social Service (hotline 114) or e-soc.am.
-Do not invent ARLIS article numbers.
+            return f"""You are a careful citizen guide for Armenia's social protection programs (MLSA / Unified Social Service).
 
-Structure your answer with markdown headings when relevant:
+GOAL: Give a COMPLETE, practical explanation so a person understands how the program works end-to-end.
+
+RULES:
+1) Use ONLY the CONTEXT below. Never invent amounts, ages, documents, deadlines, or article numbers.
+2) If a detail is missing in CONTEXT, write clearly: "This is not specified in the available materials" and suggest hotline 114 / e-soc.am / USS office.
+3) Write FULL sentences. Never cut off mid-word or mid-list. Finish every section.
+4) Prefer concrete numbers and lists FROM the context.
+5) Explain the logic: who → what benefit → how much → how it works → how to apply.
+
+Required markdown structure (fill every section; if unknown, say so):
 ## Short answer
+(2–4 sentences: what the program is and who it is for)
+
+## How the program works
+(Explain the mechanism / process in plain language)
+
 ## Who is eligible
+(Bullet criteria)
+
 ## Amount / calculation
+(All amounts or formula found in context)
+
 ## Required documents
+(Bullet list)
+
 ## How / where to apply
+(e-soc.am, USS centers, hotline 114 when relevant)
+
 ## Deadlines
+(If any)
+
+## Important notes
+(Exceptions, border villages, working vs non-working, etc. if in context)
+
 ## Sources
-(Skip sections that are not applicable. Keep language simple. Use short bullet lists.)
+(Titles from context only)
 
-Context:
+CONTEXT:
 {context_str}
 
-Citizen question:
+CITIZEN QUESTION:
 {query}
 
-Answer in clear English:"""
+Write a complete answer in clear English:"""
 
-        return f"""Դուք WISE / ՀՀ ԱՍՀՆ քաղաքացիական AI օգնականն եք սոցիալական ծրագրերի վերաբերյալ։
-Պատասխանեք ՄԻԱՅՆ տրամադրված համատեքստից (քաղաքացիական ամփոփումներ և ARLIS պաշտոնական իրավական հատվածներ)։
-Լինեք ջերմ, պարզ և գործնական — խուսափեք չոր իրավաբանական լեզվից։ Երբեք մի հորինեք գումարներ, չափորոշիչներ կամ ընթացակարգեր։
-Եթե համատեքստում կան կոնկրետ թվեր, փաստաթղթերի ցանկեր կամ քայլեր — ներառեք դրանք։
-Եթե տեղեկատվությունը բավարար չէ, ասեք դա և առաջարկեք դիմել Միասնական սոցիալական ծառայություն (թեժ գիծ 114) կամ e-soc.am։
-Մի հորինեք հոդվածների համարներ։
+        return f"""Դուք Հայաստանի սոցիալական պաշտպանության ծրագրերի (ԱՍՀՆ / Միասնական սոցիալական ծառայություն) քաղաքացիական ուղեցույցն եք։
 
-Պատասխանը կառուցեք markdown վերնագրերով (բաց թողեք անկիրառելի բաժինները)՝
+ՆՊԱՏԱԿ. տվեք ԱՄԲՈՂՋԱԿԱՆ, գործնական բացատրություն, որպեսզի մարդը հասկանա՝ ինչպես է ծրագիրն աշխատում սկզբից մինչև վերջ։
+
+ԿԱՆՈՆՆԵՐ.
+1) Օգտագործեք ՄԻԱՅՆ ստորև տրված ՀԱՄԱՏԵՔՍՏԸ։ Երբեք մի հորինեք գումարներ, տարիք, փաստաթղթեր, ժամկետներ կամ հոդվածների համարներ։
+2) Եթե որևէ մանրամասն չկա համատեքստում, գրեք հստակ՝ «Առկա նյութերում սա նշված չէ» և առաջարկեք թեժ գիծ 114 / e-soc.am / ՄՍԾ տարածքային կենտրոն։
+3) Գրեք ԼՐԻՎ նախադասություններ։ Երբեք մի կտրեք բառի կամ ցուցակի կեսից։ Ավարտեք յուրաքանչյուր բաժին։
+4) Նախընտրեք համատեքստի կոնկրետ թվերն ու ցուցակները։
+5) Բացատրեք տրամաբանությունը՝ ով → ինչ նպաստ → որքան → ինչպես է աշխատում → ինչպես դիմել։
+
+Պարտադիր markdown կառուցվածք (լրացրեք բոլոր բաժինները. եթե անհայտ է՝ ասեք).
 ## Կարճ պատասխան
-## Ով ունի իրավունք
-## Չափ / հաշվարկ
-## Անհրաժեշտ փաստաթղթեր
-## Ինչպես և որտեղ դիմել
-## Ժամկետներ
-## Աղբյուրներ
-(Օգտագործեք կարճ ցուցակներ։)
+(2–4 նախադասություն՝ ինչ է ծրագիրը և ում համար է)
 
-Համատեքստ.
+## Ինչպես է աշխատում ծրագիրը
+(Պարզ լեզվով մեխանիզմը / ընթացակարգը)
+
+## Ով ունի իրավունք
+(Չափորոշիչների ցուցակ)
+
+## Չափ / հաշվարկ
+(Բոլոր գումարները կամ բանաձևը համատեքստից)
+
+## Անհրաժեշտ փաստաթղթեր
+(Ցուցակ)
+
+## Ինչպես և որտեղ դիմել
+(e-soc.am, ՄՍԾ կենտրոններ, թեժ գիծ 114)
+
+## Ժամկետներ
+(Եթե կան)
+
+## Կարևոր նշումներ
+(Բացառություններ, սահմանամերձ, աշխատող/չաշխատող և այլն՝ եթե կա համատեքստում)
+
+## Աղբյուրներ
+(Միայն համատեքստի վերնագրերը)
+
+ՀԱՄԱՏԵՔՍՏ.
 {context_str}
 
-Քաղաքացու հարց.
+ՔԱՂԱՔԱՑՈՒ ՀԱՐՑ.
 {query}
 
-Պատասխանը պարզ հայերենով՝"""
+Գրեք ամբողջական պատասխանը պարզ հայերենով՝"""
 
-    def _parse_gemini_answer(self, data: dict) -> str:
+    def _parse_gemini_answer(self, data: dict) -> tuple[str, str]:
+        """Returns (answer_text, finish_reason)."""
         candidates = data.get("candidates") or []
         if not candidates:
-            return ""
-        parts = candidates[0].get("content", {}).get("parts", [])
+            return "", "NO_CANDIDATES"
+        c0 = candidates[0]
+        finish = str(c0.get("finishReason") or c0.get("finish_reason") or "")
+        parts = c0.get("content", {}).get("parts", [])
         answer = ""
         for part in parts:
             if not part.get("thought", False):
                 answer += part.get("text", "")
-        return answer.strip()
+        return answer.strip(), finish
 
     def _generate_with_gemini(self, system_prompt: str) -> str:
         """Try multiple Gemini models with light retries on 5xx/timeouts."""
@@ -578,8 +625,10 @@ Answer in clear English:"""
         payload = {
             "contents": [{"parts": [{"text": system_prompt}]}],
             "generationConfig": {
-                "temperature": 0.2,
-                "maxOutputTokens": 2048,
+                "temperature": 0.15,
+                "maxOutputTokens": 8192,
+                # gemini-2.5* may spend tokens on hidden "thinking" and hit MAX_TOKENS early
+                "thinkingConfig": {"thinkingBudget": 0},
             },
         }
         for model in GEMINI_GENERATE_MODELS:
@@ -590,13 +639,14 @@ Answer in clear English:"""
                         f"https://generativelanguage.googleapis.com/v1beta/models/"
                         f"{model}:generateContent?key={GEMINI_API_KEY}"
                     )
-                    r = requests.post(url, json=payload, timeout=75)
+                    r = requests.post(url, json=payload, timeout=90)
                     if r.status_code == 200:
-                        answer = self._parse_gemini_answer(r.json())
+                        answer, finish = self._parse_gemini_answer(r.json())
                         if answer:
-                            print(f"Gemini OK via {model}")
+                            print(f"Gemini OK via {model} finish={finish} len={len(answer)}")
+                            # Treat MAX_TOKENS as usable but caller may enrich
                             return answer
-                        print(f"Gemini {model}: empty candidates")
+                        print(f"Gemini {model}: empty candidates finish={finish}")
                     elif r.status_code in (429, 500, 502, 503, 504):
                         print(f"Gemini {model} status {r.status_code}; retrying…")
                         continue
@@ -629,7 +679,13 @@ Answer in clear English:"""
         return ""
 
     def generate_response(self, query: str, user_lang: str = "hy") -> dict[str, Any]:
-        relevant = self.retrieve(query, top_n=8)
+        from fidelity import (
+            evaluate_grounding,
+            is_answer_incomplete,
+            log_qa_event,
+        )
+
+        relevant = self.retrieve(query, top_n=12)
         context_parts = []
         for c in relevant:
             src = c.get("source_url") or ""
@@ -639,114 +695,175 @@ Answer in clear English:"""
                 header += f" | {art}"
             if src:
                 header += f" | {src}"
-            context_parts.append(f"{header}\n{c['text']}")
+            # Give model more room per chunk for complete answers
+            text = c.get("text") or ""
+            if len(text) > 2500:
+                text = text[:2500] + "…"
+            context_parts.append(f"{header}\n{text}")
         context_str = "\n\n---\n\n".join(context_parts) if context_parts else "(no context)"
 
         system_prompt = self._prompt(query, context_str, user_lang)
         sources = self._build_sources(relevant)
         follow_ups = self._follow_ups(query, user_lang, relevant)
 
-        # Gemini multi-model generation with retries
+        answer = ""
+        mode = "none"
+
         if self.use_gemini:
             answer = self._generate_with_gemini(system_prompt)
             if answer:
-                return {
-                    "answer": answer,
-                    "sources": sources,
-                    "vector_search": self.vector_enabled,
-                    "follow_ups": follow_ups,
-                }
+                mode = "gemini"
+                # Retry once if truncated / incomplete
+                if is_answer_incomplete(answer):
+                    print("Answer looks incomplete — regenerating with stricter finish instruction…")
+                    retry_prompt = system_prompt + (
+                        "\n\nIMPORTANT: Your previous draft was incomplete. "
+                        "Rewrite the FULL answer. Complete every section. Do not stop mid-sentence."
+                        if user_lang == "en"
+                        else "\n\nԿԱՐևՈՐ. Նախորդ տարբերակը կիսատ էր։ Վերագրեք ԱՄԲՈՂՋԱԿԱՆ պատասխանը։ Ավարտեք բոլոր բաժինները։ Մի կանգնեք նախադասության կեսից։"
+                    )
+                    retry = self._generate_with_gemini(retry_prompt)
+                    if retry and len(retry) > len(answer):
+                        answer = retry
 
-        # Ollama fallback
-        answer = self._generate_with_ollama(system_prompt)
-        if answer:
-            return {
-                "answer": answer,
-                "sources": sources,
-                "vector_search": self.vector_enabled,
-                "follow_ups": follow_ups,
-            }
+        if not answer:
+            answer = self._generate_with_ollama(system_prompt)
+            if answer:
+                mode = "ollama"
 
-        # Extractive fallback from retrieved corpus (works offline without LLM)
-        if relevant:
+        if not answer and relevant:
             answer = self._extractive_answer(query, relevant, user_lang)
-            return {
-                "answer": answer,
-                "sources": sources,
-                "vector_search": self.vector_enabled,
-                "follow_ups": follow_ups,
-            }
+            mode = "extractive"
 
-        if user_lang == "en":
-            return {
-                "answer": (
+        if not answer:
+            if user_lang == "en":
+                answer = (
                     "Sorry, no matching program information was found. "
                     "Please call Unified Social Service hotline 114 or visit e-soc.am."
-                ),
-                "sources": sources,
-                "vector_search": False,
-                "follow_ups": follow_ups,
-            }
+                )
+            else:
+                answer = (
+                    "Ցավոք, համապատասխան տեղեկատվություն չի գտնվել։ "
+                    "Խնդրում ենք զանգահարել ՄՍԾ թեժ գիծ 114 կամ այցելել e-soc.am։"
+                )
+            mode = "empty"
+
+        # If generative answer is thin/truncated, replace or heavily enrich from corpus
+        if mode in ("gemini", "ollama") and is_answer_incomplete(answer) and relevant:
+            extract = self._extractive_answer(query, relevant, user_lang)
+            # Prefer full extractive guide when model cut off badly
+            if len(answer) < 400:
+                answer = extract
+                mode = mode + "→extractive"
+            else:
+                if user_lang == "en":
+                    answer = (
+                        answer.rstrip()
+                        + "\n\n---\n\n## Full details from official materials\n\n"
+                        + extract
+                    )
+                else:
+                    answer = (
+                        answer.rstrip()
+                        + "\n\n---\n\n## Ամբողջական մանրամասներ պաշտոնական նյութերից\n\n"
+                        + extract
+                    )
+                mode = mode + "+extractive"
+
+        fidelity = evaluate_grounding(answer, context_str)
+        try:
+            log_qa_event({
+                "query": query,
+                "lang": user_lang,
+                "mode": mode,
+                "answer_preview": answer[:400],
+                "answer_len": len(answer),
+                "sources": [s.get("title") for s in sources[:6]],
+                "chunks_used": len(relevant),
+                "vector_search": self.vector_enabled,
+                **fidelity,
+            })
+        except Exception as e:
+            print(f"QA log error: {e}")
+
         return {
-            "answer": (
-                "Ցավոք, համապատասխան տեղեկատվություն չի գտնվել։ "
-                "Խնդրում ենք զանգահարել ՄՍԾ թեժ գիծ 114 կամ այցելել e-soc.am։"
-            ),
+            "answer": answer,
             "sources": sources,
-            "vector_search": False,
+            "vector_search": self.vector_enabled,
             "follow_ups": follow_ups,
+            "fidelity": fidelity,
+            "generation_mode": mode,
         }
 
     def _extractive_answer(
         self, query: str, chunks: list[dict[str, Any]], user_lang: str
     ) -> str:
-        """Plain structured answer from top chunks when LLM is offline."""
-        primary = chunks[0]
-        body = (primary.get("text") or "")[:1200]
-        # Drop label prefixes for readability
-        body = re.sub(r"^(Ծրագիր|Ակտ|Նկարագրություն)՝\s*", "", body, flags=re.M)
-        more_titles = []
-        for c in chunks[1:4]:
-            t = c.get("title")
-            if t and t not in more_titles:
-                more_titles.append(t)
+        """Rich structured answer from top chunks when LLM is offline/weak."""
+        # Prefer summary docs first for readability, then legal
+        summaries = [c for c in chunks if c.get("doc_type") == "summary"]
+        legals = [c for c in chunks if c.get("doc_type") == "legal"]
+        ordered = (summaries + legals) or chunks
+
+        def clean(t: str) -> str:
+            t = re.sub(r"^(Ծրագիր|Ակտ|Նկարագրություն)՝\s*", "", t or "", flags=re.M)
+            return t.strip()
+
+        primary = clean(ordered[0].get("text") or "")[:2200]
+        extra_blocks = []
+        for c in ordered[1:5]:
+            block = clean(c.get("text") or "")[:900]
+            if block:
+                title = c.get("title") or "Source"
+                extra_blocks.append(f"**{title}**\n{block}")
 
         if user_lang == "en":
             parts = [
                 "## Short answer",
-                f"Based on official program materials related to your question **«{query}»**:",
+                f"Here is what official materials say about **«{query}»**:",
                 "",
-                body.strip(),
-            ]
-            if more_titles:
-                parts += ["", "## Related sources", *[f"- {t}" for t in more_titles]]
-            parts += [
+                primary,
+                "",
+                "## How the program works",
+                "See the rules and steps in the materials above. Details may depend on your exact situation.",
                 "",
                 "## How / where to apply",
-                "- Online: e-soc.am",
-                "- In person: Unified Social Service territorial centers",
+                "- Online: **e-soc.am**",
+                "- In person: Unified Social Service (USS) territorial center",
                 "- Hotline: **114**",
+            ]
+            if extra_blocks:
+                parts += ["", "## Additional official excerpts", ""] + [
+                    b + "\n" for b in extra_blocks
+                ]
+            parts += [
                 "",
-                "_Note: generative AI is offline; this is an extract from the local legal/program index._",
+                "## Sources",
+                *[f"- {c.get('title')}" for c in ordered[:5]],
             ]
             return "\n".join(parts)
 
         parts = [
             "## Կարճ պատասխան",
-            f"Ձեր հարցին (**«{query}»**) առնչվող պաշտոնական նյութերից.",
+            f"Ձեր հարցի (**«{query}»**) վերաբերյալ պաշտոնական նյութերից.",
             "",
-            body.strip(),
-        ]
-        if more_titles:
-            parts += ["", "## Կապված աղբյուրներ", *[f"- {t}" for t in more_titles]]
-        parts += [
+            primary,
+            "",
+            "## Ինչպես է աշխատում ծրագիրը",
+            "Տե՛ս վերևի կանոններն ու քայլերը։ Ձեր կոնկրետ իրավիճակից կախված մանրամասները կարող են տարբերվել։",
             "",
             "## Ինչպես և որտեղ դիմել",
-            "- Առցանց՝ e-soc.am",
-            "- Անձամբ՝ Միասնական սոցիալական ծառայության տարածքային կենտրոն",
+            "- Առցանց՝ **e-soc.am**",
+            "- Անձամբ՝ Միասնական սոցիալական ծառայության (ՄՍԾ) տարածքային կենտրոն",
             "- Թեժ գիծ՝ **114**",
+        ]
+        if extra_blocks:
+            parts += ["", "## Լրացուցիչ պաշտոնական հատվածներ", ""] + [
+                b + "\n" for b in extra_blocks
+            ]
+        parts += [
             "",
-            "_Նշում. գեներատիվ AI-ն անհասանելի է. սա քաղվածք է տեղական իրավական/ծրագրային բազայից._",
+            "## Աղբյուրներ",
+            *[f"- {c.get('title')}" for c in ordered[:5]],
         ]
         return "\n".join(parts)
 

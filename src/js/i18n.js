@@ -226,53 +226,30 @@
     'part.p19': { hy: 'Յունիբանկ', en: 'Unibank' },
     'part.p20': { hy: 'Արդշինբանկ', en: 'Ardshinbank' },
     
-    /* Chat Assistant translations */
-    'chat.title':          { hy: 'Սոցիալական ծրագրերի օգնական', en: 'Social Programs Assistant' },
-    'chat.powered':        { hy: 'ARLIS իրավական բազա', en: 'ARLIS legal corpus' },
-    'chat.placeholder':    { hy: 'Հարցրեք նպաստների, կենսաթոշակների կամ ծրագրերի մասին...', en: 'Ask about benefits, pensions, or programs...' },
-    'chat.welcome_title':  { hy: 'Հարցրեք սոցիալական ծրագրերի մասին', en: 'Ask about social programs' },
-    'chat.welcome':        { hy: 'Պատասխանները հիմնված են ARLIS պաշտոնական ակտերի և ծրագրերի կանոնների վրա։', en: 'Answers are based on official ARLIS legal acts and program rules.' },
-    'chat.disclaimer':     { hy: 'Տեղեկատվական բնույթի է · Պաշտոնական որոշման համար՝ ՄՍԾ 114', en: 'For information only · Official decisions: USS hotline 114' },
-    'chat.err_offline':    { hy: 'Կապի սխալ։ Խնդրում ենք միացնել RAG սերվերը (start_backend.bat)։', en: 'Connection error. Please start the RAG server (start_backend.bat).' },
-    'chat.status_active':  { hy: 'Ակտիվ · Vector', en: 'Online · Vector' },
-    'chat.status_keyword': { hy: 'Ակտիվ · Keyword', en: 'Online · Keyword' },
-    'chat.status_offline': { hy: 'Անցանց', en: 'Offline' },
+    /* Simple Help Assistant */
+    'chat.fab':            { hy: 'Հարցրեք մեզ', en: 'Ask us' },
+    'chat.title':          { hy: 'Սոցիալական օգնական', en: 'Social Help Assistant' },
+    'chat.placeholder':    { hy: 'Օրինակ՝ տարիքային կենսաթոշակ', en: 'e.g. age pension' },
+    'chat.welcome_title':  { hy: 'Բարև ձեզ', en: 'Hello' },
+    'chat.welcome':        { hy: 'Հարցրեք նպաստների, կենսաթոշակների և սոցիալական ծրագրերի մասին։ Պատասխանները հիմնված են պաշտոնական տեղեկատվության վրա։', en: 'Ask about benefits, pensions, and social programs. Answers are based on official information.' },
+    'chat.topics_label':   { hy: 'Ընտրեք թեմա կամ գրեք հարց', en: 'Pick a topic or type a question' },
+    'chat.disclaimer':     { hy: 'Տեղեկատվական է · Պաշտոնական որոշման համար՝ 114', en: 'For information only · Official decisions: call 114' },
+    'chat.err_offline':    { hy: 'Հիմա չեմ կարող պատասխանել։ Ստուգեք, որ սերվերն աշխատում է (start_backend.bat կամ cloud API)։', en: 'I cannot answer right now. Please start the server (local or cloud API).' },
+    'chat.err_no_api':     { hy: 'Արտադրական կայքում AI-ն աշխատելու համար տեղադրեք backend-ը (Render/Railway) և լրացրեք productionApiBase-ը config.js-ում։ Տե՛ս DEPLOY.md։', en: 'To use AI on the live site, deploy the backend (Render/Railway) and set productionApiBase in config.js. See DEPLOY.md.' },
+    'chat.status_ready':   { hy: 'Պատրաստ է օգնել', en: 'Ready to help' },
+    'chat.status_offline': { hy: 'Սերվերը անջատված է', en: 'Server is offline' },
+    'chat.thinking':       { hy: 'Մտածում եմ…', en: 'Thinking…' },
     'chat.sources_label':  { hy: 'Աղբյուրներ', en: 'Sources' },
 
-    /* Suggestions tabs & categories */
-    'chat.cat_allowances': { hy: 'Նպաստներ', en: 'Allowances' },
-    'chat.cat_pensions':   { hy: 'Կենսաթոշակներ', en: 'Pensions' },
-    'chat.cat_employment': { hy: 'Աշխատանք', en: 'Employment' },
-    'chat.cat_services':   { hy: 'Ծառայություններ', en: 'Services' },
-    'chat.cat_contacts':   { hy: 'Կապ & Կոմունալ', en: 'Contact & Utilities' },
-
-    /* Suggestions under Allowances */
-    'chat.suggest_allow_1': { hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
-    'chat.suggest_allow_2': { hy: 'Երեխայի ծննդյան միանվագ նպաստ', en: 'One-time childbirth benefit' },
-    'chat.suggest_allow_3': { hy: 'Ընտանեկան նպաստ չափորոշիչներ', en: 'Family benefit criteria' },
-    'chat.suggest_allow_4': { hy: 'Մայրության նպաստ', en: 'Maternity benefit' },
-
-    /* Suggestions under Pensions */
-    'chat.suggest_pens_1': { hy: 'Տարիքային կենսաթոշակ', en: 'Age pension' },
-    'chat.suggest_pens_2': { hy: 'Հաշմանդամության կենսաթոշակ', en: 'Disability pension' },
-    'chat.suggest_pens_3': { hy: 'Կերակրողին կորցնելու կենսաթոշակ', en: 'Survivor pension' },
-    'chat.suggest_pens_4': { hy: 'Ծերության սոցիալական նպաստ', en: 'Old age social benefit' },
-
-    /* Suggestions under Employment */
-    'chat.suggest_emp_1': { hy: 'Գործազրկության կարգավիճակի ձևակերպում', en: 'Unemployment status registration' },
-    'chat.suggest_emp_2': { hy: 'Անվճար մասնագիտական ուսուցում', en: 'Free vocational retraining' },
-    'chat.suggest_emp_3': { hy: 'Գործատուներին աջակցություն', en: 'Employer subsidies for hiring' },
-    'chat.suggest_emp_4': { hy: 'Սեզոնային զբաղվածություն', en: 'Seasonal agricultural work' },
-
-    /* Services */
-    'chat.suggest_svc_1': { hy: 'Պրոթեզաօրթոպեդիկ պարագաներ', en: 'Prosthetics & orthotics' },
-    'chat.suggest_svc_2': { hy: 'Տնային խնամքի ծառայություններ', en: 'Home care services' },
-    'chat.suggest_svc_3': { hy: 'Զինծառայողների սոցիալական աջակցություն', en: 'Military family social support' },
-
-    /* Suggestions under Contacts/Utilities */
-    'chat.suggest_util_1': { hy: 'ՄՍԾ թեժ գիծ և կոնտակտներ', en: 'MLSA Hotline & Contact' },
-    'chat.suggest_util_2': { hy: 'Էլեկտրաէներգիայի սակագնի փոխհատուցում', en: 'Electricity tariff subsidy' },
-    'chat.suggest_util_3': { hy: 'Բնական գազի սակագնի զեղչեր', en: 'Natural gas tariff subsidy' }
+    /* Topic buttons */
+    'chat.q1': { hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
+    'chat.q2': { hy: 'Երեխայի ծննդյան միանվագ նպաստ', en: 'One-time childbirth benefit' },
+    'chat.q3': { hy: 'Ընտանեկան նպաստ', en: 'Family benefit' },
+    'chat.q4': { hy: 'Տարիքային կենսաթոշակ', en: 'Age pension' },
+    'chat.q5': { hy: 'Հաշմանդամության կենսաթոշակ', en: 'Disability pension' },
+    'chat.q6': { hy: 'Գործազրկության կարգավիճակ', en: 'Unemployment status' },
+    'chat.q7': { hy: 'Էլեկտրաէներգիայի փոխհատուցում', en: 'Electricity subsidy' },
+    'chat.q8': { hy: 'ՄՍԾ թեժ գիծ 114', en: 'Hotline 114 contacts' }
   };
 
   /* ══════════════════════════════════════════════════════

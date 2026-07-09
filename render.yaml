@@ -1,0 +1,14 @@
+# Render Blueprint — https://render.com
+# 1) New → Blueprint → connect this repo
+# 2) Set GEMINI_API_KEY in the dashboard (Environment)
+services:
+  - type: web
+    name: wisef-rag-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/status
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: HOST
+        value: 0.0.0.0

@@ -1,501 +1,423 @@
 /* ====================================================
-   WISE Foundation — Social Programs AI Assistant
-   Glassmorphic redesign · ARLIS-backed RAG · HY/EN
+   WISE — Simple Social Help Assistant
+   Clean, readable citizen UI · HY/EN · RAG backend
    ==================================================== */
 
 (function () {
   'use strict';
 
-  const API_BASE = 'http://127.0.0.1:8000';
-  let backendStatus = { online: false, vector: false, legalActs: 0 };
+  function getApiBase() {
+    if (typeof window.WISEF_getApiBase === 'function') {
+      return window.WISEF_getApiBase();
+    }
+    var host = (location && location.hostname) || '';
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://127.0.0.1:8000';
+    }
+    return '';
+  }
+
+  let backendOnline = false;
   let chatOpen = false;
   let chatInitialized = false;
+  let hasConversation = false;
 
-  let widgetContainer, chatToggleBtn, chatWindow, chatMessages, chatInput, chatSendBtn;
-  let statusDot, statusText, emptyState, suggestionsBox;
+  let root, fab, panel, messagesEl, inputEl, sendBtn, statusEl, homeEl, topicsEl;
 
-  const suggestionData = {
-    allowances: [
-      { key: 'chat.suggest_allow_1', fallback: 'Մինչև 2 տարեկան երեխայի նպաստ' },
-      { key: 'chat.suggest_allow_2', fallback: 'Երեխայի ծննդյան միանվագ նպաստ' },
-      { key: 'chat.suggest_allow_3', fallback: 'Ընտանեկան նպաստ չափորոշիչներ' },
-      { key: 'chat.suggest_allow_4', fallback: 'Մայրության նպաստ' }
-    ],
-    pensions: [
-      { key: 'chat.suggest_pens_1', fallback: 'Տարիքային կենսաթոշակ' },
-      { key: 'chat.suggest_pens_2', fallback: 'Հաշմանդամության կենսաթոշակ' },
-      { key: 'chat.suggest_pens_3', fallback: 'Կերակրողին կորցնելու կենսաթոշակ' },
-      { key: 'chat.suggest_pens_4', fallback: 'Ծերության սոցիալական նպաստ' }
-    ],
-    employment: [
-      { key: 'chat.suggest_emp_1', fallback: 'Գործազրկության կարգավիճակի ձևակերպում' },
-      { key: 'chat.suggest_emp_2', fallback: 'Անվճար մասնագիտական ուսուցում' },
-      { key: 'chat.suggest_emp_3', fallback: 'Գործատուներին աջակցություն' },
-      { key: 'chat.suggest_emp_4', fallback: 'Սեզոնային զբաղվածություն' }
-    ],
-    services: [
-      { key: 'chat.suggest_svc_1', fallback: 'Պրոթեզաօրթոպեդիկ պարագաներ' },
-      { key: 'chat.suggest_svc_2', fallback: 'Տնային խնամքի ծառայություններ' },
-      { key: 'chat.suggest_svc_3', fallback: 'Զինծառայողների սոցիալական աջակցություն' }
-    ],
-    contacts: [
-      { key: 'chat.suggest_util_1', fallback: 'ՄՍԾ թեժ գիծ և կոնտակտներ' },
-      { key: 'chat.suggest_util_2', fallback: 'Էլեկտրաէներգիայի սակագնի փոխհատուցում' },
-      { key: 'chat.suggest_util_3', fallback: 'Բնական գազի սակագնի զեղչեր' }
-    ]
-  };
-
-  let activeCategory = 'allowances';
+  /** Flat list of easy questions — no tabs, no jargon */
+  const TOPICS = [
+    { icon: '👶', key: 'chat.q1', hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
+    { icon: '🎁', key: 'chat.q2', hy: 'Երեխայի ծննդյան միանվագ նպաստ', en: 'One-time childbirth benefit' },
+    { icon: '👨‍👩‍👧‍👦', key: 'chat.q3', hy: 'Ընտանեկան նպաստ', en: 'Family benefit' },
+    { icon: '👴', key: 'chat.q4', hy: 'Տարիքային կենսաթոշակ', en: 'Age pension' },
+    { icon: '♿', key: 'chat.q5', hy: 'Հաշմանդամության կենսաթոշակ', en: 'Disability pension' },
+    { icon: '💼', key: 'chat.q6', hy: 'Գործազրկության կարգավիճակ', en: 'Unemployment status' },
+    { icon: '⚡', key: 'chat.q7', hy: 'Էլեկտրաէներգիայի փոխհատուցում', en: 'Electricity subsidy' },
+    { icon: '📞', key: 'chat.q8', hy: 'ՄՍԾ թեժ գիծ 114', en: 'Hotline 114 contacts' }
+  ];
 
   function t(key, fallback) {
-    if (window.wisefI18n) return window.wisefI18n.t(key);
+    if (window.wisefI18n && typeof window.wisefI18n.t === 'function') {
+      const v = window.wisefI18n.t(key);
+      if (v && v !== key) return v;
+    }
     return fallback || key;
   }
 
-  function getLang() {
+  function lang() {
     return window.wisefI18n ? window.wisefI18n.getLang() : 'hy';
   }
 
-  function initChat() {
+  function topicLabel(item) {
+    return t(item.key, lang() === 'en' ? item.en : item.hy);
+  }
+
+  function init() {
     if (chatInitialized) return;
-    createWidgetDOM();
-    setupListeners();
-    renderSuggestions();
-    checkBackendStatus();
-    setInterval(checkBackendStatus, 15000);
+    buildUI();
+    bindEvents();
+    renderTopics();
+    pollStatus();
+    setInterval(pollStatus, 12000);
     chatInitialized = true;
   }
 
-  function createWidgetDOM() {
-    widgetContainer = document.createElement('div');
-    widgetContainer.className = 'wise-chat-widget';
-    widgetContainer.setAttribute('aria-label', 'WISE AI Assistant');
-
-    chatToggleBtn = document.createElement('button');
-    chatToggleBtn.className = 'wise-chat-toggle glass';
-    chatToggleBtn.type = 'button';
-    chatToggleBtn.setAttribute('aria-expanded', 'false');
-    chatToggleBtn.setAttribute('aria-label', 'Open chat');
-    chatToggleBtn.innerHTML = `
-      <span class="wise-chat-toggle__pulse" aria-hidden="true"></span>
-      <svg class="wise-chat-toggle__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      </svg>
-      <svg class="wise-chat-toggle__close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    `;
-
-    chatWindow = document.createElement('div');
-    chatWindow.className = 'wise-chat-window glass';
-    chatWindow.style.display = 'none';
-    chatWindow.setAttribute('role', 'dialog');
-    chatWindow.setAttribute('aria-modal', 'true');
-
-    const header = document.createElement('div');
-    header.className = 'wise-chat-header';
-    header.innerHTML = `
-      <div class="wise-chat-header__brand">
-        <div class="wise-chat-header__avatar" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
+  function buildUI() {
+    root = document.createElement('div');
+    root.className = 'wise-help';
+    root.innerHTML = `
+      <button type="button" class="wise-help__fab" aria-expanded="false" aria-controls="wise-help-panel">
+        <span class="wise-help__fab-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-        </div>
-        <div class="wise-chat-header__info">
-          <h3 class="wise-chat-header__title" data-i18n="chat.title">Սոցիալական ծրագրերի օգնական</h3>
-          <div class="wise-chat-header__meta">
-            <span class="wise-chat-header__status">
-              <span class="wise-chat-header__dot"></span>
-              <span class="wise-chat-header__status-text" data-i18n="chat.status_offline">Անցանց</span>
-            </span>
-            <span class="wise-chat-header__powered" data-i18n="chat.powered">ARLIS իրավական բազա</span>
-          </div>
-        </div>
-      </div>
-      <button class="wise-chat-header__close" type="button" aria-label="Close chat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        </span>
+        <span class="wise-help__fab-label" data-i18n="chat.fab">Հարցրեք մեզ</span>
       </button>
-    `;
 
-    chatMessages = document.createElement('div');
-    chatMessages.className = 'wise-chat-messages';
+      <div class="wise-help__panel" id="wise-help-panel" role="dialog" aria-modal="true" aria-labelledby="wise-help-title" hidden>
+        <header class="wise-help__header">
+          <div class="wise-help__header-text">
+            <h2 class="wise-help__title" id="wise-help-title" data-i18n="chat.title">Սոցիալական օգնական</h2>
+            <p class="wise-help__status" data-status>
+              <span class="wise-help__status-dot"></span>
+              <span class="wise-help__status-text" data-i18n="chat.status_offline">Միացում…</span>
+            </p>
+          </div>
+          <button type="button" class="wise-help__close" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </header>
 
-    emptyState = document.createElement('div');
-    emptyState.className = 'wise-chat-empty';
-    emptyState.innerHTML = `
-      <div class="wise-chat-empty__icon" aria-hidden="true">💬</div>
-      <p class="wise-chat-empty__title" data-i18n="chat.welcome_title">Հարցրեք սոցիալական ծրագրերի մասին</p>
-      <p class="wise-chat-empty__text" data-i18n="chat.welcome">Պատասխանները հիմնված են ARLIS պաշտոնական ակտերի և ծրագրերի կանոնների վրա։</p>
-    `;
-    chatMessages.appendChild(emptyState);
+        <div class="wise-help__body">
+          <div class="wise-help__home" data-home>
+            <p class="wise-help__hello" data-i18n="chat.welcome_title">Բարև ձեզ</p>
+            <p class="wise-help__intro" data-i18n="chat.welcome">
+              Հարցրեք նպաստների, կենսաթոշակների և սոցիալական ծրագրերի մասին։ Պատասխանները հիմնված են պաշտոնական տեղեկատվության վրա։
+            </p>
+            <p class="wise-help__topics-label" data-i18n="chat.topics_label">Ընտրեք թեմա կամ գրեք հարց</p>
+            <div class="wise-help__topics" data-topics></div>
+          </div>
 
-    suggestionsBox = document.createElement('div');
-    suggestionsBox.className = 'wise-chat-suggestions-box';
-    suggestionsBox.innerHTML = `
-      <div class="wise-chat-tabs" role="tablist">
-        <button type="button" class="wise-chat-tab active" data-cat="allowances" data-i18n="chat.cat_allowances">Նպաստներ</button>
-        <button type="button" class="wise-chat-tab" data-cat="pensions" data-i18n="chat.cat_pensions">Կենսաթոշակներ</button>
-        <button type="button" class="wise-chat-tab" data-cat="employment" data-i18n="chat.cat_employment">Աշխատանք</button>
-        <button type="button" class="wise-chat-tab" data-cat="services" data-i18n="chat.cat_services">Ծառայություններ</button>
-        <button type="button" class="wise-chat-tab" data-cat="contacts" data-i18n="chat.cat_contacts">Կապ & Կոմունալ</button>
+          <div class="wise-help__messages" data-messages hidden></div>
+        </div>
+
+        <form class="wise-help__composer" data-composer>
+          <label class="wise-help__sr-only" for="wise-help-input" data-i18n="chat.placeholder">Գրեք հարցը</label>
+          <input
+            id="wise-help-input"
+            class="wise-help__input"
+            type="text"
+            autocomplete="off"
+            enterkeyhint="send"
+            placeholder="Օրինակ՝ տարիքային կենսաթոշակ"
+            data-i18n="chat.placeholder"
+          />
+          <button type="submit" class="wise-help__send" aria-label="Send">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </form>
+
+        <p class="wise-help__foot" data-i18n="chat.disclaimer">
+          Տեղեկատվական է · Պաշտոնական որոշման համար՝ 114
+        </p>
       </div>
-      <div class="wise-chat-suggestions"></div>
     `;
 
-    const footer = document.createElement('form');
-    footer.className = 'wise-chat-footer';
-    footer.innerHTML = `
-      <div class="wise-chat-composer">
-        <textarea class="wise-chat-input" rows="1" placeholder="Հարցրեք նպաստների, կենսաթոշակների կամ ծրագրերի մասին..." data-i18n="chat.placeholder" required></textarea>
-        <button type="submit" class="wise-chat-send" aria-label="Send message">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
-      </div>
-      <p class="wise-chat-disclaimer" data-i18n="chat.disclaimer">Տեղեկատվական բնույթի է · Պաշտոնական որոշման համար՝ ՄՍԾ 114</p>
-    `;
+    document.body.appendChild(root);
 
-    chatInput = footer.querySelector('.wise-chat-input');
-    chatSendBtn = footer.querySelector('.wise-chat-send');
-    statusDot = header.querySelector('.wise-chat-header__dot');
-    statusText = header.querySelector('.wise-chat-header__status-text');
-
-    chatWindow.appendChild(header);
-    chatWindow.appendChild(chatMessages);
-    chatWindow.appendChild(suggestionsBox);
-    chatWindow.appendChild(footer);
-
-    widgetContainer.appendChild(chatToggleBtn);
-    widgetContainer.appendChild(chatWindow);
-    document.body.appendChild(widgetContainer);
+    fab = root.querySelector('.wise-help__fab');
+    panel = root.querySelector('.wise-help__panel');
+    messagesEl = root.querySelector('[data-messages]');
+    homeEl = root.querySelector('[data-home]');
+    topicsEl = root.querySelector('[data-topics]');
+    inputEl = root.querySelector('.wise-help__input');
+    sendBtn = root.querySelector('.wise-help__send');
+    statusEl = root.querySelector('[data-status]');
   }
 
-  function hideEmptyState() {
-    if (emptyState) emptyState.style.display = 'none';
-  }
-
-  function renderSuggestions() {
-    const grid = chatWindow.querySelector('.wise-chat-suggestions');
-    if (!grid) return;
-    grid.innerHTML = '';
-    const items = suggestionData[activeCategory] || [];
-    items.forEach((item) => {
+  function renderTopics() {
+    if (!topicsEl) return;
+    topicsEl.innerHTML = '';
+    TOPICS.forEach((item) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'wise-chat-suggest-btn';
-      btn.textContent = t(item.key, item.fallback);
-      btn.addEventListener('click', () => handleUserMessage(btn.textContent));
-      grid.appendChild(btn);
+      btn.className = 'wise-help__topic';
+      btn.innerHTML = `
+        <span class="wise-help__topic-icon" aria-hidden="true">${item.icon}</span>
+        <span class="wise-help__topic-text">${escapeHtml(topicLabel(item))}</span>
+      `;
+      btn.addEventListener('click', () => ask(topicLabel(item)));
+      topicsEl.appendChild(btn);
     });
   }
 
-  function setupListeners() {
-    chatToggleBtn.addEventListener('click', toggleChat);
-    chatWindow.querySelector('.wise-chat-header__close').addEventListener('click', toggleChat);
+  function bindEvents() {
+    fab.addEventListener('click', toggle);
+    root.querySelector('.wise-help__close').addEventListener('click', close);
+
+    root.querySelector('[data-composer]').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const q = (inputEl.value || '').trim();
+      if (!q) return;
+      inputEl.value = '';
+      ask(q);
+    });
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && chatOpen) {
-        e.preventDefault();
-        toggleChat();
-      }
+      if (e.key === 'Escape' && chatOpen) close();
     });
 
-    chatWindow.querySelector('.wise-chat-footer').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = chatInput.value.trim();
-      if (!text) return;
-      chatInput.value = '';
-      autoResizeInput();
-      handleUserMessage(text);
+    document.addEventListener('wisefLangChanged', () => {
+      applyI18n();
+      renderTopics();
+      updateStatusUI();
     });
-
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        chatWindow.querySelector('.wise-chat-footer').requestSubmit();
-      }
-    });
-
-    chatInput.addEventListener('input', autoResizeInput);
-
-    chatWindow.querySelectorAll('.wise-chat-tab').forEach((tab) => {
-      tab.addEventListener('click', () => {
-        chatWindow.querySelectorAll('.wise-chat-tab').forEach((x) => x.classList.remove('active'));
-        tab.classList.add('active');
-        activeCategory = tab.getAttribute('data-cat');
-        renderSuggestions();
-      });
-    });
-
-    document.addEventListener('wisefLangChanged', () => translateUI());
   }
 
-  function autoResizeInput() {
-    chatInput.style.height = 'auto';
-    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
-  }
-
-  function toggleChat() {
-    chatOpen = !chatOpen;
-    chatToggleBtn.setAttribute('aria-expanded', chatOpen ? 'true' : 'false');
-    const iconChat = chatToggleBtn.querySelector('.wise-chat-toggle__icon');
-    const iconClose = chatToggleBtn.querySelector('.wise-chat-toggle__close');
-
-    if (chatOpen) {
-      chatWindow.style.display = 'flex';
-      chatWindow.classList.add('wise-chat-window--open');
-      iconChat.style.display = 'none';
-      iconClose.style.display = 'block';
-      setTimeout(() => chatInput.focus(), 50);
-    } else {
-      chatWindow.style.display = 'none';
-      chatWindow.classList.remove('wise-chat-window--open');
-      iconChat.style.display = 'block';
-      iconClose.style.display = 'none';
-    }
-  }
-
-  function translateUI() {
+  function applyI18n() {
     if (!window.wisefI18n) return;
-    const map = [
-      ['.wise-chat-header__title', 'chat.title'],
-      ['.wise-chat-header__powered', 'chat.powered'],
-      ['.wise-chat-empty__title', 'chat.welcome_title'],
-      ['.wise-chat-empty__text', 'chat.welcome'],
-      ['.wise-chat-disclaimer', 'chat.disclaimer']
-    ];
-    map.forEach(([sel, key]) => {
-      const el = chatWindow.querySelector(sel);
-      if (el) el.textContent = t(key);
+    root.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      if (!key) return;
+      if (el.matches('input, textarea')) {
+        el.placeholder = t(key, el.placeholder);
+      } else {
+        el.textContent = t(key, el.textContent);
+      }
     });
-    if (chatInput) chatInput.placeholder = t('chat.placeholder');
-    chatWindow.querySelectorAll('.wise-chat-tab').forEach((tab) => {
-      const cat = tab.getAttribute('data-cat');
-      tab.textContent = t(`chat.cat_${cat}`);
-    });
-    renderSuggestions();
-    updateStatusText();
   }
 
-  async function checkBackendStatus() {
+  function toggle() {
+    if (chatOpen) close();
+    else open();
+  }
+
+  function open() {
+    chatOpen = true;
+    panel.hidden = false;
+    fab.setAttribute('aria-expanded', 'true');
+    fab.classList.add('wise-help__fab--open');
+    root.classList.add('wise-help--open');
+    applyI18n();
+    setTimeout(() => inputEl.focus(), 80);
+  }
+
+  function close() {
+    chatOpen = false;
+    panel.hidden = true;
+    fab.setAttribute('aria-expanded', 'false');
+    fab.classList.remove('wise-help__fab--open');
+    root.classList.remove('wise-help--open');
+  }
+
+  async function pollStatus() {
+    const API_BASE = getApiBase();
+    if (!API_BASE) {
+      backendOnline = false;
+      updateStatusUI();
+      return;
+    }
     try {
-      const r = await fetch(`${API_BASE}/api/status`, { signal: AbortSignal.timeout(3000) });
-      if (r.ok) {
-        const data = await r.json();
-        backendStatus.online = data.status === 'ready';
-        backendStatus.vector = !!data.vector_search_active;
-        backendStatus.legalActs = data.legal_acts || 0;
-      } else {
-        backendStatus.online = false;
-      }
+      const r = await fetch(`${API_BASE}/api/status`, { signal: AbortSignal.timeout(5000) });
+      backendOnline = r.ok && (await r.json()).status === 'ready';
     } catch (e) {
-      backendStatus.online = false;
+      backendOnline = false;
     }
     updateStatusUI();
   }
 
   function updateStatusUI() {
-    if (!statusDot || !statusText) return;
-    if (backendStatus.online) {
-      statusDot.className = 'wise-chat-header__dot wise-chat-header__dot--online';
-      updateStatusText();
-      chatSendBtn.disabled = false;
-      chatInput.disabled = false;
-    } else {
-      statusDot.className = 'wise-chat-header__dot wise-chat-header__dot--offline';
-      statusText.textContent = t('chat.status_offline', 'Անցանց');
-      chatSendBtn.disabled = false; // still allow attempt / show error
+    if (!statusEl) return;
+    const text = statusEl.querySelector('.wise-help__status-text');
+    statusEl.classList.toggle('wise-help__status--on', backendOnline);
+    statusEl.classList.toggle('wise-help__status--off', !backendOnline);
+    if (text) {
+      text.textContent = backendOnline
+        ? t('chat.status_ready', 'Պատրաստ է օգնել')
+        : t('chat.status_offline', 'Սերվերը անջատված է');
     }
   }
 
-  function updateStatusText() {
-    if (!statusText || !backendStatus.online) return;
-    if (backendStatus.vector) {
-      statusText.textContent = t('chat.status_active', 'Ակտիվ · Vector');
-    } else {
-      statusText.textContent = t('chat.status_keyword', 'Ակտիվ · Keyword');
-    }
+  function showConversation() {
+    if (hasConversation) return;
+    hasConversation = true;
+    homeEl.hidden = true;
+    messagesEl.hidden = false;
+    root.classList.add('wise-help--chatting');
   }
 
-  function escapeHTML(str) {
+  function escapeHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+      .replace(/"/g, '&quot;');
   }
 
-  function parseMarkdown(text) {
-    let html = escapeHTML(text);
-    // Headings ## /
-    html = html.replace(/^###\s+(.+)$/gm, '<h5 class="wise-chat-h">$1</h5>');
-    html = html.replace(/^##\s+(.+)$/gm, '<h4 class="wise-chat-h">$1</h4>');
-    html = html.replace(/^#\s+(.+)$/gm, '<h4 class="wise-chat-h">$1</h4>');
-    // Bold
+  function formatAnswer(text) {
+    let html = escapeHtml(text || '');
+    html = html.replace(/^###\s+(.+)$/gm, '<h4 class="wise-help__h">$1</h4>');
+    html = html.replace(/^##\s+(.+)$/gm, '<h3 class="wise-help__h">$1</h3>');
+    html = html.replace(/^#\s+(.+)$/gm, '<h3 class="wise-help__h">$1</h3>');
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
     const lines = html.split('\n');
-    const result = [];
+    const out = [];
     let inUl = false;
     let inOl = false;
 
-    for (let line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
-        if (inOl) { result.push('</ol>'); inOl = false; }
-        if (!inUl) { result.push('<ul class="wise-chat-list">'); inUl = true; }
-        result.push('<li>' + trimmed.substring(2) + '</li>');
-      } else if (/^\d+\.\s/.test(trimmed)) {
-        if (inUl) { result.push('</ul>'); inUl = false; }
-        if (!inOl) { result.push('<ol class="wise-chat-list">'); inOl = true; }
-        result.push('<li>' + trimmed.replace(/^\d+\.\s/, '') + '</li>');
+    for (const line of lines) {
+      const tr = line.trim();
+      if (tr.startsWith('- ') || tr.startsWith('* ')) {
+        if (inOl) { out.push('</ol>'); inOl = false; }
+        if (!inUl) { out.push('<ul class="wise-help__list">'); inUl = true; }
+        out.push('<li>' + tr.slice(2) + '</li>');
+      } else if (/^\d+\.\s/.test(tr)) {
+        if (inUl) { out.push('</ul>'); inUl = false; }
+        if (!inOl) { out.push('<ol class="wise-help__list">'); inOl = true; }
+        out.push('<li>' + tr.replace(/^\d+\.\s/, '') + '</li>');
       } else {
-        if (inUl) { result.push('</ul>'); inUl = false; }
-        if (inOl) { result.push('</ol>'); inOl = false; }
-        if (trimmed.startsWith('<h4') || trimmed.startsWith('<h5')) {
-          result.push(trimmed);
-        } else if (trimmed === '') {
-          result.push('');
-        } else {
-          result.push('<p class="wise-chat-p">' + line + '</p>');
-        }
+        if (inUl) { out.push('</ul>'); inUl = false; }
+        if (inOl) { out.push('</ol>'); inOl = false; }
+        if (!tr) continue;
+        if (tr.startsWith('<h3') || tr.startsWith('<h4')) out.push(tr);
+        else out.push('<p>' + tr + '</p>');
       }
     }
-    if (inUl) result.push('</ul>');
-    if (inOl) result.push('</ol>');
-    return result.join('\n');
+    if (inUl) out.push('</ul>');
+    if (inOl) out.push('</ol>');
+    return out.join('');
   }
 
-  function appendMessage(text, sender, extras) {
-    hideEmptyState();
-    const msg = document.createElement('div');
-    msg.className = `wise-chat-msg wise-chat-msg--${sender}`;
-    const body = sender === 'assistant' ? parseMarkdown(text) : escapeHTML(text);
-    msg.innerHTML = `
-      <div class="wise-chat-msg__bubble">
-        <div class="wise-chat-msg__text">${body}</div>
-      </div>
-    `;
-    chatMessages.appendChild(msg);
+  function addUserBubble(text) {
+    const el = document.createElement('div');
+    el.className = 'wise-help__msg wise-help__msg--user';
+    el.innerHTML = `<div class="wise-help__bubble">${escapeHtml(text)}</div>`;
+    messagesEl.appendChild(el);
+  }
+
+  function addBotBubble(htmlInner, extras) {
+    const el = document.createElement('div');
+    el.className = 'wise-help__msg wise-help__msg--bot';
+    let body = `<div class="wise-help__bubble wise-help__bubble--bot">${htmlInner}</div>`;
 
     if (extras && extras.sources && extras.sources.length) {
-      appendSources(extras.sources);
+      const links = extras.sources
+        .slice(0, 4)
+        .map((s) => {
+          const title = typeof s === 'string' ? s : (s.title || 'Source');
+          const url = typeof s === 'object' ? s.url : null;
+          const short = title.length > 42 ? title.slice(0, 40) + '…' : title;
+          if (url) {
+            return `<a class="wise-help__source" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(short)}</a>`;
+          }
+          return `<span class="wise-help__source wise-help__source--plain">${escapeHtml(short)}</span>`;
+        })
+        .join('');
+      body += `<div class="wise-help__sources"><span class="wise-help__sources-label">${escapeHtml(t('chat.sources_label', 'Աղբյուրներ'))}</span>${links}</div>`;
     }
+
     if (extras && extras.follow_ups && extras.follow_ups.length) {
-      appendFollowUps(extras.follow_ups);
+      const chips = extras.follow_ups
+        .slice(0, 3)
+        .map(
+          (q) =>
+            `<button type="button" class="wise-help__chip" data-q="${escapeHtml(q)}">${escapeHtml(q)}</button>`
+        )
+        .join('');
+      body += `<div class="wise-help__chips">${chips}</div>`;
     }
 
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
+    if (extras && extras.fidelity && typeof extras.fidelity.grounding_score === 'number') {
+      const g = extras.fidelity.grounding_score;
+      const risk = extras.fidelity.risk || '';
+      const pct = Math.round(g * 100);
+      const label =
+        lang() === 'en'
+          ? `Answer grounded in sources: ${pct}% (${risk} risk)`
+          : `Աղբյուրներին համապատասխանություն՝ ${pct}% (${risk})`;
+      body += `<p class="wise-help__ground">${escapeHtml(label)}</p>`;
+    }
 
-  function appendSources(sources) {
-    const wrap = document.createElement('div');
-    wrap.className = 'wise-chat-sources';
-    const label = document.createElement('span');
-    label.className = 'wise-chat-sources__label';
-    label.textContent = t('chat.sources_label', 'Աղբյուրներ');
-    wrap.appendChild(label);
-
-    const seen = new Set();
-    sources.forEach((s) => {
-      const title = typeof s === 'string' ? s : (s.title || 'Source');
-      const url = typeof s === 'object' ? s.url : null;
-      const key = title + (url || '');
-      if (seen.has(key)) return;
-      seen.add(key);
-
-      if (url) {
-        const a = document.createElement('a');
-        a.className = 'wise-chat-sources__tag wise-chat-sources__tag--link';
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.textContent = title.length > 48 ? title.slice(0, 46) + '…' : title;
-        a.title = title;
-        wrap.appendChild(a);
-      } else {
-        const span = document.createElement('span');
-        span.className = 'wise-chat-sources__tag';
-        span.textContent = title.length > 48 ? title.slice(0, 46) + '…' : title;
-        span.title = title;
-        wrap.appendChild(span);
-      }
+    el.innerHTML = body;
+    el.querySelectorAll('.wise-help__chip').forEach((btn) => {
+      btn.addEventListener('click', () => ask(btn.getAttribute('data-q') || btn.textContent));
     });
-    chatMessages.appendChild(wrap);
+    messagesEl.appendChild(el);
   }
 
-  function appendFollowUps(items) {
-    const wrap = document.createElement('div');
-    wrap.className = 'wise-chat-followups';
-    items.forEach((q) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'wise-chat-followup-btn';
-      btn.textContent = q;
-      btn.addEventListener('click', () => handleUserMessage(q));
-      wrap.appendChild(btn);
-    });
-    chatMessages.appendChild(wrap);
+  function addTyping() {
+    const el = document.createElement('div');
+    el.className = 'wise-help__msg wise-help__msg--bot wise-help__typing';
+    el.innerHTML = `
+      <div class="wise-help__bubble wise-help__bubble--bot">
+        <span class="wise-help__dots"><i></i><i></i><i></i></span>
+        <span class="wise-help__typing-text">${escapeHtml(t('chat.thinking', 'Մտածում եմ…'))}</span>
+      </div>`;
+    messagesEl.appendChild(el);
+    return el;
   }
 
-  function appendTypingIndicator() {
-    hideEmptyState();
-    const ind = document.createElement('div');
-    ind.className = 'wise-chat-msg wise-chat-msg--assistant wise-chat-typing-indicator';
-    ind.innerHTML = `
-      <div class="wise-chat-msg__bubble wise-chat-msg__bubble--typing">
-        <div class="wise-chat-dots"><span></span><span></span><span></span></div>
-      </div>
-    `;
-    chatMessages.appendChild(ind);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    return ind;
-  }
+  async function ask(text) {
+    const q = (text || '').trim();
+    if (!q) return;
 
-  async function handleUserMessage(text) {
-    if (!text || !text.trim()) return;
-    appendMessage(text.trim(), 'user');
-    const typing = appendTypingIndicator();
-    const lang = getLang();
+    showConversation();
+    addUserBubble(q);
+    const typing = addTyping();
+
+    const API_BASE = getApiBase();
+    if (!API_BASE) {
+      typing.remove();
+      addBotBubble(
+        `<p>${escapeHtml(
+          t(
+            'chat.err_no_api',
+            'Արտադրական կայքում AI-ն աշխատելու համար պետք է տեղադրել backend-ը (Render/Railway) և լրացնել productionApiBase-ը config.js-ում։ Տե՛ս DEPLOY.md։'
+          )
+        )}</p>`
+      );
+      return;
+    }
 
     try {
-      const response = await fetch(`${API_BASE}/api/chat`, {
+      const res = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: text.trim(), lang })
+        body: JSON.stringify({ query: q, lang: lang() })
       });
       typing.remove();
 
-      if (response.ok) {
-        const data = await response.json();
-        appendMessage(data.answer, 'assistant', {
-          sources: data.sources || [],
-          follow_ups: data.follow_ups || []
-        });
-      } else {
-        appendMessage(t('chat.err_offline', 'Սերվերի սխալ։ Կրկին փորձեք։'), 'assistant');
+      if (!res.ok) {
+        addBotBubble(
+          `<p>${escapeHtml(t('chat.err_offline', 'Հիմա չեմ կարող պատասխանել։ Ստուգեք, որ սերվերն աշխատում է։'))}</p>`
+        );
+        return;
       }
+
+      const data = await res.json();
+      addBotBubble(formatAnswer(data.answer), {
+        sources: data.sources || [],
+        follow_ups: data.follow_ups || [],
+        fidelity: data.fidelity || null
+      });
     } catch (e) {
       typing.remove();
-      appendMessage(
-        t('chat.err_offline', 'Կապի սխալ։ Խնդրում ենք միացնել RAG սերվերը (start_backend.bat)։'),
-        'assistant'
+      addBotBubble(
+        `<p>${escapeHtml(t('chat.err_offline', 'Կապ չկա սերվերի հետ։ Գործարկեք start_backend.bat և կրկին փորձեք։'))}</p>
+         <p><strong>114</strong> — ՄՍԾ թեժ գիծ</p>`
       );
     }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initChat);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    initChat();
+    init();
   }
 })();
