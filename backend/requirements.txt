@@ -3,3 +3,5 @@ uvicorn==0.28.0
 requests==2.31.0
 beautifulsoup4==4.12.3
 pydantic==2.6.4
+pypdf==5.1.0
+lxml==5.3.0

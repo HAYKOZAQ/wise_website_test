@@ -1,0 +1,273 @@
+[
+  {
+    "act_id": "144492",
+    "title_hy": "ՀՀ օրենքը պետական նպաստների մասին",
+    "title_en": "Law of the RA on State Benefits",
+    "category": "allowances",
+    "program_keys": [
+      "family_benefit",
+      "social_benefit",
+      "emergency_aid",
+      "childbirth_benefit",
+      "childcare_allowance",
+      "maternity_benefit",
+      "old_age_social",
+      "disability_social"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/144492",
+    "download_url": "https://www.arlis.am/hy/acts/144492/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "199679",
+    "title_hy": "Պետական նպաստների մասին օրենքում փոփոխություններ (2024)",
+    "title_en": "Amendments to the Law on State Benefits (2024)",
+    "category": "allowances",
+    "program_keys": [
+      "family_benefit",
+      "childcare_allowance",
+      "childbirth_benefit"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/199679",
+    "download_url": "https://www.arlis.am/hy/acts/199679/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "223036",
+    "title_hy": "Ընտանիքի անապահովության գնահատման կարգը",
+    "title_en": "Procedure for assessing family vulnerability",
+    "category": "allowances",
+    "program_keys": [
+      "family_benefit",
+      "social_benefit",
+      "emergency_aid",
+      "utility_electricity",
+      "utility_gas"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/223036",
+    "download_url": "https://www.arlis.am/hy/acts/223036/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "64540",
+    "title_hy": "ՀՀ օրենքը պետական կենսաթոշակների մասին",
+    "title_en": "Law of the RA on State Pensions",
+    "category": "pensions",
+    "program_keys": [
+      "age_pension",
+      "disability_pension",
+      "survivor_pension",
+      "long_service_pension",
+      "old_age_social",
+      "disability_social"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/64540",
+    "download_url": "https://www.arlis.am/hy/acts/64540/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "31548",
+    "title_hy": "Պետական կենսաթոշակների մասին օրենքի կիրառում",
+    "title_en": "Implementation of the Law on State Pensions",
+    "category": "pensions",
+    "program_keys": [
+      "age_pension",
+      "disability_pension",
+      "survivor_pension",
+      "long_service_pension"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/31548",
+    "download_url": "https://www.arlis.am/hy/acts/31548/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "186338",
+    "title_hy": "Զինծառայողների և նրանց ընտանիքների սոցիալական ապահովություն",
+    "title_en": "Social security of servicemen and their families",
+    "category": "services",
+    "program_keys": [
+      "military_support",
+      "survivor_pension"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/186338",
+    "download_url": "https://www.arlis.am/hy/acts/186338/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "87734",
+    "title_hy": "ՀՀ օրենքը զբաղվածության մասին",
+    "title_en": "Law of the RA on Employment",
+    "category": "employment",
+    "program_keys": [
+      "unemployment",
+      "job_placement",
+      "vocational_training",
+      "employer_support",
+      "seasonal_employment"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/87734",
+    "download_url": "https://www.arlis.am/hy/acts/87734/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "97201",
+    "title_hy": "Զբաղվածության մասին օրենքի կիրառող ակտեր",
+    "title_en": "Implementing acts for the Employment Law",
+    "category": "employment",
+    "program_keys": [
+      "unemployment",
+      "job_placement",
+      "vocational_training",
+      "employer_support",
+      "seasonal_employment"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/97201",
+    "download_url": "https://www.arlis.am/hy/acts/97201/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "194144",
+    "title_hy": "Կենսաթոշակային հաշվի միջոցների հետ կապված կարգ",
+    "title_en": "Procedure related to pension account funds",
+    "category": "pensions",
+    "program_keys": [
+      "age_pension"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/194144",
+    "download_url": "https://www.arlis.am/hy/acts/194144/download/act",
+    "priority": 3
+  },
+  {
+    "act_id": "28191",
+    "title_hy": "Զինծառայողների սոցիալական ապահովություն (հիմնական օրենք)",
+    "title_en": "Social security of servicemen (base law)",
+    "category": "services",
+    "program_keys": [
+      "military_support",
+      "artsakh_support"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/28191",
+    "download_url": "https://www.arlis.am/hy/acts/28191/download/act",
+    "priority": 3
+  },
+  {
+    "act_id": "170541",
+    "title_hy": "Պետական նպաստների մասին — խնամքի նպաստի դրույթներ",
+    "title_en": "State benefits — childcare allowance provisions",
+    "category": "allowances",
+    "program_keys": [
+      "childcare_allowance",
+      "childbirth_benefit",
+      "maternity_benefit"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/170541",
+    "download_url": "https://www.arlis.am/hy/acts/170541/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "175252",
+    "title_hy": "Մինչև երկու տարեկան երեխայի խնամքի նպաստի կարգ",
+    "title_en": "Procedure for childcare allowance under 2 years",
+    "category": "allowances",
+    "program_keys": [
+      "childcare_allowance"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/175252",
+    "download_url": "https://www.arlis.am/hy/acts/175252/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "221323",
+    "title_hy": "Մինչև երկու տարեկան երեխայի խնամքի նպաստ (նոր կարգ)",
+    "title_en": "Childcare allowance under 2 (updated procedure)",
+    "category": "allowances",
+    "program_keys": [
+      "childcare_allowance"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/221323",
+    "download_url": "https://www.arlis.am/hy/acts/221323/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "194668",
+    "title_hy": "Հաշմանդամություն ունեցող անձանց աջակցող միջոցներ",
+    "title_en": "Assistive devices for persons with disabilities",
+    "category": "services",
+    "program_keys": [
+      "prosthetics",
+      "wheelchairs",
+      "home_care"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/194668",
+    "download_url": "https://www.arlis.am/hy/acts/194668/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "178327",
+    "title_hy": "Հաշմանդամություն ունեցող անձանց սոցիալական աջակցություն",
+    "title_en": "Social support for persons with disabilities",
+    "category": "services",
+    "program_keys": [
+      "prosthetics",
+      "disability_social",
+      "home_care"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/178327",
+    "download_url": "https://www.arlis.am/hy/acts/178327/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "149174",
+    "title_hy": "Վերականգնողական օգնություն և պրոթեզավորում",
+    "title_en": "Rehabilitation aid and prosthetics",
+    "category": "services",
+    "program_keys": [
+      "prosthetics",
+      "wheelchairs"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/149174",
+    "download_url": "https://www.arlis.am/hy/acts/149174/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "183771",
+    "title_hy": "Սոցիալապես անապահովների էլեկտրաէներգիայի փոխհատուցում",
+    "title_en": "Electricity tariff compensation for vulnerable households",
+    "category": "contacts",
+    "program_keys": [
+      "utility_electricity",
+      "family_benefit",
+      "social_benefit"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/183771",
+    "download_url": "https://www.arlis.am/hy/acts/183771/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "99943",
+    "title_hy": "Սահմանամերձ համայնքների սոցիալական աջակցություն",
+    "title_en": "Social support for border communities",
+    "category": "allowances",
+    "program_keys": [
+      "childcare_allowance",
+      "family_benefit"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/99943",
+    "download_url": "https://www.arlis.am/hy/acts/99943/download/act",
+    "priority": 3
+  },
+  {
+    "act_id": "100867",
+    "title_hy": "Տարեցների և հաշմանդամների սոցիալական սպասարկում",
+    "title_en": "Social care for elderly and persons with disabilities",
+    "category": "services",
+    "program_keys": [
+      "home_care",
+      "nursing_homes",
+      "disability_social"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/100867",
+    "download_url": "https://www.arlis.am/hy/acts/100867/download/act",
+    "priority": 2
+  }
+]

@@ -227,17 +227,52 @@
     'part.p20': { hy: 'Արդշինբանկ', en: 'Ardshinbank' },
     
     /* Chat Assistant translations */
-    'chat.title':          { hy: 'WISE AI Օգնական (Gemma 2)', en: 'WISE AI Assistant (Gemma 2)' },
-    'chat.placeholder':    { hy: 'Հարցրեք MLSA սոցիալական ծրագրերի մասին...', en: 'Ask about MLSA social programs...' },
-    'chat.welcome':        { hy: 'Ողջույն! Ես WISE AI օգնականն եմ: Կարող եմ տրամադրել տեղեկատվություն ՀՀ սոցիալական ապահովության և նպաստների ծրագրերի մասին:', en: 'Hello! I am the WISE AI Assistant. I can provide information about social welfare and benefit programs of MLSA.' },
-    'chat.err_offline':    { hy: 'Կապի սխալ: Խնդրում ենք համոզվել, որ RAG սերվերը միացված է:', en: 'Connection error: Please ensure the RAG server is running.' },
-    'chat.status_active':  { hy: 'Ակտիվ (Vector)', en: 'Active (Vector)' },
-    'chat.status_keyword': { hy: 'Ակտիվ (Keyword)', en: 'Active (Keyword)' },
+    'chat.title':          { hy: 'Սոցիալական ծրագրերի օգնական', en: 'Social Programs Assistant' },
+    'chat.powered':        { hy: 'ARLIS իրավական բազա', en: 'ARLIS legal corpus' },
+    'chat.placeholder':    { hy: 'Հարցրեք նպաստների, կենսաթոշակների կամ ծրագրերի մասին...', en: 'Ask about benefits, pensions, or programs...' },
+    'chat.welcome_title':  { hy: 'Հարցրեք սոցիալական ծրագրերի մասին', en: 'Ask about social programs' },
+    'chat.welcome':        { hy: 'Պատասխանները հիմնված են ARLIS պաշտոնական ակտերի և ծրագրերի կանոնների վրա։', en: 'Answers are based on official ARLIS legal acts and program rules.' },
+    'chat.disclaimer':     { hy: 'Տեղեկատվական բնույթի է · Պաշտոնական որոշման համար՝ ՄՍԾ 114', en: 'For information only · Official decisions: USS hotline 114' },
+    'chat.err_offline':    { hy: 'Կապի սխալ։ Խնդրում ենք միացնել RAG սերվերը (start_backend.bat)։', en: 'Connection error. Please start the RAG server (start_backend.bat).' },
+    'chat.status_active':  { hy: 'Ակտիվ · Vector', en: 'Online · Vector' },
+    'chat.status_keyword': { hy: 'Ակտիվ · Keyword', en: 'Online · Keyword' },
     'chat.status_offline': { hy: 'Անցանց', en: 'Offline' },
-    'chat.suggest1':       { hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
-    'chat.suggest2':       { hy: 'Ծննդյան միանվագ նպաստ', en: 'One-time childbirth benefit' },
-    'chat.suggest3':       { hy: 'Ընտանեկան նպաստներ', en: 'Family vulnerability benefits' },
-    'chat.suggest4':       { hy: 'Տարիքային կենսաթոշակ', en: 'State pension eligibility' }
+    'chat.sources_label':  { hy: 'Աղբյուրներ', en: 'Sources' },
+
+    /* Suggestions tabs & categories */
+    'chat.cat_allowances': { hy: 'Նպաստներ', en: 'Allowances' },
+    'chat.cat_pensions':   { hy: 'Կենսաթոշակներ', en: 'Pensions' },
+    'chat.cat_employment': { hy: 'Աշխատանք', en: 'Employment' },
+    'chat.cat_services':   { hy: 'Ծառայություններ', en: 'Services' },
+    'chat.cat_contacts':   { hy: 'Կապ & Կոմունալ', en: 'Contact & Utilities' },
+
+    /* Suggestions under Allowances */
+    'chat.suggest_allow_1': { hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
+    'chat.suggest_allow_2': { hy: 'Երեխայի ծննդյան միանվագ նպաստ', en: 'One-time childbirth benefit' },
+    'chat.suggest_allow_3': { hy: 'Ընտանեկան նպաստ չափորոշիչներ', en: 'Family benefit criteria' },
+    'chat.suggest_allow_4': { hy: 'Մայրության նպաստ', en: 'Maternity benefit' },
+
+    /* Suggestions under Pensions */
+    'chat.suggest_pens_1': { hy: 'Տարիքային կենսաթոշակ', en: 'Age pension' },
+    'chat.suggest_pens_2': { hy: 'Հաշմանդամության կենսաթոշակ', en: 'Disability pension' },
+    'chat.suggest_pens_3': { hy: 'Կերակրողին կորցնելու կենսաթոշակ', en: 'Survivor pension' },
+    'chat.suggest_pens_4': { hy: 'Ծերության սոցիալական նպաստ', en: 'Old age social benefit' },
+
+    /* Suggestions under Employment */
+    'chat.suggest_emp_1': { hy: 'Գործազրկության կարգավիճակի ձևակերպում', en: 'Unemployment status registration' },
+    'chat.suggest_emp_2': { hy: 'Անվճար մասնագիտական ուսուցում', en: 'Free vocational retraining' },
+    'chat.suggest_emp_3': { hy: 'Գործատուներին աջակցություն', en: 'Employer subsidies for hiring' },
+    'chat.suggest_emp_4': { hy: 'Սեզոնային զբաղվածություն', en: 'Seasonal agricultural work' },
+
+    /* Services */
+    'chat.suggest_svc_1': { hy: 'Պրոթեզաօրթոպեդիկ պարագաներ', en: 'Prosthetics & orthotics' },
+    'chat.suggest_svc_2': { hy: 'Տնային խնամքի ծառայություններ', en: 'Home care services' },
+    'chat.suggest_svc_3': { hy: 'Զինծառայողների սոցիալական աջակցություն', en: 'Military family social support' },
+
+    /* Suggestions under Contacts/Utilities */
+    'chat.suggest_util_1': { hy: 'ՄՍԾ թեժ գիծ և կոնտակտներ', en: 'MLSA Hotline & Contact' },
+    'chat.suggest_util_2': { hy: 'Էլեկտրաէներգիայի սակագնի փոխհատուցում', en: 'Electricity tariff subsidy' },
+    'chat.suggest_util_3': { hy: 'Բնական գազի սակագնի զեղչեր', en: 'Natural gas tariff subsidy' }
   };
 
   /* ══════════════════════════════════════════════════════
