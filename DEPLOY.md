@@ -1,82 +1,58 @@
 # Deploy WISE site + AI (GitHub Pages + cloud backend)
 
-## Why AI fails on GitHub Pages
+## Recommended: one Render URL = website + AI
 
-| Piece | GitHub Pages | Needs |
-|--------|----------------|--------|
-| Website HTML/CSS/JS | ✅ works | static files only |
-| Python FastAPI RAG | ❌ **cannot run** | always-on server |
-| `.env` / `GEMINI_API_KEY` | ❌ **do not upload** | secret on backend host |
+If you only open the Render URL and see **“WISE Social Programs RAG API”**, that is the **backend status page**, not a bug.  
+With the latest Docker image, the **same URL** also serves the real website:
 
-The chat in the browser must call a **public HTTPS API** (not `127.0.0.1:8000`).
+| URL | What you get |
+|-----|----------------|
+| `https://YOUR-APP.onrender.com/` | Redirects to the WISE site |
+| `https://YOUR-APP.onrender.com/pages/index.html` | Full website + chat |
+| `https://YOUR-APP.onrender.com/api` | AI backend status (what you saw) |
+| `https://YOUR-APP.onrender.com/api/status` | JSON health |
+| `https://YOUR-APP.onrender.com/docs` | API docs |
 
-```
-Browser (GitHub Pages)
-        │
-        │  POST https://YOUR-API.onrender.com/api/chat
-        ▼
-  Cloud backend (Render/Railway)
-        │  GEMINI_API_KEY from host env (not GitHub)
-        ▼
-     Gemini + ARLIS corpus
-```
+Chat uses **same origin** automatically (`config.js` leaves `productionApiBase` empty).
 
 ---
 
-## Step 1 — Deploy the backend (Render, free tier example)
+## Deploy on Render (Docker)
 
-1. Create account: [https://render.com](https://render.com)
-2. **New → Web Service** → connect your GitHub repo
-3. Settings:
-   - **Runtime:** Docker  
-   - **Dockerfile path:** `Dockerfile` (repo root)  
-   - **Instance:** Free  
-4. **Environment** (dashboard — not a file in Git):
+1. [render.com](https://render.com) → **New → Web Service** → this GitHub repo  
+2. **Runtime:** Docker · **Dockerfile:** repo root  
+3. **Environment** (dashboard only — never commit secrets):
 
    | Key | Value |
    |-----|--------|
-   | `GEMINI_API_KEY` | your key from [Google AI Studio](https://aistudio.google.com/apikey) |
+   | `GEMINI_API_KEY` | from [Google AI Studio](https://aistudio.google.com/apikey) |
 
-5. Deploy → wait until status is **Live**
-6. Copy the URL, e.g. `https://wisef-rag-api.onrender.com`
+4. Deploy → open: `https://YOUR-APP.onrender.com/pages/index.html`  
+5. Use **Ask us** chat (green “ready” when API is up)
 
-### Alternative: Railway
-
-1. [railway.app](https://railway.app) → New Project → Deploy from GitHub  
-2. Root directory / Dockerfile as above  
-3. Variables → add `GEMINI_API_KEY`  
-4. Generate public domain  
+**Manual deploy:** Render dashboard → **Manual Deploy → Deploy latest commit** after you push.
 
 ---
 
-## Step 2 — Point the website at the API
+## Option B: GitHub Pages (site) + Render (API only)
 
-Edit **`src/js/config.js`**:
+1. Site: `https://YOURUSER.github.io/REPO/`  
+2. API: Render Docker as above  
+3. In `src/js/config.js` set:
 
 ```js
-window.WISEF_CONFIG = {
-  productionApiBase: 'https://wisef-rag-api.onrender.com',  // ← your URL, no trailing slash
-  localApiBase: 'http://127.0.0.1:8000'
-};
+productionApiBase: 'https://YOUR-APP.onrender.com'
 ```
 
-Commit and push. GitHub Pages will rebuild.  
-**Never put the Gemini key in `config.js`.**
+4. Push so GitHub Pages rebuilds. **Never put the API key in config.js.**
 
 ---
 
-## Step 3 — CORS / HTTPS
+## Test
 
-- Backend already allows all origins (`CORS *`) for simplicity.  
-- Use **https** API URL on GitHub Pages (browsers block mixed content if page is https and API is http).
-
----
-
-## Step 4 — Test
-
-1. Open live site → chat status should show **Ready** (green)  
-2. Or open: `https://YOUR-API.onrender.com/api/status`  
-3. Or: `https://YOUR-API.onrender.com/docs`
+1. Site: `…/pages/index.html` — full design + chat  
+2. API: `…/api/status` — `"status":"ready"`  
+3. Docs: `…/docs`
 
 ---
 

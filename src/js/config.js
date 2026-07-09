@@ -1,24 +1,20 @@
 /* ====================================================
    WISE site config (safe to commit — NO secrets here)
    ====================================================
-   GitHub Pages is STATIC only. The AI backend must be
-   deployed separately (Render / Railway / Fly.io).
-
-   1) Deploy backend (see DEPLOY.md)
-   2) Paste the public HTTPS URL below (no trailing slash)
-   3) Commit & push — do NOT put GEMINI_API_KEY in this file
+   Put GEMINI_API_KEY only on Render/Railway (server env).
+   Never put the key in this file.
 */
 window.WISEF_CONFIG = {
   /**
-   * Public FastAPI base URL after cloud deploy.
-   * Example: 'https://wisef-rag.onrender.com'
-   * Leave empty until backend is deployed.
+   * Optional: public API URL if backend is on a DIFFERENT domain.
+   * Example: 'https://wisef-rag-api.onrender.com'
+   *
+   * Leave empty when the website is served FROM the same Render
+   * service as the API (recommended) — chat will use this domain.
    */
   productionApiBase: '',
 
-  /**
-   * Local backend while developing on your PC.
-   */
+  /** Local backend while developing on your PC */
   localApiBase: 'http://127.0.0.1:8000'
 };
 
@@ -39,6 +35,9 @@ window.WISEF_getApiBase = function () {
   var prod = (cfg.productionApiBase || '').trim().replace(/\/$/, '');
   if (prod) return prod;
 
-  // Fallback: same origin only if you later reverse-proxy /api
+  // Same host as the page (Docker/Render serves site + API together)
+  if (typeof location !== 'undefined' && location.origin) {
+    return location.origin.replace(/\/$/, '');
+  }
   return '';
 };

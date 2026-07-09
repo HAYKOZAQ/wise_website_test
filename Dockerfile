@@ -1,4 +1,4 @@
-# WISE RAG API — deploy to Render / Railway / Fly / Cloud Run
+# WISE website + RAG API — one service for Render / Railway / Fly
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -10,9 +10,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Backend code
 COPY backend/ /app/
 
-# Ensure data directory exists (scraper may fill on first boot)
+# Frontend static site (HTML/CSS/JS) served by FastAPI
+COPY src/ /app/frontend/
+
 RUN mkdir -p /app/data/corpus
 
 ENV HOST=0.0.0.0
@@ -21,5 +24,5 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-# Build index if missing, then start API
+# Index corpus, then serve website + API
 CMD sh -c "python scraper.py; python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"

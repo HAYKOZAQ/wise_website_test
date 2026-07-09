@@ -1,9 +1,12 @@
 import os
 import sys
+from pathlib import Path
+
 import uvicorn
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from typing import Any, Optional
 import requests
@@ -19,8 +22,8 @@ from fidelity import load_eval_stats, EVAL_CASES, evaluate_grounding, log_qa_eve
 
 app = FastAPI(
     title="MLSA Welfare RAG API",
-    version="2.1",
-    description="WISE Foundation social programs assistant — ARLIS-backed RAG + fidelity checks",
+    version="2.2",
+    description="WISE Foundation website + ARLIS-backed RAG API",
 )
 
 app.add_middleware(
@@ -37,6 +40,18 @@ try:
 except Exception as e:
     print(f"Error starting RAG Engine: {e}")
     rag_engine = None
+
+# Frontend paths (Docker: /app/frontend ; local: ../src next to backend/)
+_BACKEND_DIR = Path(__file__).resolve().parent
+_FRONTEND_CANDIDATES = [
+    _BACKEND_DIR / "frontend",
+    _BACKEND_DIR.parent / "src",
+]
+FRONTEND_ROOT = next((p for p in _FRONTEND_CANDIDATES if p.is_dir()), None)
+if FRONTEND_ROOT:
+    print(f"Frontend static files: {FRONTEND_ROOT}")
+else:
+    print("Frontend static folder not found — / will show API-only page")
 
 
 class ChatRequest(BaseModel):
@@ -82,6 +97,7 @@ def _status_payload() -> dict:
         "legal_acts": legal_acts,
         "cache_ok": cache_ok,
         "corpus_hash": corpus_hash,
+        "frontend_mounted": bool(FRONTEND_ROOT),
         "fidelity_summary": {
             "entries": stats.get("entries"),
             "avg_grounding_score": stats.get("avg_grounding_score"),
@@ -91,8 +107,7 @@ def _status_payload() -> dict:
     }
 
 
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
-def root():
+def _api_only_html() -> str:
     s = _status_payload()
     ok = s["status"] == "ready"
     badge = "#10b981" if ok else "#ef4444"
@@ -102,16 +117,17 @@ def root():
     ground = fs.get("avg_grounding_score")
     hall_s = f"{hall:.0%}" if isinstance(hall, (int, float)) else "n/a"
     ground_s = f"{ground:.0%}" if isinstance(ground, (int, float)) else "n/a"
-    html = f"""<!DOCTYPE html>
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WISE RAG API</title>
+  <title>WISE AI Backend (not the full site)</title>
   <style>
     body {{ font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto;
            padding: 0 20px; color: #0f172a; line-height: 1.5; }}
-    h1 {{ font-size: 1.4rem; }}
+    .warn {{ background: #fff7ed; border: 1px solid #fdba74; border-radius: 12px;
+             padding: 14px 16px; margin: 16px 0; }}
     .badge {{ display: inline-block; background: {badge}; color: #fff;
               padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }}
     a {{ color: #183960; }}
@@ -121,8 +137,17 @@ def root():
   </style>
 </head>
 <body>
-  <h1>WISE Social Programs RAG API</h1>
+  <h1>WISE AI Backend</h1>
   <p><span class="badge">{label}</span></p>
+  <div class="warn">
+    <strong>This is not the full WISE marketing website.</strong><br>
+    This page is the <em>AI server</em> status. The public site is either:
+    <ul>
+      <li>GitHub Pages (your static site), with <code>productionApiBase</code> pointing here, or</li>
+      <li>Redeploy this service with the latest Docker image that includes the frontend
+          (then open <code>/pages/index.html</code>).</li>
+    </ul>
+  </div>
   <div class="card">
     <strong>Corpus</strong>
     <ul>
@@ -130,30 +155,22 @@ def root():
       <li>Chunks: {s['chunks_indexed']}</li>
       <li>ARLIS acts: {s['legal_acts']}</li>
     </ul>
-    <strong>Fidelity (recent chats)</strong>
+    <strong>Fidelity</strong>
     <ul>
-      <li>Logged answers: {fs.get('entries', 0)}</li>
-      <li>Avg grounding: {ground_s}</li>
-      <li>Avg hallucination rate: {hall_s}</li>
-      <li>Risk counts: {fs.get('risk_counts')}</li>
+      <li>Logged: {fs.get('entries', 0)}</li>
+      <li>Grounding: {ground_s}</li>
+      <li>Hallucination rate: {hall_s}</li>
     </ul>
   </div>
-  <p>Endpoints:</p>
+  <p>API:</p>
   <ul>
     <li><a href="/api/status"><code>GET /api/status</code></a></li>
     <li><code>POST /api/chat</code></li>
-    <li><a href="/api/eval/stats"><code>GET /api/eval/stats</code></a> — hallucination dashboard JSON</li>
-    <li><a href="/api/eval/run"><code>POST /api/eval/run</code></a> — run built-in test cases</li>
+    <li><a href="/api/eval/stats"><code>GET /api/eval/stats</code></a></li>
     <li><a href="/docs"><code>/docs</code></a></li>
   </ul>
 </body>
 </html>"""
-    return HTMLResponse(content=html)
-
-
-@app.get("/favicon.ico", include_in_schema=False)
-def favicon():
-    return Response(status_code=204)
 
 
 @app.get("/api/status")
@@ -187,16 +204,11 @@ def chat(request: ChatRequest):
 
 @app.get("/api/eval/stats")
 def eval_stats(limit: int = 500):
-    """Hallucination / grounding dashboard over logged answers."""
     return load_eval_stats(limit=min(max(limit, 10), 5000))
 
 
 @app.post("/api/eval/check")
 def eval_check(payload: dict[str, Any]):
-    """
-    Manually score an answer against context text.
-    Body: { "answer": "...", "context": "..." }
-    """
     answer = (payload or {}).get("answer") or ""
     context = (payload or {}).get("context") or ""
     if not answer:
@@ -216,10 +228,6 @@ def eval_check(payload: dict[str, Any]):
 
 @app.post("/api/eval/run")
 def eval_run():
-    """
-    Run built-in regression questions through the live RAG engine
-    and return per-case grounding + hallucination metrics.
-    """
     if not rag_engine:
         raise HTTPException(status_code=500, detail="RAG Engine is not initialized")
 
@@ -267,8 +275,50 @@ def eval_run():
     return {"summary": summary, "results": results}
 
 
+@app.get("/api", response_class=HTMLResponse, include_in_schema=False)
+@app.get("/api/", response_class=HTMLResponse, include_in_schema=False)
+def api_dashboard():
+    """Backend status dashboard (not the public marketing site)."""
+    return HTMLResponse(content=_api_only_html())
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    if FRONTEND_ROOT:
+        icon = FRONTEND_ROOT / "assets" / "logos" / "favicon.svg"
+        if icon.is_file():
+            return FileResponse(icon, media_type="image/svg+xml")
+    return Response(status_code=204)
+
+
+# ── Static website (when frontend folder is present) ─────────────────
+if FRONTEND_ROOT:
+    _css = FRONTEND_ROOT / "css"
+    _js = FRONTEND_ROOT / "js"
+    _assets = FRONTEND_ROOT / "assets"
+    _pages = FRONTEND_ROOT / "pages"
+
+    if _css.is_dir():
+        app.mount("/css", StaticFiles(directory=str(_css)), name="css")
+    if _js.is_dir():
+        app.mount("/js", StaticFiles(directory=str(_js)), name="js")
+    if _assets.is_dir():
+        app.mount("/assets", StaticFiles(directory=str(_assets)), name="assets")
+    if _pages.is_dir():
+        app.mount("/pages", StaticFiles(directory=str(_pages), html=True), name="pages")
+
+    @app.get("/", include_in_schema=False)
+    def site_home():
+        return RedirectResponse(url="/pages/index.html", status_code=302)
+
+else:
+
+    @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+    def root_api_only():
+        return HTMLResponse(content=_api_only_html())
+
+
 if __name__ == "__main__":
-    # Cloud hosts (Render/Railway) inject PORT; local default 8000
     port = int(os.environ.get("PORT", "8000"))
     host = os.environ.get("HOST", "0.0.0.0")
     reload = os.environ.get("UVICORN_RELOAD", "").lower() in ("1", "true", "yes")
