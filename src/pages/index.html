@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
-  <script>try{var t=localStorage.getItem('wisef_theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <script>try{var t=localStorage.getItem('wisef_theme')||'light';document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=(t==='dark'?'dark':'light');}catch(e){}</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WISE Foundation — «Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ</title>
@@ -10,11 +10,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Armenian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/base.css">
-  <link rel="stylesheet" href="../css/glass.css">
-  <link rel="stylesheet" href="../css/components.css">
-  <link rel="stylesheet" href="../css/dark.css">
-  <link rel="icon" href="../assets/logos/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css?v=26">
+  <link rel="stylesheet" href="/css/glass.css?v=26">
+  <link rel="stylesheet" href="/css/components.css?v=26">
+  <link rel="stylesheet" href="/css/dark.css?v=26">
+  <link rel="icon" href="/assets/logos/favicon.svg" type="image/svg+xml">
 </head>
 <body lang="hy">
 
@@ -22,7 +22,7 @@
   <header class="header" id="header">
     <div class="header__inner">
       <a href="index.html" class="header__logo">
-        <img src="../assets/logos/wisef-logo.svg" alt="WISE Foundation">
+        <img src="/assets/logos/wisef-logo.svg" alt="WISE Foundation">
       </a>
 
       <nav class="nav" role="navigation" aria-label="Հիմնական նավիգացիա">
@@ -242,7 +242,7 @@
   <footer class="footer">
     <div class="footer__inner">
       <div class="footer__brand">
-        <img src="../assets/logos/wisef-logo-white.svg" alt="WISE Foundation" style="height: 32px;">
+        <img src="/assets/logos/wisef-logo-white.svg" alt="WISE Foundation" style="height: 32px;">
         <p data-i18n="footer.brand">«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ</p>
         <div class="footer__social">
           <a href="https://www.facebook.com/norktechnologycenter/" target="_blank" rel="noopener" aria-label="Facebook">
@@ -292,9 +292,9 @@
     </div>
   </footer>
 
-  <script src="../js/main.js"></script>
-  <script src="../js/i18n.js"></script>
-  <script src="../js/config.js"></script>
-  <script src="../js/chat.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/chat.js"></script>
 </body>
 </html>

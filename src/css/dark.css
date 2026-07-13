@@ -23,6 +23,10 @@ html[data-theme="dark"] .glass-hero {
 html[data-theme="dark"] .page-header__title,
 html[data-theme="dark"] .hero__title,
 html[data-theme="dark"] .section__title,
+html[data-theme="dark"] .service-card__title,
+html[data-theme="dark"] .value-card__title,
+html[data-theme="dark"] .why-card__title,
+html[data-theme="dark"] .partner-card__name,
 html[data-theme="dark"] h1,
 html[data-theme="dark"] h2,
 html[data-theme="dark"] h3,
@@ -30,20 +34,37 @@ html[data-theme="dark"] h4 {
   color: #f8fafc !important;
 }
 
+/* Keep gradient text readable on hero titles */
+html[data-theme="dark"] .hero__title span {
+  background: linear-gradient(135deg, #7dd3fc 0%, #fbbf24 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
 html[data-theme="dark"] .page-header__breadcrumb,
 html[data-theme="dark"] .hero__text,
 html[data-theme="dark"] .section__subtitle,
 html[data-theme="dark"] .section__label,
-html[data-theme="dark"] p {
+html[data-theme="dark"] .service-card__text,
+html[data-theme="dark"] .value-card__text,
+html[data-theme="dark"] .why-card__text,
+html[data-theme="dark"] .section p,
+html[data-theme="dark"] .page-header p,
+html[data-theme="dark"] .container > p {
   color: #94a3b8 !important;
 }
 
-html[data-theme="dark"] .page-header__breadcrumb a,
-html[data-theme="dark"] a {
+html[data-theme="dark"] .page-header__breadcrumb a {
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .section a:not(.glass-btn):not(.wise-help a) {
   color: #7dd3fc;
 }
 
-html[data-theme="dark"] a:hover {
+html[data-theme="dark"] .section a:not(.glass-btn):hover {
   color: #38bdf8;
 }
 
@@ -200,9 +221,10 @@ html[data-theme="dark"] textarea::placeholder {
   color: #64748b !important;
 }
 
-/* Placeholder media blocks */
+/* Placeholder media blocks (also kill light inline gradients) */
 html[data-theme="dark"] .media-placeholder,
-html[data-theme="dark"] .featured-thumb {
+html[data-theme="dark"] .featured-thumb,
+html[data-theme="dark"] .media-placeholder[style] {
   background: linear-gradient(135deg, #1e3a5f, #312e81) !important;
   color: #e2e8f0 !important;
 }
@@ -220,13 +242,49 @@ html[data-theme="dark"] .glass-stat {
   border-color: rgba(148, 163, 184, 0.16) !important;
 }
 
+html[data-theme="dark"] .stats-banner .glass-stat:not(:last-child) {
+  border-right-color: #1e293b !important;
+}
+
 html[data-theme="dark"] .glass-stat__value,
+html[data-theme="dark"] .stats-banner [data-counter],
 html[data-theme="dark"] [data-counter] {
   color: #38bdf8 !important;
 }
 
 html[data-theme="dark"] .glass-stat__label {
   color: #94a3b8 !important;
+}
+
+/* About / services specific cards */
+html[data-theme="dark"] .value-card,
+html[data-theme="dark"] .service-card,
+html[data-theme="dark"] .project-card {
+  background: rgba(30, 41, 59, 0.92) !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .timeline-item.glass,
+html[data-theme="dark"] .timeline-item {
+  background: rgba(30, 41, 59, 0.92) !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .timeline-item__year {
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .timeline-item__title {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .timeline-item__text {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .page-header {
+  background: linear-gradient(135deg, #0b1220 0%, #111827 100%) !important;
+  color: #f1f5f9 !important;
 }
 
 /* ── Timeline ─────────────────────────────────────── */
