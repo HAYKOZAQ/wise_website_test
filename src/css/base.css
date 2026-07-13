@@ -36,17 +36,10 @@
 
   --container-max: 1200px;
   --header-height: 80px;
-
-  --hero-grad-start: #ffffff;
-  --hero-grad-mid: #f5f2eb;
-  --hero-grad-end: #ede8dd;
-  /* Page-header is always brand navy (never cream) — light and dark */
 }
 
-/* ── Dark Mode Custom Overrides ────────────────────────── */
 html[data-theme="dark"] {
   color-scheme: dark;
-
   --color-primary: #0b1220;
   --color-secondary: #121a2b;
   --color-accent: #38bdf8;
@@ -61,13 +54,7 @@ html[data-theme="dark"] {
   --color-glass-shadow: rgba(0, 0, 0, 0.35);
   --color-glass-hover: rgba(51, 65, 85, 0.85);
   --color-overlay: rgba(2, 6, 23, 0.78);
-
-  /* Page heroes match dark body; page-header stays brand navy */
-  --hero-grad-start: #0b1220;
-  --hero-grad-mid: #111827;
-  --hero-grad-end: #0f172a;
 }
-
 
 * {
   margin: 0;
@@ -79,7 +66,6 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   overflow-x: hidden;
-  overflow-y: auto;
   background: var(--color-primary);
 }
 
@@ -116,15 +102,10 @@ body[lang="hy"],
   font-family: var(--font-armenian), var(--font-primary);
 }
 
-img {
+img, svg {
   max-width: 100%;
   height: auto;
   display: block;
-}
-
-svg {
-  max-width: 100%;
-  height: auto;
 }
 
 iframe, video {

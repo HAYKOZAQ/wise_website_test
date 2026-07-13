@@ -1,6 +1,6 @@
 /* ====================================================
-   Global Dark Mode — full-page consistency
-   Loaded after base/glass/components so it wins.
+   Global Dark Mode — Single Source of Truth
+   Loaded LAST so it wins via specificity.
    ==================================================== */
 
 html[data-theme="dark"],
@@ -10,33 +10,42 @@ html[data-theme="dark"] body {
   color-scheme: dark;
 }
 
-/* ── Top banners / heroes (page-header stays navy in components.css) ── */
+/* ── Page Backgrounds ── */
 html[data-theme="dark"] .hero,
 html[data-theme="dark"] .hero--small,
-html[data-theme="dark"] .glass-hero {
-  background: linear-gradient(160deg, #0b1220 0%, #111827 45%, #0f172a 100%) !important;
+html[data-theme="dark"] .glass-hero,
+html[data-theme="dark"] .section {
+  background: #0b1220 !important;
   color: #f1f5f9 !important;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-/* Section/card titles only (not .page-header) */
+html[data-theme="dark"] .section--alt {
+  background: #121a2b !important;
+}
+
+/* ── Text Colors ── */
 html[data-theme="dark"] .hero__title,
 html[data-theme="dark"] .section__title,
 html[data-theme="dark"] .service-card__title,
 html[data-theme="dark"] .value-card__title,
 html[data-theme="dark"] .why-card__title,
 html[data-theme="dark"] .partner-card__name,
+html[data-theme="dark"] .project-card__title,
+html[data-theme="dark"] .blog-card__title,
+html[data-theme="dark"] .featured-post h2,
+html[data-theme="dark"] .featured-post h3,
 html[data-theme="dark"] .section h1,
 html[data-theme="dark"] .section h2,
 html[data-theme="dark"] .section h3,
 html[data-theme="dark"] .section h4,
 html[data-theme="dark"] .hero h1,
-html[data-theme="dark"] .hero h2 {
+html[data-theme="dark"] .hero h2,
+html[data-theme="dark"] .timeline-item__title,
+html[data-theme="dark"] .timeline-item__year {
   color: #f8fafc !important;
   -webkit-text-fill-color: #f8fafc !important;
 }
 
-/* Keep gradient text readable on hero titles */
 html[data-theme="dark"] .hero__title span {
   background: linear-gradient(135deg, #7dd3fc 0%, #fbbf24 100%) !important;
   -webkit-background-clip: text !important;
@@ -51,8 +60,13 @@ html[data-theme="dark"] .section__label,
 html[data-theme="dark"] .service-card__text,
 html[data-theme="dark"] .value-card__text,
 html[data-theme="dark"] .why-card__text,
+html[data-theme="dark"] .blog-card__date,
+html[data-theme="dark"] .blog-card__excerpt,
+html[data-theme="dark"] .project-card__text,
 html[data-theme="dark"] .section p,
-html[data-theme="dark"] .container > p {
+html[data-theme="dark"] .container > p,
+html[data-theme="dark"] .timeline-item__text,
+html[data-theme="dark"] .contact-info__item div {
   color: #94a3b8 !important;
 }
 
@@ -64,16 +78,13 @@ html[data-theme="dark"] .section a:not(.glass-btn):hover {
   color: #38bdf8;
 }
 
-/* ── Header / nav ─────────────────────────────────── */
-html[data-theme="dark"] .header {
+/* ── Header / Nav ── */
+html[data-theme="dark"] .header,
+html[data-theme="dark"] .header.scrolled {
   background: rgba(11, 18, 32, 0.92) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-html[data-theme="dark"] .header.scrolled {
-  background: rgba(11, 18, 32, 0.98) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
 }
 
 html[data-theme="dark"] .nav__link {
@@ -85,44 +96,11 @@ html[data-theme="dark"] .nav__link--active {
   color: #38bdf8 !important;
 }
 
-html[data-theme="dark"] .theme-toggle,
-html[data-theme="dark"] .lang-toggle__track {
-  background: rgba(30, 41, 59, 0.9) !important;
-  border-color: rgba(148, 163, 184, 0.2) !important;
+html[data-theme="dark"] .header-controls {
+  background: transparent !important;
 }
 
-html[data-theme="dark"] .lang-toggle__hy,
-html[data-theme="dark"] .lang-toggle__en {
-  color: #cbd5e1 !important;
-}
-
-html[data-theme="dark"] .mobile-toggle span {
-  background: #e2e8f0 !important;
-}
-
-/* ── Page body sections ───────────────────────────── */
-html[data-theme="dark"] .section {
-  background: #0b1220 !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .section--alt {
-  background: #121a2b !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .container {
-  color: inherit;
-}
-
-/* Kill leftover light / white panels in dark mode */
-html[data-theme="dark"] .section .grid-2 > div,
-html[data-theme="dark"] main,
-html[data-theme="dark"] .page-content {
-  color: #e2e8f0;
-}
-
-/* ── Glass surfaces (cards, search, forms) ────────── */
+/* ── Glass Surfaces ── */
 html[data-theme="dark"] .glass,
 html[data-theme="dark"] .glass-strong,
 html[data-theme="dark"] .glass-light,
@@ -134,7 +112,6 @@ html[data-theme="dark"] .service-card,
 html[data-theme="dark"] .partner-card,
 html[data-theme="dark"] .why-card,
 html[data-theme="dark"] .value-card,
-html[data-theme="dark"] .team-card,
 html[data-theme="dark"] .timeline-item,
 html[data-theme="dark"] .contact-form,
 html[data-theme="dark"] .contact-info__item,
@@ -174,6 +151,7 @@ html[data-theme="dark"] .glass-card--interactive:hover {
   background: rgba(51, 65, 85, 0.95) !important;
 }
 
+/* ── Buttons ── */
 html[data-theme="dark"] .glass-btn {
   background: rgba(30, 41, 59, 0.95) !important;
   border-color: rgba(148, 163, 184, 0.28) !important;
@@ -197,6 +175,7 @@ html[data-theme="dark"] .glass-btn--outline:hover {
   color: #0b1220 !important;
 }
 
+/* ── Inputs ── */
 html[data-theme="dark"] .glass-input,
 html[data-theme="dark"] input.glass-input,
 html[data-theme="dark"] textarea.glass-input,
@@ -217,15 +196,16 @@ html[data-theme="dark"] textarea::placeholder {
   color: #64748b !important;
 }
 
-/* Placeholder media blocks (also kill light inline gradients) */
+/* ── Media Placeholders ── */
 html[data-theme="dark"] .media-placeholder,
 html[data-theme="dark"] .featured-thumb,
-html[data-theme="dark"] .media-placeholder[style] {
+html[data-theme="dark"] .media-placeholder[style],
+html[data-theme="dark"] .featured-thumb[style] {
   background: linear-gradient(135deg, #1e3a5f, #312e81) !important;
   color: #e2e8f0 !important;
 }
 
-/* ── Stats ────────────────────────────────────────── */
+/* ── Stats ── */
 html[data-theme="dark"] .stats-banner {
   background: #1e293b !important;
   color: #f1f5f9 !important;
@@ -252,7 +232,7 @@ html[data-theme="dark"] .glass-stat__label {
   color: #94a3b8 !important;
 }
 
-/* About / services specific cards */
+/* ── Cards ── */
 html[data-theme="dark"] .value-card,
 html[data-theme="dark"] .service-card,
 html[data-theme="dark"] .project-card {
@@ -278,9 +258,7 @@ html[data-theme="dark"] .timeline-item__text {
   color: #94a3b8 !important;
 }
 
-
-
-/* ── Timeline ─────────────────────────────────────── */
+/* ── Timeline ── */
 html[data-theme="dark"] .timeline-item::before {
   border-color: #0b1220 !important;
 }
@@ -289,7 +267,7 @@ html[data-theme="dark"] .timeline::before {
   background: #38bdf8 !important;
 }
 
-/* ── Partner logos ────────────────────────────────── */
+/* ── Partner Logos ── */
 html[data-theme="dark"] .partner-card__img img {
   filter: grayscale(100%) brightness(1.35);
   opacity: 0.85;
@@ -300,7 +278,15 @@ html[data-theme="dark"] .partner-card:hover .partner-card__img img {
   opacity: 1;
 }
 
-/* ── Footer — never light-on-light ────────────────── */
+html[data-theme="dark"] .partner-card__name {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .partner-card:hover .partner-card__name {
+  color: #38bdf8 !important;
+}
+
+/* ── Footer ── */
 html[data-theme="dark"] .footer,
 html[data-theme="dark"] footer.footer {
   background: #020617 !important;
@@ -348,14 +334,14 @@ html[data-theme="dark"] .footer__brand img {
   opacity: 0.95;
 }
 
-/* ── Mobile menu ──────────────────────────────────── */
+/* ── Mobile Menu ── */
 @media (max-width: 768px) {
   html[data-theme="dark"] .nav {
     background: rgba(11, 18, 32, 0.98) !important;
   }
 }
 
-/* ── Modal / blog ─────────────────────────────────── */
+/* ── Modal / Blog ── */
 html[data-theme="dark"] .modal__title,
 html[data-theme="dark"] .modal__body,
 html[data-theme="dark"] .blog-card__title {
@@ -378,219 +364,6 @@ html[data-theme="dark"] .modal__close {
   background: rgba(30, 41, 59, 0.9) !important;
 }
 
-/* ── Pagination ───────────────────────────────────── */
-html[data-theme="dark"] .pagination__btn {
-  background: rgba(30, 41, 59, 0.9) !important;
-  color: #e2e8f0 !important;
-  border-color: rgba(148, 163, 184, 0.2) !important;
-}
-
-html[data-theme="dark"] .pagination__btn--active {
-  background: #38bdf8 !important;
-  color: #0b1220 !important;
-}
-
-/* ── Contact form labels ──────────────────────────── */
-html[data-theme="dark"] label,
-html[data-theme="dark"] .form-label {
-  color: #cbd5e1 !important;
-}
-
-/* ── Inline light boxes / white cards (safety net) ── */
-html[data-theme="dark"] [style*="background: white"],
-html[data-theme="dark"] [style*="background:white"],
-html[data-theme="dark"] [style*="background: #fff"],
-html[data-theme="dark"] [style*="background:#fff"],
-html[data-theme="dark"] [style*="background: #ffffff"],
-html[data-theme="dark"] [style*="background:#ffffff"] {
-  background: #1e293b !important;
-  color: #f1f5f9 !important;
-}
-
-/* Contact CTA band just above footer */
-html[data-theme="dark"] .section .contact-grid,
-html[data-theme="dark"] .contact-grid {
-  color: #e2e8f0;
-}
-
-/* ── Chat assistant dark polish ───────────────────── */
-html[data-theme="dark"] .wise-help__fab {
-  color: #0b1220 !important;
-  background: #38bdf8 !important;
-}
-
-html[data-theme="dark"] .wise-help__fab--open {
-  background: #0f172a !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .wise-help__header {
-  background: #0c4a6e !important;
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .wise-help__msg--user .wise-help__bubble {
-  color: #fff !important;
-}
-
-/* ── Blog page specific ───────────────────────────────── */
-html[data-theme="dark"] .search-bar {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-html[data-theme="dark"] .search-bar .glass-input,
-html[data-theme="dark"] .search-bar input {
-  background: rgba(15, 23, 42, 0.75) !important;
-  border-color: rgba(148, 163, 184, 0.25) !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .featured-thumb,
-html[data-theme="dark"] .featured-thumb[style] {
-  background: linear-gradient(135deg, #1e3a5f, #312e81) !important;
-  color: #e2e8f0 !important;
-}
-
-html[data-theme="dark"] .featured-post {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-html[data-theme="dark"] .featured-post h2,
-html[data-theme="dark"] .featured-post h3 {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .featured-post p {
-  color: #94a3b8 !important;
-}
-
-/* Pagination */
-html[data-theme="dark"] .pagination__btn {
-  background: rgba(30, 41, 59, 0.9) !important;
-  color: #e2e8f0 !important;
-  border-color: rgba(148, 163, 184, 0.2) !important;
-}
-
-html[data-theme="dark"] .pagination__btn--active {
-  background: #38bdf8 !important;
-  color: #0b1220 !important;
-}
-
-/* Blog modal */
-html[data-theme="dark"] .modal {
-  background: rgba(30, 41, 59, 0.95) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .modal__title {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .modal__body {
-  color: #e2e8f0 !important;
-}
-
-html[data-theme="dark"] .modal__body a {
-  color: #38bdf8 !important;
-}
-
-html[data-theme="dark"] .modal__close {
-  color: #e2e8f0 !important;
-  background: rgba(30, 41, 59, 0.9) !important;
-  border-color: rgba(148, 163, 184, 0.2) !important;
-}
-
-/* Blog card enhancements */
-html[data-theme="dark"] .blog-card {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-html[data-theme="dark"] .blog-card__title {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .blog-card__date,
-html[data-theme="dark"] .blog-card__excerpt {
-  color: #94a3b8 !important;
-}
-
-/* ── Partners page specific ───────────────────────────── */
-html[data-theme="dark"] .partner-card {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-html[data-theme="dark"] .partner-card__name {
-  color: #94a3b8 !important;
-}
-
-html[data-theme="dark"] .partner-card:hover .partner-card__name {
-  color: #38bdf8 !important;
-}
-
-/* ── Services page project cards ── */
-html[data-theme="dark"] .project-card {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .project-card__title {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .project-card__text {
-  color: #94a3b8 !important;
-}
-
-/* ── About page timeline & values ── */
-html[data-theme="dark"] .value-card__icon,
-html[data-theme="dark"] .value-card__title {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .value-card__text {
-  color: #94a3b8 !important;
-}
-
-/* ── Search bar ── */
-html[data-theme="dark"] .search-bar {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-html[data-theme="dark"] .search-bar .glass-input,
-html[data-theme="dark"] .search-bar input {
-  background: rgba(15, 23, 42, 0.75) !important;
-  border-color: rgba(148, 163, 184, 0.25) !important;
-  color: #f1f5f9 !important;
-}
-
-/* ── Featured post / thumb ── */
-html[data-theme="dark"] .featured-thumb,
-html[data-theme="dark"] .featured-thumb[style] {
-  background: linear-gradient(135deg, #1e3a5f, #312e81) !important;
-  color: #e2e8f0 !important;
-}
-
-html[data-theme="dark"] .featured-post {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-html[data-theme="dark"] .featured-post h2,
-html[data-theme="dark"] .featured-post h3 {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .featured-post p {
-  color: #94a3b8 !important;
-}
-
 /* ── Pagination ── */
 html[data-theme="dark"] .pagination__btn {
   background: rgba(30, 41, 59, 0.9) !important;
@@ -603,11 +376,30 @@ html[data-theme="dark"] .pagination__btn--active {
   color: #0b1220 !important;
 }
 
-/* ── Header controls (lang + theme toggles) ── */
-html[data-theme="dark"] .header-controls {
-  background: transparent !important;
+/* ── Form Labels ── */
+html[data-theme="dark"] label,
+html[data-theme="dark"] .form-label {
+  color: #cbd5e1 !important;
 }
 
+/* ── Inline White Cards Safety Net ── */
+html[data-theme="dark"] [style*="background: white"],
+html[data-theme="dark"] [style*="background:white"],
+html[data-theme="dark"] [style*="background: #fff"],
+html[data-theme="dark"] [style*="background:#fff"],
+html[data-theme="dark"] [style*="background: #ffffff"],
+html[data-theme="dark"] [style*="background:#ffffff"] {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Contact CTA ── */
+html[data-theme="dark"] .section .contact-grid,
+html[data-theme="dark"] .contact-grid {
+  color: #e2e8f0;
+}
+
+/* ── Header Controls ── */
 html[data-theme="dark"] .lang-toggle__track {
   background: rgba(30, 41, 59, 0.9) !important;
   border-color: rgba(148, 163, 184, 0.2) !important;
@@ -646,7 +438,56 @@ html[data-theme="dark"] .theme-toggle:hover {
   color: #fbbf24 !important;
 }
 
-/* ── Subpage hero / page-header (keep navy but ensure text contrast) ── */
+/* ── Search Bar ── */
+html[data-theme="dark"] .search-bar {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .search-bar .glass-input,
+html[data-theme="dark"] .search-bar input {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Featured Post / Thumb ── */
+html[data-theme="dark"] .featured-thumb,
+html[data-theme="dark"] .featured-thumb[style] {
+  background: linear-gradient(135deg, #1e3a5f, #312e81) !important;
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .featured-post {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .featured-post h2,
+html[data-theme="dark"] .featured-post h3 {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .featured-post p {
+  color: #94a3b8 !important;
+}
+
+/* ── Blog Cards ── */
+html[data-theme="dark"] .blog-card {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .blog-card__title {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .blog-card__date,
+html[data-theme="dark"] .blog-card__excerpt {
+  color: #94a3b8 !important;
+}
+
+/* ── Subpage Header ── */
 html[data-theme="dark"] .page-header {
   background: #0f2740 !important;
   color: #ffffff !important;
@@ -669,8 +510,35 @@ html[data-theme="dark"] .page-header__breadcrumb a:hover {
   color: #fbbf24 !important;
 }
 
-/* ── Partners grid & cards ── */
-html[data-theme="dark"] .grid-auto > .glass.partner-card,
+/* ── Section Headers ── */
+html[data-theme="dark"] .section__header,
+html[data-theme="dark"] .section__label,
+html[data-theme="dark"] .section__title,
+html[data-theme="dark"] .section__subtitle {
+  color: inherit;
+}
+
+html[data-theme="dark"] .section__label {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+/* ── Stats Banner ── */
+html[data-theme="dark"] .stats-banner .glass-stat:not(:last-child) {
+  border-right-color: #1e293b !important;
+}
+
+/* ── Why / Service Card Icons ── */
+html[data-theme="dark"] .why-card__icon {
+  background: rgba(56, 189, 248, 0.15) !important;
+}
+
+html[data-theme="dark"] .service-card__icon {
+  background: rgba(56, 189, 248, 0.15) !important;
+}
+
+/* ── Partners ── */
 html[data-theme="dark"] .partner-card {
   background: rgba(30, 41, 59, 0.92) !important;
   border-color: rgba(148, 163, 184, 0.18) !important;
@@ -684,7 +552,7 @@ html[data-theme="dark"] .partner-card:hover .partner-card__name {
   color: #38bdf8 !important;
 }
 
-/* ── Services page project cards ── */
+/* ── Services Page Project Cards ── */
 html[data-theme="dark"] .project-card {
   background: rgba(30, 41, 59, 0.92) !important;
   border-color: rgba(148, 163, 184, 0.18) !important;
@@ -699,7 +567,7 @@ html[data-theme="dark"] .project-card__text {
   color: #94a3b8 !important;
 }
 
-/* ── About page timeline & values ── */
+/* ── About Page ── */
 html[data-theme="dark"] .value-card__icon,
 html[data-theme="dark"] .value-card__title {
   color: #f8fafc !important;
@@ -709,61 +577,22 @@ html[data-theme="dark"] .value-card__text {
   color: #94a3b8 !important;
 }
 
-/* ── Blog cards ── */
-html[data-theme="dark"] .blog-card {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
+/* ── Chat Assistant ── */
+html[data-theme="dark"] .wise-help__fab {
+  color: #0b1220 !important;
+  background: #38bdf8 !important;
 }
 
-html[data-theme="dark"] .blog-card__title {
+html[data-theme="dark"] .wise-help__fab--open {
+  background: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .wise-help__header {
+  background: #0c4a6e !important;
   color: #f8fafc !important;
 }
 
-html[data-theme="dark"] .blog-card__date,
-html[data-theme="dark"] .blog-card__excerpt {
-  color: #94a3b8 !important;
-}
-
-/* ── Featured post (blog page) ── */
-html[data-theme="dark"] .featured-post {
-  background: rgba(30, 41, 59, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-html[data-theme="dark"] .featured-post h2,
-html[data-theme="dark"] .featured-post h3 {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .featured-post p {
-  color: #94a3b8 !important;
-}
-
-/* ── Section headers in all pages ── */
-html[data-theme="dark"] .section__header,
-html[data-theme="dark"] .section__label,
-html[data-theme="dark"] .section__title,
-html[data-theme="dark"] .section__subtitle {
-  color: inherit;
-}
-
-html[data-theme="dark"] .section__label {
-  background: rgba(56, 189, 248, 0.15) !important;
-  color: #38bdf8 !important;
-  border-color: rgba(56, 189, 248, 0.3) !important;
-}
-
-/* ── Stats banner on about page ── */
-html[data-theme="dark"] .stats-banner .glass-stat:not(:last-child) {
-  border-right-color: #1e293b !important;
-}
-
-/* ── Why cards (home page) ── */
-html[data-theme="dark"] .why-card__icon {
-  background: rgba(56, 189, 248, 0.15) !important;
-}
-
-/* ── Service cards (home page preview) ── */
-html[data-theme="dark"] .service-card__icon {
-  background: rgba(56, 189, 248, 0.15) !important;
+html[data-theme="dark"] .wise-help__msg--user .wise-help__bubble {
+  color: #fff !important;
 }
