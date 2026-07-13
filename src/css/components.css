@@ -934,12 +934,15 @@ html[data-theme="dark"] .contact-form .glass-input {
 /* ===== PAGE HEADER =====
    Always solid brand navy + white title (light AND dark).
    Prevents white-on-cream / theme-mismatch bugs on Partners/About/etc.
+   Never use cream gradients here — they break white titles.
 */
 .page-header,
 section.page-header,
 html[data-theme="light"] .page-header,
 html[data-theme="dark"] .page-header,
-html:not([data-theme]) .page-header {
+html:not([data-theme]) .page-header,
+.page-header.fade-in,
+.page-header.visible {
   background: #0f2740 !important;
   background-image: none !important;
   background-color: #0f2740 !important;
@@ -948,7 +951,10 @@ html:not([data-theme]) .page-header {
   position: relative;
   color: #ffffff !important;
   border-bottom: none !important;
-  transition: background 0.25s ease, color 0.2s ease;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none;
 }
 
 .page-header__title,
@@ -1196,6 +1202,13 @@ html[data-theme="dark"] .hero__title span {
 .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Page headers never start invisible (white-on-cream flash / stuck opacity) */
+.page-header.fade-in,
+section.page-header.fade-in {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 .fade-in-left {

@@ -40,8 +40,9 @@
   --hero-grad-start: #ffffff;
   --hero-grad-mid: #f5f2eb;
   --hero-grad-end: #ede8dd;
-  --page-header-grad-start: #f8f6f0;
-  --page-header-grad-end: #ede8dd;
+  /* Page-header is always brand navy (never cream) — light and dark */
+  --page-header-grad-start: #0f2740;
+  --page-header-grad-end: #0f2740;
 }
 
 /* ── Dark Mode Custom Overrides ────────────────────────── */
@@ -63,12 +64,12 @@ html[data-theme="dark"] {
   --color-glass-hover: rgba(51, 65, 85, 0.85);
   --color-overlay: rgba(2, 6, 23, 0.78);
 
-  /* Page heroes / page-header — must match body, not stay beige */
+  /* Page heroes match dark body; page-header stays brand navy */
   --hero-grad-start: #0b1220;
   --hero-grad-mid: #111827;
   --hero-grad-end: #0f172a;
-  --page-header-grad-start: #0b1220;
-  --page-header-grad-end: #111827;
+  --page-header-grad-start: #0f2740;
+  --page-header-grad-end: #0f2740;
 }
 
 

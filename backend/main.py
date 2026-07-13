@@ -416,7 +416,7 @@ def get_version():
     """Deploy stamp so we can confirm Render is on the latest build."""
     payload = {
         "ok": True,
-        "asset_version": "28",
+        "asset_version": "32",
         "frontend_root": str(FRONTEND_ROOT) if FRONTEND_ROOT else None,
         "frontend_mounted": bool(FRONTEND_ROOT),
     }
@@ -443,11 +443,18 @@ def get_version():
                 if i18n.is_file()
                 else False
             )
-            payload["components_has_header_controls"] = (
-                "header-controls" in (FRONTEND_ROOT / "css" / "components.css").read_text(
-                    encoding="utf-8", errors="ignore"
-                )
+            components_css = (FRONTEND_ROOT / "css" / "components.css").read_text(
+                encoding="utf-8", errors="ignore"
             )
+            payload["components_has_header_controls"] = "header-controls" in components_css
+            payload["page_header_navy"] = "#0f2740" in components_css and ".page-header" in components_css
+            main_js = (FRONTEND_ROOT / "js" / "main.js").read_text(encoding="utf-8", errors="ignore")
+            payload["page_header_js_force"] = "forcePageHeaderContrast" in main_js
+            partners = FRONTEND_ROOT / "pages" / "partners.html"
+            if partners.is_file():
+                ph = partners.read_text(encoding="utf-8", errors="ignore")
+                payload["partners_inline_navy"] = "#0f2740" in ph and "wisef-page-header-critical" in ph
+                payload["partners_asset_v32"] = "?v=32" in ph
         except Exception as e:
             payload["probe_error"] = str(e)
     return payload

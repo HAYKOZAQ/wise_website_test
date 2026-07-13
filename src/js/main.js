@@ -396,7 +396,50 @@ function initBlogSearch() {
   });
 }
 
+/**
+ * Force readable page-header contrast regardless of theme / cached CSS.
+ * Navy band + white title — cannot be cream + white.
+ */
+function forcePageHeaderContrast() {
+  document.querySelectorAll('.page-header, section.page-header').forEach((el) => {
+    el.style.setProperty('background', '#0f2740', 'important');
+    el.style.setProperty('background-color', '#0f2740', 'important');
+    el.style.setProperty('background-image', 'none', 'important');
+    el.style.setProperty('color', '#ffffff', 'important');
+    el.style.setProperty('opacity', '1', 'important');
+    el.style.setProperty('transform', 'none', 'important');
+    el.style.setProperty('filter', 'none', 'important');
+    el.classList.remove('fade-in');
+    el.classList.add('visible');
+    el.querySelectorAll('.page-header__title, h1').forEach((title) => {
+      title.style.setProperty('color', '#ffffff', 'important');
+      title.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+      title.style.setProperty('background', 'none', 'important');
+      title.style.setProperty('opacity', '1', 'important');
+    });
+    el.querySelectorAll('.page-header__breadcrumb, p').forEach((crumb) => {
+      if (crumb.matches('a') || crumb.querySelector('a')) {
+        /* leave link coloring to CSS */
+      }
+      crumb.style.setProperty('color', 'rgba(255,255,255,0.8)', 'important');
+      crumb.style.setProperty('-webkit-text-fill-color', 'rgba(255,255,255,0.8)', 'important');
+    });
+    el.querySelectorAll('.page-header__breadcrumb a').forEach((a) => {
+      a.style.setProperty('color', '#7dd3fc', 'important');
+      a.style.setProperty('-webkit-text-fill-color', '#7dd3fc', 'important');
+    });
+  });
+}
+
+// Run ASAP (before DOMContentLoaded) if possible, and again on ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', forcePageHeaderContrast);
+} else {
+  forcePageHeaderContrast();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  forcePageHeaderContrast();
   initMobileMenu();
   initHeaderScroll();
   initScrollReveal();
@@ -407,4 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBlogPagination();
   initContactForm();
   initBlogSearch();
+  // Re-apply after theme / i18n may touch DOM
+  setTimeout(forcePageHeaderContrast, 0);
+  setTimeout(forcePageHeaderContrast, 250);
 });

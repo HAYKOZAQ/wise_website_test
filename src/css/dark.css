@@ -11,13 +11,28 @@ html[data-theme="dark"] body {
 }
 
 /* ── Top banners / heroes ─────────────────────────── */
-/* page-header is always navy (see components.css) — do not re-theme it here */
+/* page-header is ALWAYS navy + white (components.css + inline critical).
+   Do NOT set cream/beige backgrounds or light text overrides on .page-header. */
 html[data-theme="dark"] .hero,
 html[data-theme="dark"] .hero--small,
 html[data-theme="dark"] .glass-hero {
   background: linear-gradient(160deg, #0b1220 0%, #111827 45%, #0f172a 100%) !important;
   color: #f1f5f9 !important;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* Explicit guard: dark theme must never paint page-header cream */
+html[data-theme="dark"] .page-header,
+html[data-theme="dark"] section.page-header {
+  background: #0f2740 !important;
+  background-color: #0f2740 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .page-header__title,
+html[data-theme="dark"] .page-header h1 {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Section/card titles only (NOT page-header — that is always white on navy) */
