@@ -369,6 +369,48 @@ def get_status():
     return _status_payload()
 
 
+@app.get("/api/version")
+def get_version():
+    """Deploy stamp so we can confirm Render is on the latest build."""
+    payload = {
+        "ok": True,
+        "asset_version": "28",
+        "frontend_root": str(FRONTEND_ROOT) if FRONTEND_ROOT else None,
+        "frontend_mounted": bool(FRONTEND_ROOT),
+    }
+    for cand in (
+        _BACKEND_DIR / "version.json",
+        Path("/app/version.json"),
+    ):
+        if cand.is_file():
+            try:
+                payload.update(json.loads(cand.read_text(encoding="utf-8")))
+            except Exception as e:
+                payload["version_file_error"] = str(e)
+            break
+    # Prove newest CSS/JS files exist in the image
+    if FRONTEND_ROOT:
+        dark = FRONTEND_ROOT / "css" / "dark.css"
+        i18n = FRONTEND_ROOT / "js" / "i18n.js"
+        payload["has_dark_css"] = dark.is_file()
+        payload["has_i18n_js"] = i18n.is_file()
+        try:
+            payload["dark_css_bytes"] = dark.stat().st_size if dark.is_file() else 0
+            payload["i18n_has_insertBefore"] = (
+                "insertBefore" in i18n.read_text(encoding="utf-8", errors="ignore")
+                if i18n.is_file()
+                else False
+            )
+            payload["components_has_header_controls"] = (
+                "header-controls" in (FRONTEND_ROOT / "css" / "components.css").read_text(
+                    encoding="utf-8", errors="ignore"
+                )
+            )
+        except Exception as e:
+            payload["probe_error"] = str(e)
+    return payload
+
+
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(request: ChatRequest, req: Request):
     if not rag_engine:

@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <script>try{var t=localStorage.getItem('wisef_theme')||'light';document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=(t==='dark'?'dark':'light');}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Մեր մասին — WISE Foundation</title>
+  <meta name="description" content="Իմացեք ավելին WISE Foundation-ի մասին՝ 25 տարվա փորձ տեղեկատվական տեխնոլոգիաների ոլորտում:">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Armenian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css?v=27">
+  <link rel="stylesheet" href="/css/glass.css?v=27">
+  <link rel="stylesheet" href="/css/components.css?v=27">
+  <link rel="stylesheet" href="/css/dark.css?v=27">
+  <link rel="icon" href="/assets/logos/favicon.svg" type="image/svg+xml">
+</head>
+<body lang="hy">
+
+  <header class="header" id="header">
+    <div class="header__inner">
+      <a href="index.html" class="header__logo">
+        <img src="/assets/logos/wisef-logo.svg" alt="WISE Foundation">
+      </a>
+      <nav class="nav" role="navigation" aria-label="Հիմնական նավիգացիա">
+        <a href="index.html" class="nav__link" data-i18n="nav.home">Գլխավոր</a>
+        <a href="about.html" class="nav__link nav__link--active" data-i18n="nav.about">Մեր մասին</a>
+        <a href="services.html" class="nav__link" data-i18n="nav.services">Ծառայություններ</a>
+        <a href="partners.html" class="nav__link" data-i18n="nav.partners">Գործընկերներ</a>
+        <a href="contact.html" class="nav__link" data-i18n="nav.contact">Հետադարձ կապ</a>
+        <a href="blog.html" class="nav__link" data-i18n="nav.blog">Բլոգ</a>
+        <button class="nav__lang-btn" aria-label="Switch to English">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M2.5 8h11M8 1.5A6.5 6.5 0 008 14.5M8 1.5a6.5 6.5 0 010 13" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          EN
+        </button>
+      </nav>
+      <button class="mobile-toggle" aria-label="Բացել մենյուն">
+        <span></span>
+        <span></span>
+        <span></span>
+      </

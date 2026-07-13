@@ -30,10 +30,11 @@ html[data-theme="dark"] .header.scrolled {
 }
 
 .header__inner {
-  display: grid;
-  grid-template-columns: minmax(100px, 1fr) auto minmax(100px, 1fr);
+  /* Flex + absolute-centered nav = true visual center for EN/HY */
+  position: relative;
+  display: flex;
   align-items: center;
-  column-gap: 16px;
+  justify-content: space-between;
   height: var(--header-height);
   max-width: var(--container-max);
   margin: 0 auto;
@@ -43,12 +44,14 @@ html[data-theme="dark"] .header.scrolled {
 .header__logo {
   display: flex;
   align-items: center;
-  justify-self: start;
   gap: 12px;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-text);
   min-width: 0;
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
 }
 
 .header__logo img {
@@ -62,10 +65,11 @@ html[data-theme="dark"] .header.scrolled {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  justify-self: end;
   gap: 10px;
   flex-shrink: 0;
-  grid-column: 3;
+  position: relative;
+  z-index: 2;
+  margin-left: auto;
 }
 
 /* ===== THEME SWITCHER ===== */
@@ -115,11 +119,15 @@ html[data-theme="dark"] .theme-toggle .theme-toggle__moon {
   display: flex;
   align-items: center;
   justify-content: center;
-  justify-self: center;
   gap: 2px;
   flex-shrink: 0;
   min-width: 0;
-  grid-column: 2;
+  /* True horizontal center of the header bar (independent of logo width) */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  max-width: min(720px, calc(100% - 280px));
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -1216,8 +1224,8 @@ html[data-theme="dark"] .hero__title span {
 
 @media (max-width: 768px) {
   .header__inner {
-    grid-template-columns: 1fr auto auto;
-    column-gap: 10px;
+    display: flex;
+    justify-content: space-between;
   }
 
   .nav {
@@ -1225,8 +1233,9 @@ html[data-theme="dark"] .hero__title span {
     top: var(--header-height);
     left: 0;
     right: 0;
-    grid-column: 1 / -1;
-    justify-self: stretch;
+    transform: translateY(-120%);
+    max-width: none;
+    width: 100%;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
@@ -1235,7 +1244,6 @@ html[data-theme="dark"] .hero__title span {
     backdrop-filter: var(--blur-lg);
     -webkit-backdrop-filter: var(--blur-lg);
     border-bottom: 1px solid var(--color-glass-border);
-    transform: translateY(-120%);
     transition: transform var(--transition-base);
     gap: 4px;
     z-index: 999;
@@ -1257,15 +1265,19 @@ html[data-theme="dark"] .hero__title span {
   }
 
   .header-controls {
-    grid-column: 2;
-    justify-self: end;
+    margin-left: 0;
+    order: 2;
   }
 
   .mobile-toggle {
     display: flex;
-    grid-column: 3;
-    justify-self: end;
+    order: 3;
     align-self: center;
+  }
+
+  .header__logo {
+    order: 1;
+    margin-right: auto;
   }
 
   .lang-toggle {

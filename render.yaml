@@ -12,7 +12,12 @@ services:
         sync: false
       - key: HOST
         value: 0.0.0.0
+      # Do not block boot on scrape — corpus is in the image
+      - key: FORCE_SCRAPE_ON_BOOT
+        value: "0"
       - key: REINGEST_INTERVAL_HOURS
-        value: "24"
+        value: "0"
+      - key: REINGEST_MODE
+        value: "off"
       - key: ADMIN_TOKEN
         sync: false
