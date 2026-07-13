@@ -394,6 +394,20 @@ html[lang="en"] .nav__link {
   margin: 0 auto;
 }
 
+.section__text {
+  font-size: 1.0625rem;
+  color: var(--color-text-light);
+  line-height: 1.8;
+}
+
+.content-heading {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
 /* ===== GRID LAYOUTS ===== */
 .grid-2, .grid-3, .grid-4, .grid-auto {
   min-width: 0;

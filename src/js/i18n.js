@@ -248,7 +248,23 @@
     'chat.q10': { hy: 'Ֆունկցիոնալության գնահատում', en: 'Functional assessment / disability' },
     'chat.q6': { hy: 'Գործազրկության կարգավիճակ', en: 'Unemployment status' },
     'chat.q7': { hy: 'Էլեկտրաէներգիայի փոխհատուցում', en: 'Electricity subsidy' },
-    'chat.q8': { hy: 'ՄՍԾ թեժ գիծ 114', en: 'Hotline 114 contacts' }
+    'chat.q8': { hy: 'ՄՍԾ թեժ գիծ 114', en: 'Hotline 114 contacts' },
+
+    /* Page titles */
+    'site.title.home':     { hy: 'WISE Foundation — «Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամ', en: 'WISE Foundation — Welfare Information Systems Enterprise Foundation' },
+    'site.title.about':    { hy: 'Մեր մասին — WISE Foundation', en: 'About Us — WISE Foundation' },
+    'site.title.services': { hy: 'Ծառայություններ — WISE Foundation', en: 'Services — WISE Foundation' },
+    'site.title.partners': { hy: 'Գործընկերներ — WISE Foundation', en: 'Partners — WISE Foundation' },
+    'site.title.contact':  { hy: 'Հետադարձ կապ — WISE Foundation', en: 'Contact Us — WISE Foundation' },
+    'site.title.blog':     { hy: 'Բլոգ — WISE Foundation', en: 'Blog — WISE Foundation' },
+
+    /* Meta descriptions */
+    'site.desc.home':     { hy: 'WISE Foundation — 25 տարի տեղեկատվական տեխնոլոգիաների ոլորտում: Մենք ստեղծում ենք թվային լուծումներ:', en: 'WISE Foundation — 25 years in information technology. We create digital solutions for government and private sector.' },
+    'site.desc.about':    { hy: 'Իմացեք ավելին WISE Foundation-ի մասին՝ 25 տարվա փորձ տեղեկատվական տեխնոլոգիաների ոլորտում:', en: 'Learn more about WISE Foundation — 25 years of experience in information technology.' },
+    'site.desc.services': { hy: 'WISE Foundation-ի ծառայություններ՝ տեղեկատվական համակարգերի նախագծում, կիբեռանվտանգություն, տվյալների մշակում և ավելին:', en: 'WISE Foundation services — information systems design, cybersecurity, data processing and more.' },
+    'site.desc.partners': { hy: 'WISE Foundation-ի գործընկերներ՝ պետական հաստատություններ, միջազգային կազմակերպություններ, բանկեր:', en: 'WISE Foundation partners — government institutions, international organizations, banks.' },
+    'site.desc.contact':  { hy: 'Կապնվեք WISE Foundation-ի հետ: Էլ. փոստ, հեռախոս, կոնտակտային ձև:', en: 'Contact WISE Foundation. Email, phone, contact form.' },
+    'site.desc.blog':     { hy: 'WISE Foundation-ի բլոգ՝ նորություններ, հոդվածներ և հայտարարություններ տեղեկատվական տեխնոլոգիաների ոլորտում:', en: 'WISE Foundation blog — news, articles and announcements in information technology.' }
   };
 
   /* ══════════════════════════════════════════════════════

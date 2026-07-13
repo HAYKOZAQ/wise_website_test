@@ -146,6 +146,12 @@ input, textarea {
   }
 }
 
+html[lang="en"] .hero__text,
+html[lang="en"] .section__subtitle,
+html[lang="en"] .section__text {
+  font-size: 1.125rem;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
