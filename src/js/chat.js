@@ -678,6 +678,17 @@
           );
           return;
         }
+        if (res.status === 500) {
+          addBotBubble(
+            '<p>' + escapeHtml(t('chat.err_offline', 'Հիմա չեմ կարող պատասխանել։')) + '</p>' +
+            '<p style="font-size:0.85rem;margin-top:4px;opacity:0.7">' + escapeHtml(
+              lang() === 'en'
+                ? 'The AI service encountered an error. Our team has been notified.'
+                : 'AI ծառայությունը սխալ է հայտնաբերել։ Մեր թիմը տեղեկացված է։'
+            ) + '</p>'
+          );
+          return;
+        }
         addBotBubble(
           '<p>' + escapeHtml(t('chat.err_offline', 'Հիմա չեմ կարող պատասխանել։')) + '</p>'
         );

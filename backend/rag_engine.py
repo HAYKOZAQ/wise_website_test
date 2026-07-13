@@ -68,6 +68,11 @@ SUMMARY_QUERY_HINTS = (
     "how to apply", "where", "simple", "amount", "documents needed",
 )
 
+_IMAGE_REF_RE = re.compile(r'\b[\w\-]+\.(?:png|jpg|jpeg|gif|svg|webp|bmp|ico)\b', re.I)
+
+def _strip_image_refs(text: str) -> str:
+    return _IMAGE_REF_RE.sub('', text or '')
+
 
 class RAGEngine:
     def __init__(self):
@@ -157,14 +162,15 @@ class RAGEngine:
                 pieces = [content.strip()] if content.strip() else []
 
             for p in pieces:
+                cleaned = _strip_image_refs(p)
                 if doc_type == "legal":
-                    chunk_text = f"Ակտ՝ {title}\n{p}"
+                    chunk_text = f"Ակտ՝ {title}\n{cleaned}"
                 elif doc_type == "pdf":
-                    chunk_text = f"Պաշտոնական PDF՝ {title}\n{p}"
+                    chunk_text = f"Պաշտոնական PDF՝ {title}\n{cleaned}"
                 elif doc_type == "web":
-                    chunk_text = f"Պաշտոնական էջ՝ {title}\n{p}"
+                    chunk_text = f"Պաշտոնական էջ՝ {title}\n{cleaned}"
                 else:
-                    chunk_text = f"Ծրագիր՝ {title}\nՆկարագրություն՝ {p}"
+                    chunk_text = f"Ծրագիր՝ {title}\nՆկարագրություն՝ {cleaned}"
 
                 self.chunks.append({
                     "chunk_id": len(self.chunks),
@@ -792,7 +798,10 @@ Write a complete answer in clear English:"""
                         print(f"Gemini {model} status {r.status_code}; retrying…")
                         continue
                     else:
-                        print(f"Gemini {model} status {r.status_code}: {r.text[:220]}")
+                        err_snippet = r.text[:300]
+                        print(f"Gemini {model} status {r.status_code}: {err_snippet}")
+                        if "image input" in err_snippet.lower() and "not support" in err_snippet.lower():
+                            print(f"  ↳ Image file reference detected in context text — corpus may contain image filenames")
                         break  # non-retryable for this model
                 except requests.Timeout:
                     print(f"Gemini {model} timeout on attempt {attempt}")
@@ -853,7 +862,7 @@ Write a complete answer in clear English:"""
             if src:
                 header += f" | {src}"
             # Give model more room per chunk for complete answers
-            text = c.get("text") or ""
+            text = _strip_image_refs(c.get("text") or "")
             if len(text) > 2500:
                 text = text[:2500] + "…"
             context_parts.append(f"{header}\n{text}")
