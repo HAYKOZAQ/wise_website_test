@@ -1,0 +1,17 @@
+{
+  "note": "PDFs that cannot yield extractable text (scanned/image-only) are listed here and skipped from the RAG index. Replace with OCR text or HTML source to include them.",
+  "excluded": [
+    {
+      "file": "mlsa-pension-charter.pdf",
+      "reason": "image-only / no extractable text via pypdf"
+    },
+    {
+      "file": "mlsa-child-multidisciplinary.pdf",
+      "reason": "image-only / no extractable text via pypdf"
+    },
+    {
+      "file": "uss-pension-docs.pdf",
+      "reason": "image-only / no extractable text via pypdf"
+    }
+  ]
+}

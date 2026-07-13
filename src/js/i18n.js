@@ -247,6 +247,8 @@
     'chat.q3': { hy: 'Ընտանեկան նպաստ', en: 'Family benefit' },
     'chat.q4': { hy: 'Տարիքային կենսաթոշակ', en: 'Age pension' },
     'chat.q5': { hy: 'Հաշմանդամության կենսաթոշակ', en: 'Disability pension' },
+    'chat.q9': { hy: 'Տեղահանվածների աջակցություն', en: 'Displaced persons support' },
+    'chat.q10': { hy: 'Ֆունկցիոնալության գնահատում', en: 'Functional assessment / disability' },
     'chat.q6': { hy: 'Գործազրկության կարգավիճակ', en: 'Unemployment status' },
     'chat.q7': { hy: 'Էլեկտրաէներգիայի փոխհատուցում', en: 'Electricity subsidy' },
     'chat.q8': { hy: 'ՄՍԾ թեժ գիծ 114', en: 'Hotline 114 contacts' }
@@ -373,8 +375,21 @@
       const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('wisef_theme', theme);
+      applyHeaderLogo(theme);
     });
     return btn;
+  }
+
+  function applyHeaderLogo(theme) {
+    const dark = theme === 'dark';
+    document.querySelectorAll('.header__logo img').forEach((img) => {
+      const src = img.getAttribute('src') || '';
+      if (dark) {
+        img.setAttribute('src', src.replace('wisef-logo.svg', 'wisef-logo-white.svg'));
+      } else {
+        img.setAttribute('src', src.replace('wisef-logo-white.svg', 'wisef-logo.svg'));
+      }
+    });
   }
 
   /* ══════════════════════════════════════════════════════
@@ -382,6 +397,7 @@
   ══════════════════════════════════════════════════════ */
   function init() {
     cacheOriginals();
+    applyHeaderLogo(document.documentElement.getAttribute('data-theme') || 'light');
 
     document.querySelectorAll('.nav__lang-btn').forEach(old => {
       const container = document.createElement('div');

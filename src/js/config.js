@@ -15,7 +15,13 @@ window.WISEF_CONFIG = {
   productionApiBase: '',
 
   /** Local backend while developing on your PC */
-  localApiBase: 'http://127.0.0.1:8000'
+  localApiBase: 'http://127.0.0.1:8000',
+
+  /**
+   * Optional secondary contact URL (only if /api/contact is unreachable).
+   * Leave empty — primary path is POST /api/contact on the backend.
+   */
+  contactFallbackUrl: ''
 };
 
 /** Resolve which API the chat should call */

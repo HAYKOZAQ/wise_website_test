@@ -21,6 +21,8 @@
   let chatOpen = false;
   let chatInitialized = false;
   let hasConversation = false;
+  /** Multi-turn context sent to /api/chat */
+  let conversationHistory = [];
 
   let root, fab, panel, messagesEl, inputEl, sendBtn, statusEl, homeEl, topicsEl;
 
@@ -33,6 +35,8 @@
     { icon: '♿', key: 'chat.q5', hy: 'Հաշմանդամության կենսաթոշակ', en: 'Disability pension' },
     { icon: '💼', key: 'chat.q6', hy: 'Գործազրկության կարգավիճակ', en: 'Unemployment status' },
     { icon: '⚡', key: 'chat.q7', hy: 'Էլեկտրաէներգիայի փոխհատուցում', en: 'Electricity subsidy' },
+    { icon: '🏠', key: 'chat.q9', hy: 'Տեղահանվածների աջակցություն', en: 'Displaced persons support' },
+    { icon: '🩺', key: 'chat.q10', hy: 'Ֆունկցիոնալության գնահատում', en: 'Functional assessment / disability' },
     { icon: '📞', key: 'chat.q8', hy: 'ՄՍԾ թեժ գիծ 114', en: 'Hotline 114 contacts' }
   ];
 
@@ -68,8 +72,11 @@
     root.innerHTML = `
       <button type="button" class="wise-help__fab" aria-expanded="false" aria-controls="wise-help-panel">
         <span class="wise-help__fab-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <svg class="wise-help__fab-svg wise-help__fab-svg--chat" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <svg class="wise-help__fab-svg wise-help__fab-svg--close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </span>
         <span class="wise-help__fab-label" data-i18n="chat.fab">Հարցրեք մեզ</span>
@@ -192,27 +199,68 @@
     });
   }
 
+  let animating = false;
+
   function toggle() {
+    if (animating) return;
     if (chatOpen) close();
     else open();
   }
 
   function open() {
+    if (chatOpen || animating) return;
+    animating = true;
     chatOpen = true;
+
     panel.hidden = false;
+    panel.classList.remove('wise-help__panel--closing');
     fab.setAttribute('aria-expanded', 'true');
     fab.classList.add('wise-help__fab--open');
     root.classList.add('wise-help--open');
     applyI18n();
-    setTimeout(() => inputEl.focus(), 80);
+
+    // Double rAF so the browser applies the "from" state before animating "to"
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        panel.classList.add('wise-help__panel--open');
+        animating = false;
+        setTimeout(function () {
+          if (chatOpen && inputEl) inputEl.focus();
+        }, 320);
+      });
+    });
   }
 
   function close() {
+    if (!chatOpen || animating) return;
+    animating = true;
     chatOpen = false;
-    panel.hidden = true;
+
     fab.setAttribute('aria-expanded', 'false');
     fab.classList.remove('wise-help__fab--open');
     root.classList.remove('wise-help--open');
+    panel.classList.remove('wise-help__panel--open');
+    panel.classList.add('wise-help__panel--closing');
+
+    var finished = false;
+    function finishClose() {
+      if (finished) return;
+      finished = true;
+      panel.removeEventListener('transitionend', onEnd);
+      panel.hidden = true;
+      panel.classList.remove('wise-help__panel--closing');
+      animating = false;
+    }
+
+    function onEnd(e) {
+      if (e.target !== panel) return;
+      if (e.propertyName !== 'opacity' && e.propertyName !== 'transform') return;
+      finishClose();
+    }
+
+    panel.addEventListener('transitionend', onEnd);
+    // Fallback if transitionend doesn't fire
+    setTimeout(finishClose, 380);
   }
 
   async function pollStatus() {
@@ -386,14 +434,25 @@
     }
 
     try {
+      const historyPayload = conversationHistory.slice(-8);
       const res = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q, lang: lang() })
+        body: JSON.stringify({ query: q, lang: lang(), history: historyPayload })
       });
       typing.remove();
 
       if (!res.ok) {
+        if (res.status === 429) {
+          addBotBubble(
+            `<p>${escapeHtml(
+              lang() === 'en'
+                ? 'Too many questions in a short time. Please wait a minute and try again.'
+                : 'Շատ հարցեր կարճ ժամանակում։ Սպասեք մեկ րոպե և կրկին փորձեք։'
+            )}</p>`
+          );
+          return;
+        }
         addBotBubble(
           `<p>${escapeHtml(t('chat.err_offline', 'Հիմա չեմ կարող պատասխանել։ Ստուգեք, որ սերվերն աշխատում է։'))}</p>`
         );
@@ -401,6 +460,13 @@
       }
 
       const data = await res.json();
+      conversationHistory.push({ role: 'user', content: q });
+      if (data.answer) {
+        conversationHistory.push({ role: 'assistant', content: String(data.answer).slice(0, 2000) });
+      }
+      if (conversationHistory.length > 16) {
+        conversationHistory = conversationHistory.slice(-16);
+      }
       addBotBubble(formatAnswer(data.answer), {
         sources: data.sources || [],
         follow_ups: data.follow_ups || [],

@@ -269,5 +269,152 @@
     "arlis_url": "https://www.arlis.am/hy/acts/100867",
     "download_url": "https://www.arlis.am/hy/acts/100867/download/act",
     "priority": 2
+  },
+  {
+    "act_id": "202013",
+    "title_hy": "Ընտանիքի անապահովության գնահատման կարգ (2025 N 27-Ն)",
+    "title_en": "Family vulnerability assessment procedure (2025 N 27-N)",
+    "category": "allowances",
+    "program_keys": [
+      "family_benefit",
+      "social_benefit",
+      "emergency_aid",
+      "utility_electricity",
+      "utility_gas"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/202013",
+    "download_url": "https://www.arlis.am/hy/acts/202013/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "218849",
+    "title_hy": "Պետական նպաստների մասին օրենքում փոփոխություններ (2025)",
+    "title_en": "Amendments to the Law on State Benefits (2025)",
+    "category": "allowances",
+    "program_keys": [
+      "family_benefit",
+      "childcare_allowance",
+      "childbirth_benefit",
+      "maternity_benefit"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/218849",
+    "download_url": "https://www.arlis.am/hy/acts/218849/download/act",
+    "priority": 1
+  },
+  {
+    "act_id": "94822",
+    "title_hy": "ՀՀ օրենքը պետական նպաստների մասին (բազային տարբերակ ARLIS)",
+    "title_en": "Law of the RA on State Benefits (base ARLIS entry)",
+    "category": "allowances",
+    "program_keys": [
+      "family_benefit",
+      "social_benefit",
+      "childbirth_benefit",
+      "childcare_allowance",
+      "maternity_benefit"
+    ],
+    "arlis_url": "https://www.arlis.am/hy/acts/94822",
+    "download_url": "https://www.arlis.am/hy/acts/94822/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "183639",
+    "title_hy": "Պետական կենսաթոշակների մասին — կիրառում",
+    "title_en": "Պետական կենսաթոշակների մասին — կիրառում",
+    "category": "pensions",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/183639",
+    "download_url": "https://www.arlis.am/hy/acts/183639/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "147840",
+    "title_hy": "Պետական կենսաթոշակների մասին — փոփոխություններ",
+    "title_en": "Պետական կենսաթոշակների մասին — փոփոխություններ",
+    "category": "pensions",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/147840",
+    "download_url": "https://www.arlis.am/hy/acts/147840/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "92207",
+    "title_hy": "Պետական կենսաթոշակների մասին — հաշմանդամություն",
+    "title_en": "Պետական կենսաթոշակների մասին — հաշմանդամություն",
+    "category": "pensions",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/92207",
+    "download_url": "https://www.arlis.am/hy/acts/92207/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "187129",
+    "title_hy": "Պետական նպաստների մասին — լրացումներ",
+    "title_en": "Պետական նպաստների մասին — լրացումներ",
+    "category": "allowances",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/187129",
+    "download_url": "https://www.arlis.am/hy/acts/187129/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "152960",
+    "title_hy": "Հաշմանդամություն ունեցող անձանց իրավունքներ",
+    "title_en": "Հաշմանդամություն ունեցող անձանց իրավունքներ",
+    "category": "services",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/152960",
+    "download_url": "https://www.arlis.am/hy/acts/152960/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "199715",
+    "title_hy": "Զբաղվածության մասին օրենք (նոր)",
+    "title_en": "Զբաղվածության մասին օրենք (նոր)",
+    "category": "employment",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/199715",
+    "download_url": "https://www.arlis.am/hy/acts/199715/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "138920",
+    "title_hy": "Զբաղվածության մասին օրենք",
+    "title_en": "Զբաղվածության մասին օրենք",
+    "category": "employment",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/138920",
+    "download_url": "https://www.arlis.am/hy/acts/138920/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "34317",
+    "title_hy": "Հաշմանդամություն / կենսաթոշակ կիրառում",
+    "title_en": "Հաշմանդամություն / կենսաթոշակ կիրառում",
+    "category": "pensions",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/34317",
+    "download_url": "https://www.arlis.am/hy/acts/34317/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "109076",
+    "title_hy": "Պետական կենսաթոշակների մասին — կառավարության որոշում",
+    "title_en": "Պետական կենսաթոշակների մասին — կառավարության որոշում",
+    "category": "pensions",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/109076",
+    "download_url": "https://www.arlis.am/hy/acts/109076/download/act",
+    "priority": 2
+  },
+  {
+    "act_id": "73884",
+    "title_hy": "Հաշմանդամության կենսաթոշակների չափեր",
+    "title_en": "Հաշմանդամության կենսաթոշակների չափեր",
+    "category": "pensions",
+    "program_keys": [],
+    "arlis_url": "https://www.arlis.am/hy/acts/73884",
+    "download_url": "https://www.arlis.am/hy/acts/73884/download/act",
+    "priority": 2
   }
 ]

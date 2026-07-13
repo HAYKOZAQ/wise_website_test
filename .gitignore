@@ -6,5 +6,12 @@ node_modules/
 __pycache__/
 .env
 backend/.env
+# Runtime caches / logs (regenerated)
 backend/data/
+# Keep committed seed snapshot for offline deploy
+!backend/seed/
+!backend/seed/**
+# Local PDF drops may be large; allow README only under pdfs/
+backend/pdfs/*
+!backend/pdfs/README.md
 

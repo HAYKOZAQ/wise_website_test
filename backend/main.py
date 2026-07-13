@@ -1,9 +1,13 @@
 import os
 import sys
+import time
+import json
+from collections import defaultdict, deque
 from pathlib import Path
+from threading import Lock
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Request, Response, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -19,20 +23,72 @@ if sys.platform == "win32":
 
 from rag_engine import RAGEngine, OLLAMA_HOST, OLLAMA_MODEL
 from fidelity import load_eval_stats, EVAL_CASES, evaluate_grounding, log_qa_event
+from reingest import (
+    get_state as get_reingest_state,
+    run_reingest_async,
+    start_scheduler,
+)
 
 app = FastAPI(
     title="MLSA Welfare RAG API",
-    version="2.2",
-    description="WISE Foundation website + ARLIS-backed RAG API",
+    version="2.5",
+    description="WISE Foundation website + MLSA/ARLIS RAG (summaries, legal acts, PDFs, web) + scheduled re-ingest",
 )
 
+# CORS: production-safe default is same-origin + localhost.
+# Set CORS_ORIGINS=* only when you explicitly want wide-open public API.
+# Or CORS_ORIGINS=https://a.com,https://b.com for multi-host.
+def _resolve_cors_origins() -> list[str]:
+    raw = (os.environ.get("CORS_ORIGINS") or "").strip()
+    if raw:
+        return [o.strip() for o in raw.split(",") if o.strip()] or ["*"]
+    # Explicit opt-in to wide open
+    if (os.environ.get("WISEF_CORS_OPEN") or "").strip().lower() in ("1", "true", "yes"):
+        return ["*"]
+    # Default: local dev + same host patterns (browser same-origin still works without CORS)
+    return [
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    ]
+
+
+_cors_origins = _resolve_cors_origins()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=_cors_origins,
+    allow_credentials=False if "*" in _cors_origins else True,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Simple in-memory rate limit (per IP) for expensive endpoints
+_RATE_LIMIT = int(os.environ.get("CHAT_RATE_LIMIT", "20"))  # requests
+_RATE_WINDOW = int(os.environ.get("CHAT_RATE_WINDOW_SEC", "60"))  # seconds
+_rate_buckets: dict[str, deque] = defaultdict(deque)
+_rate_lock = Lock()
+
+
+def _client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for") or ""
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    if request.client:
+        return request.client.host or "unknown"
+    return "unknown"
+
+
+def _rate_limit_ok(ip: str, limit: int = _RATE_LIMIT, window: int = _RATE_WINDOW) -> bool:
+    now = time.time()
+    with _rate_lock:
+        q = _rate_buckets[ip]
+        while q and now - q[0] > window:
+            q.popleft()
+        if len(q) >= limit:
+            return False
+        q.append(now)
+        return True
 
 print("Initializing RAG Engine...")
 try:
@@ -40,6 +96,59 @@ try:
 except Exception as e:
     print(f"Error starting RAG Engine: {e}")
     rag_engine = None
+
+_rag_lock = Lock()
+_ADMIN_TOKEN = (os.environ.get("ADMIN_TOKEN") or os.environ.get("REINGEST_TOKEN") or "").strip()
+
+
+def reload_rag_engine() -> dict[str, Any]:
+    """Hot-reload corpus into a new RAGEngine without restarting the process."""
+    global rag_engine
+    print("[main] Hot-reloading RAG engine…")
+    new_engine = RAGEngine()
+    with _rag_lock:
+        rag_engine = new_engine
+    return {
+        "ok": True,
+        "documents": len(new_engine.documents),
+        "chunks": len(new_engine.chunks),
+        "vector_search": new_engine.vector_enabled,
+        "corpus_hash": new_engine.corpus_hash,
+        "legal_acts": new_engine.legal_acts,
+    }
+
+
+def _require_admin(authorization: Optional[str], x_admin_token: Optional[str]) -> None:
+    """
+    Protect admin/ingest endpoints.
+    If ADMIN_TOKEN is unset, allow only from localhost (dev convenience).
+    """
+    provided = ""
+    if x_admin_token:
+        provided = x_admin_token.strip()
+    elif authorization and authorization.lower().startswith("bearer "):
+        provided = authorization[7:].strip()
+
+    if _ADMIN_TOKEN:
+        if provided != _ADMIN_TOKEN:
+            raise HTTPException(status_code=401, detail="Invalid or missing admin token")
+        return
+
+    # No token configured — only local machine may trigger re-ingest
+    # (checked by caller with request client when needed)
+
+
+def _admin_or_local(request: Request, authorization: Optional[str], x_admin_token: Optional[str]) -> None:
+    if _ADMIN_TOKEN:
+        _require_admin(authorization, x_admin_token)
+        return
+    ip = _client_ip(request)
+    if ip not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(
+            status_code=401,
+            detail="Set ADMIN_TOKEN env to allow remote re-ingest, or call from localhost",
+        )
+
 
 # Frontend paths (Docker: /app/frontend ; local: ../src next to backend/)
 _BACKEND_DIR = Path(__file__).resolve().parent
@@ -53,10 +162,66 @@ if FRONTEND_ROOT:
 else:
     print("Frontend static folder not found — / will show API-only page")
 
+def _reingest_mode_file() -> Path:
+    return _BACKEND_DIR / "data" / "reingest_mode.json"
+
+
+def _read_reingest_mode() -> str:
+    """
+    Single schedule path:
+      - env REINGEST_MODE=inprocess|windows|off overrides
+      - data/reingest_mode.json written by install_scheduled_reingest.ps1
+      - default: inprocess when REINGEST_INTERVAL_HOURS>0, else off
+    """
+    env_mode = (os.environ.get("REINGEST_MODE") or "").strip().lower()
+    if env_mode in ("inprocess", "windows", "off"):
+        return env_mode
+    path = _BACKEND_DIR / "data" / "reingest_mode.json"
+    if path.is_file():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            m = (data.get("mode") or "").strip().lower()
+            if m in ("inprocess", "windows", "off"):
+                return m
+        except Exception:
+            pass
+    return "inprocess"
+
+
+# Optional background re-ingest — disabled if Windows task owns the schedule
+try:
+    _interval = float(os.environ.get("REINGEST_INTERVAL_HOURS") or "0")
+except ValueError:
+    _interval = 0.0
+_sched_force = (os.environ.get("REINGEST_FORCE") or "").lower() in ("1", "true", "yes")
+_sched_immediate = (os.environ.get("REINGEST_ON_START") or "").lower() in ("1", "true", "yes")
+_reingest_mode = _read_reingest_mode()
+if _reingest_mode == "windows":
+    print("[main] Re-ingest mode=windows — in-process scheduler OFF (use Task Scheduler only)")
+    _interval = 0.0
+elif _reingest_mode == "off":
+    print("[main] Re-ingest mode=off")
+    _interval = 0.0
+if _interval > 0:
+    start_scheduler(
+        _interval,
+        force=_sched_force,
+        reload_callback=reload_rag_engine,
+        run_immediately=_sched_immediate,
+    )
+else:
+    print("[main] In-process scheduled re-ingest off (set REINGEST_INTERVAL_HOURS=24 + mode=inprocess)")
+
+
+class ChatHistoryTurn(BaseModel):
+    role: str = "user"
+    content: str = ""
+
 
 class ChatRequest(BaseModel):
     query: str
     lang: str = "hy"
+    history: list[ChatHistoryTurn] = Field(default_factory=list)
 
 
 class ChatResponse(BaseModel):
@@ -66,6 +231,23 @@ class ChatResponse(BaseModel):
     follow_ups: list[str] = Field(default_factory=list)
     fidelity: Optional[dict[str, Any]] = None
     generation_mode: Optional[str] = None
+
+
+class ContactRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    email: str = Field(..., min_length=3, max_length=200)
+    subject: str = Field(default="", max_length=300)
+    message: str = Field(..., min_length=5, max_length=5000)
+
+
+def _doc_type_counts() -> dict[str, int]:
+    if not rag_engine:
+        return {}
+    counts: dict[str, int] = {}
+    for d in getattr(rag_engine, "documents", []) or []:
+        t = d.get("doc_type") or "?"
+        counts[t] = counts.get(t, 0) + 1
+    return counts
 
 
 def _status_payload() -> dict:
@@ -88,16 +270,25 @@ def _status_payload() -> dict:
     stats = load_eval_stats(limit=200)
     return {
         "status": "ready" if rag_engine else "error",
+        "version": "2.5",
         "vector_search_active": rag_engine.vector_enabled if rag_engine else False,
+        "vector_backend": getattr(rag_engine, "vector_backend", None) if rag_engine else None,
+        "embed_skip_reason": getattr(rag_engine, "embed_skip_reason", None) if rag_engine else None,
         "ollama_connected": ollama_ok,
         "ollama_host": OLLAMA_HOST,
         "model": OLLAMA_MODEL,
         "documents_indexed": len(rag_engine.documents) if rag_engine else 0,
         "chunks_indexed": len(rag_engine.chunks) if rag_engine else 0,
+        "doc_types": _doc_type_counts(),
         "legal_acts": legal_acts,
         "cache_ok": cache_ok,
         "corpus_hash": corpus_hash,
         "frontend_mounted": bool(FRONTEND_ROOT),
+        "rate_limit": {"max": _RATE_LIMIT, "window_sec": _RATE_WINDOW},
+        "admin_token_configured": bool(_ADMIN_TOKEN),
+        "cors_origins": _cors_origins,
+        "reingest_mode": _reingest_mode,
+        "reingest": get_reingest_state(),
         "fidelity_summary": {
             "entries": stats.get("entries"),
             "avg_grounding_score": stats.get("avg_grounding_score"),
@@ -179,16 +370,35 @@ def get_status():
 
 
 @app.post("/api/chat", response_model=ChatResponse)
-def chat(request: ChatRequest):
+def chat(request: ChatRequest, req: Request):
     if not rag_engine:
         raise HTTPException(status_code=500, detail="RAG Engine is not initialized")
 
     if not request.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty")
 
-    print(f"Received query ({request.lang}): {request.query}")
+    if len(request.query) > 2000:
+        raise HTTPException(status_code=400, detail="Query too long (max 2000 characters)")
+
+    ip = _client_ip(req)
+    if not _rate_limit_ok(ip):
+        raise HTTPException(
+            status_code=429,
+            detail=f"Too many requests. Limit {_RATE_LIMIT} per {_RATE_WINDOW}s. Try again shortly.",
+        )
+
+    print(f"Received query ({request.lang}) from {ip}: {request.query[:120]}")
     try:
-        result = rag_engine.generate_response(request.query, request.lang)
+        with _rag_lock:
+            engine = rag_engine
+        if not engine:
+            raise HTTPException(status_code=500, detail="RAG Engine is not initialized")
+        hist = [
+            {"role": t.role, "content": t.content}
+            for t in (request.history or [])
+            if (t.content or "").strip()
+        ][-8:]
+        result = engine.generate_response(request.query, request.lang, history=hist or None)
         return ChatResponse(
             answer=result["answer"],
             sources=result.get("sources") or [],
@@ -197,9 +407,162 @@ def chat(request: ChatRequest):
             fidelity=result.get("fidelity"),
             generation_mode=result.get("generation_mode"),
         )
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Chat generation error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class ReingestRequest(BaseModel):
+    force: bool = False
+    import_path: Optional[str] = Field(
+        default=None,
+        description="Optional folder of PDFs to copy into backend/pdfs before rebuild",
+    )
+
+
+class ImportPdfsRequest(BaseModel):
+    source: Optional[str] = Field(
+        default=None,
+        description="Folder or PDF path. Default: backend/pdfs",
+    )
+    force: bool = False
+    rebuild: bool = True
+
+
+@app.get("/api/admin/ingest-status")
+def ingest_status(
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
+):
+    _admin_or_local(request, authorization, x_admin_token)
+    st = get_reingest_state()
+    pdf_dir = _BACKEND_DIR / "pdfs"
+    pdfs = sorted([p.name for p in pdf_dir.glob("*.pdf")]) if pdf_dir.is_dir() else []
+    return {
+        "reingest": st,
+        "library_pdfs": pdfs,
+        "library_count": len(pdfs),
+        "documents_indexed": len(rag_engine.documents) if rag_engine else 0,
+        "doc_types": _doc_type_counts(),
+        "corpus_hash": getattr(rag_engine, "corpus_hash", None) if rag_engine else None,
+    }
+
+
+@app.post("/api/admin/reingest")
+def admin_reingest(
+    payload: ReingestRequest,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
+):
+    """Trigger full corpus rebuild (async) and hot-reload RAG when done."""
+    _admin_or_local(request, authorization, x_admin_token)
+    out = run_reingest_async(
+        force=bool(payload.force),
+        import_pdfs_from=payload.import_path,
+        reload_callback=reload_rag_engine,
+    )
+    if not out.get("ok") and not out.get("started"):
+        raise HTTPException(status_code=409, detail=out.get("error") or "Could not start re-ingest")
+    return out
+
+
+@app.post("/api/admin/import-pdfs")
+def admin_import_pdfs(
+    payload: ImportPdfsRequest,
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
+):
+    """
+    Bulk-import PDFs from a folder (or backend/pdfs), rebuild corpus, hot-reload.
+    Runs async so the HTTP call returns immediately.
+    """
+    _admin_or_local(request, authorization, x_admin_token)
+
+    source = (payload.source or "").strip() or str(_BACKEND_DIR / "pdfs")
+    lib = str((_BACKEND_DIR / "pdfs").resolve())
+    try:
+        src_resolved = str(Path(source).resolve())
+    except Exception:
+        src_resolved = source
+
+    st = get_reingest_state()
+    if st.get("running"):
+        raise HTTPException(status_code=409, detail="Re-ingest already running")
+
+    # Always rebuild via reingest; copy from external folders first
+    import_from = None if src_resolved == lib else source
+    out = run_reingest_async(
+        force=bool(payload.force),
+        import_pdfs_from=import_from,
+        reload_callback=reload_rag_engine if payload.rebuild else None,
+    )
+    if not out.get("started") and not out.get("ok"):
+        raise HTTPException(status_code=409, detail=out.get("error") or "busy")
+
+    mode = "rebuild_from_library" if import_from is None else "import_and_rebuild"
+    return {**out, "source": source, "mode": mode}
+
+
+@app.post("/api/admin/reload")
+def admin_reload(
+    request: Request,
+    authorization: Optional[str] = Header(default=None),
+    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
+):
+    """Reload RAG from existing mlsa_programs.json without re-downloading."""
+    _admin_or_local(request, authorization, x_admin_token)
+    try:
+        return reload_rag_engine()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/contact")
+def contact(payload: ContactRequest, req: Request):
+    """Store contact form submissions (and optional webhook)."""
+    ip = _client_ip(req)
+    if not _rate_limit_ok(ip, limit=8, window=300):
+        raise HTTPException(status_code=429, detail="Too many contact submissions. Try later.")
+
+    name = payload.name.strip()
+    email = payload.email.strip()
+    subject = (payload.subject or "").strip() or "Website contact"
+    message = payload.message.strip()
+    if "@" not in email or "." not in email.split("@")[-1]:
+        raise HTTPException(status_code=400, detail="Invalid email")
+
+    entry = {
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "ip": ip,
+        "name": name,
+        "email": email,
+        "subject": subject,
+        "message": message,
+    }
+    data_dir = _BACKEND_DIR / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    log_path = data_dir / "contact_messages.jsonl"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print(f"Contact log error: {e}")
+        raise HTTPException(status_code=500, detail="Could not save message")
+
+    # Optional webhook (Slack/email service)
+    webhook = (os.environ.get("CONTACT_WEBHOOK_URL") or "").strip()
+    if webhook:
+        try:
+            requests.post(webhook, json=entry, timeout=10)
+        except Exception as e:
+            print(f"Contact webhook error: {e}")
+
+    return {"ok": True, "message": "Message received"}
 
 
 @app.get("/api/eval/stats")

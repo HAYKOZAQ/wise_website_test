@@ -75,10 +75,13 @@ class RAGEngine:
         self.chunks: list[dict[str, Any]] = []
         self.embeddings: list[tuple[int, list[float]]] = []
         self.vector_enabled = False
+        self.vector_backend = "none"  # gemini | ollama | tfidf_local | none
         self.use_gemini = bool(GEMINI_API_KEY)
         self.corpus_hash = ""
         self.legal_acts = 0
         self.cache_ok = False
+        self._tfidf = None  # LocalTfidfIndex | None
+        self.embed_skip_reason = ""
 
         self.load_data()
         self.build_index()
@@ -86,9 +89,16 @@ class RAGEngine:
     def _backend_dir(self) -> str:
         return os.path.dirname(os.path.abspath(__file__))
 
+    def _candidate_data_files(self) -> list[str]:
+        b = self._backend_dir()
+        return [
+            os.path.join(b, "data", "mlsa_programs.json"),
+            os.path.join(b, "seed", "mlsa_programs.json"),
+        ]
+
     def load_data(self):
-        data_file = os.path.join(self._backend_dir(), "data", "mlsa_programs.json")
-        if not os.path.exists(data_file):
+        data_file = next((p for p in self._candidate_data_files() if os.path.exists(p)), None)
+        if not data_file:
             print("Data file not found. Running scraper...")
             try:
                 from scraper import run_scraper
@@ -96,8 +106,11 @@ class RAGEngine:
                 sys.path.append(self._backend_dir())
                 from scraper import run_scraper
             run_scraper()
+            data_file = next((p for p in self._candidate_data_files() if os.path.exists(p)), None)
 
         try:
+            if not data_file:
+                raise FileNotFoundError("No mlsa_programs.json or seed found")
             with open(data_file, "r", encoding="utf-8") as f:
                 self.documents = json.load(f)
             # Normalize legacy plain summaries
@@ -109,8 +122,21 @@ class RAGEngine:
                 doc.setdefault("program_keys", [])
                 doc.setdefault("source_url", None)
                 doc.setdefault("priority", 2)
-            self.legal_acts = len({d.get("act_id") for d in self.documents if d.get("act_id")})
-            print(f"Loaded {len(self.documents)} documents ({self.legal_acts} legal acts).")
+            self.legal_acts = len(
+                {
+                    d.get("act_id")
+                    for d in self.documents
+                    if d.get("act_id") and not str(d.get("act_id")).startswith(("pdf:", "web:"))
+                }
+            )
+            by_type: dict[str, int] = {}
+            for d in self.documents:
+                t = d.get("doc_type") or "?"
+                by_type[t] = by_type.get(t, 0) + 1
+            print(
+                f"Loaded {len(self.documents)} documents from {data_file} "
+                f"(legal acts≈{self.legal_acts}, by_type={by_type})."
+            )
         except Exception as e:
             print(f"Error loading social programs JSON: {e}")
             self.documents = []
@@ -124,8 +150,8 @@ class RAGEngine:
             if not content:
                 continue
 
-            # Keep one coherent unit per summary; legal acts already article-sized
-            if doc_type == "legal":
+            # Keep one coherent unit per summary; legal/pdf/web already chunk-sized
+            if doc_type in ("legal", "pdf", "web"):
                 pieces = [content]
             else:
                 pieces = [content.strip()] if content.strip() else []
@@ -133,6 +159,10 @@ class RAGEngine:
             for p in pieces:
                 if doc_type == "legal":
                     chunk_text = f"Ակտ՝ {title}\n{p}"
+                elif doc_type == "pdf":
+                    chunk_text = f"Պաշտոնական PDF՝ {title}\n{p}"
+                elif doc_type == "web":
+                    chunk_text = f"Պաշտոնական էջ՝ {title}\n{p}"
                 else:
                     chunk_text = f"Ծրագիր՝ {title}\nՆկարագրություն՝ {p}"
 
@@ -163,10 +193,27 @@ class RAGEngine:
     def _cache_path(self) -> str:
         return os.path.join(self._backend_dir(), "data", "embeddings_cache.json")
 
+    def _enable_local_tfidf(self) -> None:
+        """Offline vector channel that always works for any corpus size."""
+        try:
+            from local_vectors import LocalTfidfIndex
+        except ImportError:
+            from backend.local_vectors import LocalTfidfIndex  # type: ignore
+        texts = [c.get("text") or "" for c in self.chunks]
+        self._tfidf = LocalTfidfIndex(texts)
+        self.vector_enabled = True
+        self.vector_backend = "tfidf_local"
+        self.cache_ok = False
+        self.embed_skip_reason = ""
+        print(f"Local TF–IDF vector search enabled ({len(self.chunks)} docs).")
+
     def _load_or_build_embeddings(self):
         self.embeddings = []
         self.vector_enabled = False
+        self.vector_backend = "none"
         self.cache_ok = False
+        self._tfidf = None
+        self.embed_skip_reason = ""
         cache_file = self._cache_path()
 
         if os.path.exists(cache_file):
@@ -184,21 +231,28 @@ class RAGEngine:
                     if len(self.embeddings) == len(self.chunks):
                         self.vector_enabled = True
                         self.cache_ok = True
+                        self.vector_backend = cached.get("backend") or "cache"
                         print(f"Loaded {len(self.embeddings)} embeddings from cache (hash={self.corpus_hash}).")
                         return
             except Exception as e:
                 print(f"Error loading embeddings cache: {e}")
 
         force_embed = os.environ.get("FORCE_EMBED", "").strip() in ("1", "true", "yes")
-        # Large ARLIS corpora: skip online bulk embed unless forced or small index
-        if len(self.chunks) > 200 and not force_embed:
-            print(
-                f"Skipping bulk embedding for {len(self.chunks)} chunks "
-                "(set FORCE_EMBED=1 to build full vector cache). Using keyword hybrid."
+        max_auto = int(os.environ.get("AUTO_EMBED_MAX_CHUNKS", "400"))
+        prefer_local = os.environ.get("USE_LOCAL_TFIDF", "1").strip().lower() not in ("0", "false", "no")
+
+        # Large corpora: skip online bulk embed unless forced
+        if len(self.chunks) > max_auto and not force_embed:
+            self.embed_skip_reason = (
+                f"bulk cloud embed skipped for {len(self.chunks)} chunks "
+                f"(limit={max_auto}; set FORCE_EMBED=1 for Gemini/Ollama cache)"
             )
+            print(self.embed_skip_reason + ". Enabling local TF–IDF vectors.")
+            if prefer_local:
+                self._enable_local_tfidf()
             return
 
-        if self.use_gemini:
+        if self.use_gemini and (force_embed or len(self.chunks) <= max_auto):
             print("Using Google Gemini API for embeddings…")
             success = True
             for i, chunk in enumerate(self.chunks):
@@ -212,6 +266,7 @@ class RAGEngine:
                     break
             if success and len(self.embeddings) == len(self.chunks):
                 self.vector_enabled = True
+                self.vector_backend = "gemini"
                 self._save_embeddings_cache()
                 print(f"Gemini vector search enabled ({len(self.embeddings)} embeddings).")
                 return
@@ -230,14 +285,22 @@ class RAGEngine:
                         self.embeddings.append((chunk["chunk_id"], vector))
                 if len(self.embeddings) == len(self.chunks):
                     self.vector_enabled = True
+                    self.vector_backend = "ollama"
                     self._save_embeddings_cache()
                     print(f"Ollama vector search enabled ({len(self.embeddings)} embeddings).")
-                else:
-                    print("Could not generate all embeddings. Keyword search only.")
+                    return
+                print("Could not generate all embeddings.")
             else:
-                print("Ollama non-200. Keyword search only.")
+                print("Ollama non-200.")
         except Exception as e:
-            print(f"Ollama not available: {e}. Keyword search only.")
+            print(f"Ollama not available: {e}.")
+
+        # Always provide a working offline vector channel
+        if prefer_local:
+            self._enable_local_tfidf()
+        else:
+            self.embed_skip_reason = "no cloud embeddings; USE_LOCAL_TFIDF=0"
+            print("Keyword search only.")
 
     def _save_embeddings_cache(self):
         try:
@@ -335,11 +398,17 @@ class RAGEngine:
     def _vector_scores(self, query: str) -> list[tuple[int, float]]:
         if not self.vector_enabled:
             return []
-        q_vec = (
-            self.get_gemini_embedding(query)
-            if self.use_gemini
-            else self.get_ollama_embedding(query)
-        )
+        # Local TF–IDF path (offline)
+        if self._tfidf is not None:
+            return self._tfidf.scores(query)[:80]
+        # Dense embedding path (Gemini / Ollama / cache)
+        if not self.embeddings:
+            return []
+        q_vec = None
+        if self.use_gemini:
+            q_vec = self.get_gemini_embedding(query)
+        if not q_vec:
+            q_vec = self.get_ollama_embedding(query)
         if not q_vec:
             return []
         scores = []
@@ -348,6 +417,14 @@ class RAGEngine:
             scores.append((chunk_id, sim))
         scores.sort(key=lambda x: x[1], reverse=True)
         return scores
+
+    @staticmethod
+    def _canonical_act_id(act_id: Any) -> str | None:
+        if not act_id:
+            return None
+        s = str(act_id)
+        m = re.search(r"(\d{4,})", s)
+        return m.group(1) if m else s
 
     def _query_prefers_legal(self, query: str) -> bool:
         q = query.lower()
@@ -378,48 +455,77 @@ class RAGEngine:
         prefer_legal = self._query_prefers_legal(query)
         prefer_summary = self._query_prefers_summary(query)
 
+        # Precompute which canonical acts have legal HTML chunks available
+        acts_with_legal: set[str] = set()
+        for ch in self.chunks:
+            if (ch.get("doc_type") or "") == "legal":
+                ca = self._canonical_act_id(ch.get("act_id"))
+                if ca:
+                    acts_with_legal.add(ca)
+
         combined: list[tuple[int, float]] = []
         for cid in all_ids:
-            score = 0.55 * vmap.get(cid, 0.0) + 0.45 * kmap.get(cid, 0.0)
+            # Prefer keyword a bit more when only local TF–IDF (both are lexical)
+            if self.vector_backend == "tfidf_local":
+                score = 0.50 * vmap.get(cid, 0.0) + 0.50 * kmap.get(cid, 0.0)
+            else:
+                score = 0.55 * vmap.get(cid, 0.0) + 0.45 * kmap.get(cid, 0.0)
             chunk = self.chunks[cid]
-            # Metadata boosts
-            if prefer_legal and chunk.get("doc_type") == "legal":
-                score += 0.22
-            if prefer_summary and chunk.get("doc_type") == "summary":
+            dtype = chunk.get("doc_type") or "summary"
+            ca = self._canonical_act_id(chunk.get("act_id"))
+            # Prefer official legal text over PDF of the same act
+            if dtype == "legal":
+                score += 0.20
+            elif dtype == "pdf":
+                if ca and ca in acts_with_legal:
+                    score -= 0.28  # demote PDF when legal exists for same act
+                else:
+                    score += 0.06
+            if prefer_legal and dtype == "legal":
                 score += 0.18
-            if chunk.get("doc_type") == "summary" and not prefer_legal:
+            if prefer_legal and dtype == "pdf" and not (ca and ca in acts_with_legal):
+                score += 0.10
+            if prefer_summary and dtype == "summary":
+                score += 0.18
+            if dtype == "summary" and not prefer_legal:
                 score += 0.06
-            if chunk.get("doc_type") == "legal" and prefer_legal is False and prefer_summary is False:
-                score += 0.04
-            # Slight priority boost for core acts
+            if dtype == "web" and not prefer_legal:
+                score += 0.05
             pr = chunk.get("priority") or 2
             score += max(0, (3 - pr)) * 0.02
             combined.append((cid, score))
 
         combined.sort(key=lambda x: x[1], reverse=True)
 
-        # Diversify: limit chunks per act / per title; mix summary + legal
+        # Diversify: limit per act/title; skip PDF if legal already picked for act
         picked: list[dict[str, Any]] = []
         act_counts: dict[str, int] = defaultdict(int)
         title_counts: dict[str, int] = defaultdict(int)
         type_counts: dict[str, int] = defaultdict(int)
+        legal_picked_acts: set[str] = set()
 
         def try_pick(cid: int) -> bool:
             chunk = self.chunks[cid]
-            act_key = str(chunk.get("act_id") or f"t:{chunk.get('title')}" or cid)
+            ca = self._canonical_act_id(chunk.get("act_id"))
+            act_key = ca or str(chunk.get("act_id") or f"t:{chunk.get('title')}" or cid)
             title_key = chunk.get("title") or str(cid)
             dtype = chunk.get("doc_type") or "summary"
+            if dtype == "pdf" and ca and ca in legal_picked_acts:
+                return False  # legal already represents this act
+            if dtype == "pdf" and ca and ca in acts_with_legal and act_counts[act_key] >= 1:
+                return False
             if act_counts[act_key] >= 2:
                 return False
             if title_counts[title_key] >= 1:
                 return False
-            # Keep room for both layers
             if type_counts[dtype] >= max(3, top_n // 2 + 1):
                 return False
             picked.append(chunk)
             act_counts[act_key] += 1
             title_counts[title_key] += 1
             type_counts[dtype] += 1
+            if dtype == "legal" and ca:
+                legal_picked_acts.add(ca)
             return True
 
         for cid, _ in combined:
@@ -427,7 +533,6 @@ class RAGEngine:
             if len(picked) >= top_n:
                 break
 
-        # Ensure at least one legal + one summary when available in candidates
         have_legal = any(c.get("doc_type") == "legal" for c in picked)
         have_sum = any(c.get("doc_type") == "summary" for c in picked)
         if not have_legal or not have_sum:
@@ -441,7 +546,6 @@ class RAGEngine:
                         have_sum = True
                 if have_legal and have_sum:
                     break
-            # Trim if we overshot
             if len(picked) > top_n:
                 picked = picked[:top_n]
 
@@ -508,7 +612,26 @@ class RAGEngine:
             base.append("Ինչպե՞ս ձևակերպել գործազրկության կարգավիճակ")
         return base[:4]
 
-    def _prompt(self, query: str, context_str: str, user_lang: str) -> str:
+    def _prompt(
+        self,
+        query: str,
+        context_str: str,
+        user_lang: str,
+        history: list[dict[str, str]] | None = None,
+    ) -> str:
+        hist_block = ""
+        if history:
+            lines = []
+            for turn in history[-6:]:
+                role = (turn.get("role") or "user").lower()
+                content = (turn.get("content") or "").strip()
+                if not content:
+                    continue
+                label = "Citizen" if role == "user" else "Assistant"
+                lines.append(f"{label}: {content[:500]}")
+            if lines:
+                hist_block = "\n\nPRIOR TURNS (for context only; still ground facts in CONTEXT):\n" + "\n".join(lines)
+
         if user_lang == "en":
             return f"""You are a careful citizen guide for Armenia's social protection programs (MLSA / Unified Social Service).
 
@@ -518,8 +641,9 @@ RULES:
 1) Use ONLY the CONTEXT below. Never invent amounts, ages, documents, deadlines, or article numbers.
 2) If a detail is missing in CONTEXT, write clearly: "This is not specified in the available materials" and suggest hotline 114 / e-soc.am / USS office.
 3) Write FULL sentences. Never cut off mid-word or mid-list. Finish every section.
-4) Prefer concrete numbers and lists FROM the context.
-5) Explain the logic: who → what benefit → how much → how it works → how to apply.
+4) Prefer concrete numbers and lists FROM the context. Prefer [legal] facts over citizen [summary] when they conflict. Treat [summary] amounts as provisional.
+5) For any money amount, age threshold, or deadline: if it comes only from a citizen summary, add: "Please verify the current amount with hotline 114 or e-social.am."
+6) Explain the logic: who → what benefit → how much → how it works → how to apply.
 
 Required markdown structure (fill every section; if unknown, say so):
 ## Short answer
@@ -551,11 +675,25 @@ Required markdown structure (fill every section; if unknown, say so):
 
 CONTEXT:
 {context_str}
+{hist_block}
 
 CITIZEN QUESTION:
 {query}
 
 Write a complete answer in clear English:"""
+
+        hist_hy = ""
+        if history:
+            lines = []
+            for turn in history[-6:]:
+                role = (turn.get("role") or "user").lower()
+                content = (turn.get("content") or "").strip()
+                if not content:
+                    continue
+                label = "Քաղաքացի" if role == "user" else "Օգնական"
+                lines.append(f"{label}: {content[:500]}")
+            if lines:
+                hist_hy = "\n\nՆԱԽՈՐԴ ՀԱՐՑՈՒՄՆԵՐ (միայն համատեքստի համար. փաստերը՝ ՀԱՄԱՏԵՔՍՏԻՑ).\n" + "\n".join(lines)
 
         return f"""Դուք Հայաստանի սոցիալական պաշտպանության ծրագրերի (ԱՍՀՆ / Միասնական սոցիալական ծառայություն) քաղաքացիական ուղեցույցն եք։
 
@@ -565,6 +703,8 @@ Write a complete answer in clear English:"""
 1) Օգտագործեք ՄԻԱՅՆ ստորև տրված ՀԱՄԱՏԵՔՍՏԸ։ Երբեք մի հորինեք գումարներ, տարիք, փաստաթղթեր, ժամկետներ կամ հոդվածների համարներ։
 2) Եթե որևէ մանրամասն չկա համատեքստում, գրեք հստակ՝ «Առկա նյութերում սա նշված չէ» և առաջարկեք թեժ գիծ 114 / e-soc.am / ՄՍԾ տարածքային կենտրոն։
 3) Գրեք ԼՐԻՎ նախադասություններ։ Երբեք մի կտրեք բառի կամ ցուցակի կեսից։ Ավարտեք յուրաքանչյուր բաժին։
+3ա) Եթե [legal] և [summary] հակասում են, նախընտրեք [legal]։ Summary-ի գումարները պայմանական են.
+3բ) Յուրաքանչյուր գումար/տարիք/ժամկետ summary-ից՝ ավելացրեք. «Ստուգեք ակտուալ չափը 114 կամ e-social.am»։
 4) Նախընտրեք համատեքստի կոնկրետ թվերն ու ցուցակները։
 5) Բացատրեք տրամաբանությունը՝ ով → ինչ նպաստ → որքան → ինչպես է աշխատում → ինչպես դիմել։
 
@@ -598,6 +738,7 @@ Write a complete answer in clear English:"""
 
 ՀԱՄԱՏԵՔՍՏ.
 {context_str}
+{hist_hy}
 
 ՔԱՂԱՔԱՑՈՒ ՀԱՐՑ.
 {query}
@@ -678,14 +819,30 @@ Write a complete answer in clear English:"""
             print(f"Ollama generate error: {e}")
         return ""
 
-    def generate_response(self, query: str, user_lang: str = "hy") -> dict[str, Any]:
+    def generate_response(
+        self,
+        query: str,
+        user_lang: str = "hy",
+        history: list[dict[str, str]] | None = None,
+    ) -> dict[str, Any]:
         from fidelity import (
             evaluate_grounding,
             is_answer_incomplete,
             log_qa_event,
         )
 
-        relevant = self.retrieve(query, top_n=12)
+        # Expand query with last user turn terms for follow-ups ("իսկ չափը?")
+        search_query = query
+        if history:
+            prior_user = [
+                (t.get("content") or "").strip()
+                for t in history
+                if (t.get("role") or "").lower() == "user" and (t.get("content") or "").strip()
+            ]
+            if prior_user and len(query.split()) <= 6:
+                search_query = prior_user[-1] + " " + query
+
+        relevant = self.retrieve(search_query, top_n=12)
         context_parts = []
         for c in relevant:
             src = c.get("source_url") or ""
@@ -702,7 +859,7 @@ Write a complete answer in clear English:"""
             context_parts.append(f"{header}\n{text}")
         context_str = "\n\n---\n\n".join(context_parts) if context_parts else "(no context)"
 
-        system_prompt = self._prompt(query, context_str, user_lang)
+        system_prompt = self._prompt(query, context_str, user_lang, history=history)
         sources = self._build_sources(relevant)
         follow_ups = self._follow_ups(query, user_lang, relevant)
 

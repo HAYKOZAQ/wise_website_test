@@ -12,3 +12,7 @@ services:
         sync: false
       - key: HOST
         value: 0.0.0.0
+      - key: REINGEST_INTERVAL_HOURS
+        value: "24"
+      - key: ADMIN_TOKEN
+        sync: false

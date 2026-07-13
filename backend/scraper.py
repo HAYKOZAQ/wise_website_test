@@ -19,9 +19,9 @@ FALLBACK_PROGRAMS = [
 Իրավասություն և Չափորոշիչներ.
 1. Խնամքի նպաստ ստանալու իրավունք ունի երեխայի ծնողը, ով գտնվում է մինչև 3 տարեկան երեխայի խնամքի արձակուրդում:
 2. 2023թ. հունվարի 1-ից հետո ծնված երեխայի դեպքում նպաստ նշանակվում է նաև չաշխատող ծնողին (եթե բնակվում է Հայաստանում):
-Նպաստի չափը.
-- Չաշխատող ծնողների համար նպաստի չափը կազմում է 28,600 ՀՀ դրամ ամսական:
-- Աշխատող և արձակուրդում գտնվող ծնողների համար նպաստի չափը կազմում է 37,500 ՀՀ դրամ ամսական:
+Նպաստի չափը (ստուգեք ակտուալ չափը պաշտոնական աղբյուրում / 114).
+- Խնամքի արձակուրդում չգտնվող ծնողի համար՝ մոտ 31,600 ՀՀ դրամ ամսական:
+- Խնամքի արձակուրդում գտնվող ծնողի համար՝ մոտ 37,500 ՀՀ դրամ ամսական:
 - Եթե ծնողը և՛ աշխատող է, և՛ բնակվում է սահմանամերձ գյուղական բնակավայրում, նպաստը կրկնապատկվում է:
 Անհրաժեշտ փաստաթղթեր.
 1. Դիմումատուի անձնագիրը կամ ID քարտը
@@ -314,88 +314,292 @@ FALLBACK_PROGRAMS = [
         "content": """Հարցերի և դիմումների ընդունման համար քաղաքացիները կարող են կապ հաստատել ՀՀ աշխատանքի և սոցիալական հարցերի նախարարության Միասնական սոցիալական ծառայության հետ:
 Կոնտակտային տվյալներ.
 - Թեժ գիծ՝ 114 (Հայաստանի տարածքից զանգերն անվճար են)
-- Պաշտոնական կայք՝ www.mlsa.am
-- Դիմումների առցանց ընդունում՝ e-request.am կամ e-soc.am
+- Պաշտոնական կայք՝ social.gov.am (նախկին mlsa.am)
+- ՄՍԾ կայք՝ uss.social.gov.am
+- Առցանց սոցիալական ծառայություններ՝ e-social.am (նախկին e-soc.am)
+- Աշխատանքի որոնում՝ e-work.am
+- Էլեկտրոնային հարցումներ՝ e-request.am
 - Հասցե՝ ք. Երևան, Կառավարական տուն 3։"""
+    },
+    {
+        "title": "Ղարաբաղից / Արցախից տեղահանված անձանց պետական աջակցություն (Displaced Persons Support)",
+        "content": """ՀՀ աշխատանքի և սոցիալական հարցերի նախարարությունը և գործընկեր գերատեսչությունները իրականացնում են Ղարաբաղից (Արցախից) տեղահանված անձանց և ընտանիքների համար սոցիալական, բնակարանային, կրթական և զբաղվածության աջակցության ծրագրեր։
+Ուղղություններ.
+1. Սոցիալական դրամական աջակցություն և նպաստներ (ըստ գործող որոշումների).
+2. Բնակապահովման աջակցություն (վարձակալություն, բնակարանային ծրագրեր).
+3. Զբաղվածության և մասնագիտական ուսուցման ծրագրեր.
+4. Կրթական և այլ սոցիալական երաշխիքներ.
+Որտեղ տեղեկանալ.
+- social.gov.am — ԱՍՀՆ պաշտոնական կայք
+- uss.social.gov.am — Միասնական սոցիալական ծառայություն
+- hartak.am — տեղահանվածների աջակցության ծրագրերի հավաքածու
+- Թեժ գիծ 114
+Դիմումներ՝ e-social.am, ՄՍԾ տարածքային կենտրոններ, e-request.am։
+Ուշադրություն. կոնկրետ գումարները և ժամկետները փոխվում են կառավարության որոշումներով — ստուգեք ակտուալ պայմանները 114 կամ պաշտոնական կայքերում։"""
+    },
+    {
+        "title": "Ընտանիքների անապահովության գնահատման նոր համակարգ (Vulnerability Assessment System)",
+        "content": """Ընտանիքների անապահովության գնահատման համակարգը հիմք է ընտանեկան և սոցիալական նպաստների, կոմունալ զեղչերի և այլ աջակցության համար։
+Ինչպես է աշխատում.
+- Ընտանիքը դիմում է գնահատման (այժմ հաճախ առցանց՝ id.e-social.am / e-social.am).
+- Հաշվի են առնվում սոցիալական խումբը, եկամուտները, գույքը և այլ չափորոշիչներ.
+- Ստացված միավորից կախված է նպաստի իրավունքը և չափը.
+Իրավական հիմք.
+- Ընտանիքի անապահովության գնահատման կարգը (այդ թվում՝ 2025թ. N 27-Ն և հետագա փոփոխություններ)՝ arlis.am.
+Դիմել՝ ՄՍԾ տարածքային կենտրոն կամ e-social.am։ Թեժ գիծ՝ 114։"""
+    },
+    {
+        "title": "Անձի ֆունկցիոնալության գնահատում և հաշմանդամության կարգ (Functional Assessment)",
+        "content": """Միասնական սոցիալական ծառայությունը իրականացնում է անձի ֆունկցիոնալության գնահատում՝ հաշմանդամության կարգի սահմանման, վերանայման և փաստաթղթերի տրամադրման համար։
+Ինչ է տալիս.
+- Հաշմանդամության կարգ / ֆունկցիոնալության սահմանափակման որոշում.
+- Վերականգնողական անհատական ծրագիր (ԾԱՊ / նմանատիպ).
+- Հիմք պրոթեզների, սայլակների և այլ աջակցող միջոցների համար.
+Դիմում՝ ՄՍԾ, uss.social.gov.am, թեժ գիծ 114։"""
+    },
+    {
+        "title": "Բնակապահովման աջակցություն սահմանամերձ և խոցելի ընտանիքներին (Housing Support Programs)",
+        "content": """Պետությունը իրականացնում է բնակապահովման աջակցության ծրագրեր սահմանամերձ բնակավայրերում, խոցելի և տեղահանված ընտանիքների համար (պայմանները փոփոխվում են որոշումներով)։
+Հնարավոր ձևեր.
+- Բնակարանի վարձակալության աջակցություն.
+- Բնակարանի գնման / կառուցման աջակցություն կամ վկայագրեր.
+- Սոցիալական բնակարանային ֆոնդ.
+Որտեղ դիմել.
+- ԱՍՀՆ / ՄՍԾ տարածքային կենտրոններ
+- social.gov.am նորություններ և ծրագրերի էջեր
+- Թեժ գիծ 114
+Ակտուալ պայմանները միշտ ստուգեք պաշտոնական աղբյուրում։"""
+    },
+    {
+        "title": "e-social.am և առցանց դիմումներ (Online Social Services Portal)",
+        "content": """e-social.am (նաև id.e-social.am) պետական առցանց հարթակ է սոցիալական ծառայությունների և դիմումների համար։
+Ինչ կարող եք անել.
+- Դիմել նպաստների և գնահատման համար.
+- Հետևել դիմումի կարգավիճակին (որտեղ հասանելի է).
+- Օգտվել ՄՍԾ էլեկտրոնային ծառայություններից.
+Այլ պորտալներ.
+- e-work.am — աշխատանքի որոնում
+- e-request.am — էլեկտրոնային հարցումներ
+- uss.social.gov.am — ՄՍԾ տեղեկատվություն
+Օգնություն՝ 114։"""
+    },
+    {
+        "title": "Ծնողական ժամ և ընտանեկան աշխատանքային երաշխիքներ (Parental Hour / Family Work Guarantees)",
+        "content": """ԱՍՀՆ-ն իրականացնում է ընտանիքի և ծնողության հետ կապված աշխատանքային/սոցիալական կարգավորումներ, այդ թվում՝ «ծնողական ժամ» և հարակից երաշխիքներ (մտնում են ուժի մեջ ըստ ակտուալ իրավական ակտերի)։
+Ինչ անել.
+- Ստուգեք social.gov.am նորությունները և ARLIS-ում հրապարակված որոշումները.
+- Աշխատող ծնողների համար՝ գործատուի և աշխատանքային օրենսդրության համատեքստում.
+- Լրացուցիչ հարցեր՝ 114 կամ ՄՍԾ։
+Ուշադրություն. սա իրավական կարգավորում է — կոնկրետ իրավունքները կախված են ընդունված ակտի տեքստից։"""
     }
 ]
 
 def _category_for_summary(title: str) -> str:
     t = title.lower()
-    if any(k in t for k in ["կենսաթոշակ", "pension", "ծերության", "հաշմանդամության սոց"]):
+    if any(k in t for k in ["կենսաթոշակ", "pension", "ծերության", "հաշմանդամության սոց", "ֆունկցիոնալ"]):
         return "pensions"
-    if any(k in t for k in ["գործազրկ", "զբաղված", "աշխատանք", "մասնագիտական", "գործատու", "employment", "unemployment"]):
+    if any(k in t for k in ["գործազրկ", "զբաղված", "աշխատանք", "մասնագիտական", "գործատու", "employment", "unemployment", "e-work"]):
         return "employment"
-    if any(k in t for k in ["էլեկտր", "գազ", "թեժ գիծ", "կապ", "utility", "hotline"]):
+    if any(k in t for k in ["էլեկտր", "գազ", "թեժ գիծ", "կապ", "utility", "hotline", "e-social", "առցանց"]):
         return "contacts"
-    if any(k in t for k in ["պրոթեզ", "սայլակ", "խնամք", "ինտերնատ", "զինծառայ", "բնակարան", "վետերան", "արցախ"]):
+    if any(k in t for k in ["պրոթեզ", "սայլակ", "խնամք", "ինտերնատ", "զինծառայ", "բնակարան", "վետերան", "արցախ", "տեղահան", "բնակապահով", "հավասար"]):
         return "services"
     return "allowances"
+
+
+_AMOUNT_disclaimer_hy = (
+    "\n\nՈՒՇԱԴՐՈՒԹՅՈՒՆ. Գումարները, տարիքները և ժամկետները կարող են փոփոխվել։ "
+    "Պաշտոնական հաստատման համար զանգահարեք 114 կամ ստուգեք e-social.am / uss.social.gov.am / ARLIS։"
+)
+_amount_disclaimer_en = (
+    "\n\nNOTE: Amounts, ages, and deadlines may change. "
+    "Verify officially via hotline 114 or e-social.am / uss.social.gov.am / ARLIS."
+)
 
 
 def summaries_as_docs() -> list:
     docs = []
     for item in FALLBACK_PROGRAMS:
+        content = item["content"]
+        # Ensure disclaimer present once for amount safety
+        if "114" not in content[-200:] or "ՈՒՇԱԴՐՈՒԹՅՈՒՆ" not in content:
+            content = content.rstrip() + _amount_disclaimer_hy
         docs.append({
             "title": item["title"],
-            "content": item["content"],
+            "content": content,
             "doc_type": "summary",
             "act_id": None,
             "article": None,
             "category": _category_for_summary(item["title"]),
             "program_keys": [],
-            "source_url": "https://www.mlsa.am/",
+            "source_url": "https://social.gov.am/",
             "priority": 1,
         })
     return docs
 
 
-def run_scraper(force_arlis: bool = False):
-    """Build merged corpus: citizen summaries + ARLIS legal act chunks."""
+def _load_json_list(path: str) -> list:
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except Exception as e:
+        print(f"[scraper] Failed reading {path}: {e}")
+        return []
+
+
+def _dedupe_docs(docs: list) -> list:
+    """Drop content duplicates; keep first (higher-priority sources first)."""
+    seen = set()
+    out = []
+    for d in docs:
+        content_h = hashlib_sha((d.get("content") or "")[:800])
+        # PDFs/web often reappear via catalog + local drop — dedupe by body text
+        if (d.get("doc_type") or "") in ("pdf", "web"):
+            key = ((d.get("doc_type") or ""), content_h)
+        else:
+            key = (
+                (d.get("doc_type") or ""),
+                (d.get("act_id") or ""),
+                (d.get("title") or "")[:120],
+                content_h,
+            )
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(d)
+    return out
+
+
+def hashlib_sha(s: str) -> str:
+    import hashlib
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()[:16]
+
+
+def export_seed(docs: list, backend: str) -> None:
+    """Write a committed seed snapshot so deploys work offline."""
+    seed_dir = os.path.join(backend, "seed")
+    os.makedirs(seed_dir, exist_ok=True)
+    seed_path = os.path.join(seed_dir, "mlsa_programs.json")
+    # Cap seed size for git: prefer summaries + high-priority chunks
+    seed_docs = []
+    for d in docs:
+        if d.get("doc_type") == "summary":
+            seed_docs.append(d)
+        elif d.get("priority", 9) <= 2 and d.get("doc_type") in ("legal", "pdf", "web"):
+            seed_docs.append(d)
+        if len(seed_docs) >= 2500:
+            break
+    if len(seed_docs) < 50:
+        seed_docs = docs[: min(len(docs), 800)]
+    with open(seed_path, "w", encoding="utf-8") as f:
+        json.dump(seed_docs, f, ensure_ascii=False)
+    meta = {
+        "documents": len(seed_docs),
+        "full_corpus_hint": len(docs),
+        "by_type": {},
+    }
+    for d in seed_docs:
+        t = d.get("doc_type") or "?"
+        meta["by_type"][t] = meta["by_type"].get(t, 0) + 1
+    with open(os.path.join(seed_dir, "manifest.json"), "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+    print(f"[scraper] Seed snapshot: {len(seed_docs)} docs → {seed_path}")
+
+
+def run_scraper(force_arlis: bool = False, force_all: bool = False):
+    """Build merged corpus: summaries + ARLIS + MLSA PDFs + web pages."""
     backend = os.path.dirname(os.path.abspath(__file__))
     out_dir = os.path.join(backend, "data")
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, "mlsa_programs.json")
+    force = force_arlis or force_all
 
     data = summaries_as_docs()
     print(f"[scraper] Loaded {len(data)} citizen program summaries")
 
-    # Ingest official ARLIS acts (rules, criteria, procedures)
+    # 1) ARLIS legal acts (HTML + PDF fallback)
     legal_docs = []
     try:
         from arlis_ingest import ingest_all
-        legal_docs = ingest_all(force=force_arlis)
+        legal_docs = ingest_all(force=force)
     except Exception as e:
         print(f"[scraper] ARLIS ingest warning: {e}")
-        # Try offline cached legal docs if present
-        legal_cache = os.path.join(out_dir, "arlis_legal_docs.json")
-        if os.path.exists(legal_cache):
-            try:
-                with open(legal_cache, "r", encoding="utf-8") as f:
-                    legal_docs = json.load(f)
-                print(f"[scraper] Loaded {len(legal_docs)} cached legal docs")
-            except Exception as e2:
-                print(f"[scraper] Failed loading legal cache: {e2}")
+        legal_docs = _load_json_list(os.path.join(out_dir, "arlis_legal_docs.json"))
+        if legal_docs:
+            print(f"[scraper] Loaded {len(legal_docs)} cached legal docs")
 
     if legal_docs:
         data.extend(legal_docs)
-        legal_out = os.path.join(out_dir, "arlis_legal_docs.json")
-        with open(legal_out, "w", encoding="utf-8") as f:
+        with open(os.path.join(out_dir, "arlis_legal_docs.json"), "w", encoding="utf-8") as f:
             json.dump(legal_docs, f, ensure_ascii=False, indent=2)
-        print(f"[scraper] Saved {len(legal_docs)} legal docs → {legal_out}")
+        print(f"[scraper] ARLIS legal docs: {len(legal_docs)}")
     else:
-        print("[scraper] No ARLIS legal docs available; using summaries only")
+        print("[scraper] No ARLIS legal docs available")
+
+    # 2) Ministry / USS / ARLIS PDFs (catalog + local drop folder)
+    pdf_docs = []
+    try:
+        from pdf_ingest import ingest_all as ingest_pdfs
+        pdf_docs = ingest_pdfs(force=force)
+    except Exception as e:
+        print(f"[scraper] PDF ingest warning: {e}")
+        pdf_docs = _load_json_list(os.path.join(out_dir, "mlsa_pdf_docs.json"))
+
+    if pdf_docs:
+        data.extend(pdf_docs)
+        with open(os.path.join(out_dir, "mlsa_pdf_docs.json"), "w", encoding="utf-8") as f:
+            json.dump(pdf_docs, f, ensure_ascii=False, indent=2)
+        print(f"[scraper] PDF docs: {len(pdf_docs)}")
+    else:
+        print("[scraper] No PDF docs available (drop files into backend/pdfs/)")
+
+    # 3) Official web program pages
+    web_docs = []
+    try:
+        from mlsa_web_ingest import ingest_all as ingest_web
+        web_docs = ingest_web(force=force)
+    except Exception as e:
+        print(f"[scraper] Web ingest warning: {e}")
+        web_docs = _load_json_list(os.path.join(out_dir, "mlsa_web_docs.json"))
+
+    if web_docs:
+        data.extend(web_docs)
+        with open(os.path.join(out_dir, "mlsa_web_docs.json"), "w", encoding="utf-8") as f:
+            json.dump(web_docs, f, ensure_ascii=False, indent=2)
+        print(f"[scraper] Web docs: {len(web_docs)}")
+    else:
+        print("[scraper] No web docs available")
+
+    # If live ingest failed almost entirely, fall back to seed
+    if len(data) < 40:
+        seed_path = os.path.join(backend, "seed", "mlsa_programs.json")
+        seed = _load_json_list(seed_path)
+        if seed:
+            print(f"[scraper] Merging seed corpus ({len(seed)} docs)")
+            data.extend(seed)
+
+    data = _dedupe_docs(data)
 
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    n_sum = sum(1 for d in data if d.get("doc_type") == "summary")
-    n_leg = sum(1 for d in data if d.get("doc_type") == "legal")
-    print(f"Completed! Saved {len(data)} documents ({n_sum} summaries + {n_leg} legal) to {out_file}")
+    try:
+        export_seed(data, backend)
+    except Exception as e:
+        print(f"[scraper] Seed export warning: {e}")
+
+    counts: dict[str, int] = {}
+    for d in data:
+        t = d.get("doc_type") or "?"
+        counts[t] = counts.get(t, 0) + 1
+    print(f"Completed! Saved {len(data)} documents {counts} → {out_file}")
     return data
 
 
 if __name__ == "__main__":
     force = "--force" in sys.argv
-    run_scraper(force_arlis=force)
+    run_scraper(force_arlis=force, force_all=force)
 

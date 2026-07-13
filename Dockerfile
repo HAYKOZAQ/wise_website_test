@@ -24,5 +24,6 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-# Index corpus, then serve website + API
+# Index MLSA corpus (summaries + ARLIS + PDFs + web), then serve website + API
+# Seed under /app/seed is used if live download fails.
 CMD sh -c "python scraper.py; python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"

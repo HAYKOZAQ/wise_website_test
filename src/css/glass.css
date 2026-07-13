@@ -22,12 +22,22 @@
   box-shadow: var(--shadow-lg);
 }
 
+html[data-theme="dark"] .glass-strong {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
 .glass-light {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .glass-light {
+  background: rgba(30, 41, 59, 0.45);
+  border-color: rgba(148, 163, 184, 0.14);
 }
 
 .glass-card {
@@ -84,6 +94,14 @@
   box-shadow: 0 8px 24px rgba(24, 57, 96, 0.3);
 }
 
+html[data-theme="dark"] .glass-btn--primary {
+  color: #0b1220;
+}
+
+html[data-theme="dark"] .glass-btn--primary:hover {
+  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.28);
+}
+
 .glass-btn--outline {
   background: transparent;
   border: 2px solid var(--color-accent);
@@ -128,6 +146,10 @@
   backdrop-filter: var(--blur-lg);
   -webkit-backdrop-filter: var(--blur-lg);
   border-bottom: 1px solid var(--color-glass-border);
+}
+
+html[data-theme="dark"] .glass-nav {
+  background: rgba(15, 23, 42, 0.75);
 }
 
 .glass-hero {

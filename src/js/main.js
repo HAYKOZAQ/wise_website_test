@@ -293,32 +293,71 @@ function initContactForm() {
     const data = Object.fromEntries(formData.entries());
     console.log('[ContactForm] Sending data:', JSON.stringify(data));
 
-    fetch("https://formsubmit.co/ajax/hayko16140@gmail.com", {
-      method: "POST",
-      headers: { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    .then(response => {
-      console.log('[ContactForm] Response status:', response.status);
-      return response.json();
-    })
-    .then(result => {
-      console.log('[ContactForm] Result:', JSON.stringify(result));
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
+    function getContactApiBase() {
+      if (typeof window.WISEF_getApiBase === 'function') {
+        return window.WISEF_getApiBase();
+      }
+      var host = (location && location.hostname) || '';
+      if (host === 'localhost' || host === '127.0.0.1') {
+        return 'http://127.0.0.1:8000';
+      }
+      return (typeof location !== 'undefined' && location.origin) || '';
+    }
 
-      showStatus(texts.success, true);
-      form.reset();
-    })
-    .catch(error => {
-      console.error('[ContactForm] Error:', error);
+    const apiBase = getContactApiBase();
+    const primaryUrl = apiBase ? (apiBase.replace(/\/$/, '') + '/api/contact') : '';
+    // Optional secondary path only if site owner configures window.WISEF_CONTACT_FALLBACK_URL
+    const fallbackUrl = (window.WISEF_CONFIG && window.WISEF_CONFIG.contactFallbackUrl) || '';
+
+    function postContact(url) {
+      return fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(async (response) => {
+        console.log('[ContactForm] Response status:', response.status, url);
+        let result = {};
+        try {
+          result = await response.json();
+        } catch (_) {}
+        if (!response.ok) {
+          throw new Error((result && result.detail) || ('HTTP ' + response.status));
+        }
+        return result;
+      });
+    }
+
+    if (!primaryUrl) {
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
       showStatus(texts.error, false);
-    });
+      return;
+    }
+
+    const tryPrimary = fallbackUrl
+      ? postContact(primaryUrl).catch((err) => {
+          console.warn('[ContactForm] API contact failed, trying configured fallback:', err);
+          return postContact(fallbackUrl);
+        })
+      : postContact(primaryUrl);
+
+    tryPrimary
+      .then((result) => {
+        console.log('[ContactForm] Result:', JSON.stringify(result));
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        showStatus(texts.success, true);
+        form.reset();
+      })
+      .catch((error) => {
+        console.error('[ContactForm] Error:', error);
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        showStatus(texts.error, false);
+      });
   });
 }
 
