@@ -30,15 +30,15 @@ html[data-theme="dark"] .header.scrolled {
 }
 
 .header__inner {
-  /* 3-column flex: logo | centered nav | controls */
-  display: flex;
+  /* True 3-column grid: logo (auto) | centered nav (1fr) | controls (auto) */
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
+  gap: 24px;
   height: var(--header-height);
   max-width: var(--container-max);
   margin: 0 auto;
   width: 100%;
-  gap: 24px;
 }
 
 .header__logo {
@@ -49,9 +49,7 @@ html[data-theme="dark"] .header.scrolled {
   font-weight: 700;
   color: var(--color-text);
   min-width: 0;
-  position: relative;
-  z-index: 2;
-  flex: 0 0 auto;
+  flex-shrink: 0;
 }
 
 .header__logo img {
@@ -60,16 +58,26 @@ html[data-theme="dark"] .header.scrolled {
   display: block;
 }
 
-/* Right-side controls (lang + theme) — sibling of nav, not inside it */
+/* Centered nav — middle column, centers its children */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+/* Right column: controls injected by i18n.js (lang + theme toggles) */
 .header-controls {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
   flex-shrink: 0;
-  position: relative;
-  z-index: 2;
-  margin-left: auto;
 }
 
 /* ===== THEME SWITCHER ===== */
