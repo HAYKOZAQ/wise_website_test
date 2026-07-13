@@ -9,8 +9,10 @@ from threading import Lock
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Response, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel, Field
 from typing import Any, Optional
 import requests
@@ -31,9 +33,47 @@ from reingest import (
 
 app = FastAPI(
     title="MLSA Welfare RAG API",
-    version="2.5",
+    version="2.6",
     description="WISE Foundation website + MLSA/ARLIS RAG (summaries, legal acts, PDFs, web) + scheduled re-ingest",
 )
+
+
+class RenderFriendlyMiddleware(BaseHTTPMiddleware):
+    """
+    Render probes often send HEAD / which Starlette may 405 on GET-only routes.
+    Also set cache headers so HTML is never sticky after deploys.
+    """
+
+    async def dispatch(self, request: Request, call_next):
+        # Convert HEAD → GET for routing, then strip body
+        is_head = request.method == "HEAD"
+        if is_head:
+            # Mutate scope so routes registered as GET still match
+            request.scope["method"] = "GET"
+
+        response = await call_next(request)
+
+        path = request.url.path or ""
+        # HTML pages: always revalidate after deploy
+        if path.endswith(".html") or path in ("/", "/pages", "/pages/"):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+        # Versioned assets (?v=) can be cached briefly
+        elif path.startswith(("/css/", "/js/", "/assets/")):
+            response.headers.setdefault(
+                "Cache-Control", "public, max-age=300, must-revalidate"
+            )
+
+        if is_head:
+            return Response(
+                status_code=response.status_code,
+                headers=dict(response.headers),
+            )
+        return response
+
+
+app.add_middleware(RenderFriendlyMiddleware)
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # CORS: production-safe default is same-origin + localhost.
 # Set CORS_ORIGINS=* only when you explicitly want wide-open public API.
@@ -45,12 +85,14 @@ def _resolve_cors_origins() -> list[str]:
     # Explicit opt-in to wide open
     if (os.environ.get("WISEF_CORS_OPEN") or "").strip().lower() in ("1", "true", "yes"):
         return ["*"]
-    # Default: local dev + same host patterns (browser same-origin still works without CORS)
+    # Default: allow same-origin style hosts + common local dev + live Render URL
     return [
         "http://127.0.0.1:8000",
         "http://localhost:8000",
         "http://127.0.0.1:3000",
         "http://localhost:3000",
+        "https://wise-website-test.onrender.com",
+        "http://wise-website-test.onrender.com",
     ]
 
 
@@ -364,7 +406,7 @@ def _api_only_html() -> str:
 </html>"""
 
 
-@app.get("/api/status")
+@app.api_route("/api/status", methods=["GET", "HEAD"])
 def get_status():
     return _status_payload()
 
@@ -712,13 +754,18 @@ if FRONTEND_ROOT:
     if _pages.is_dir():
         app.mount("/pages", StaticFiles(directory=str(_pages), html=True), name="pages")
 
-    @app.get("/", include_in_schema=False)
+    @app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
     def site_home():
+        # Explicit 302 Location works for both GET and HEAD probes on Render
         return RedirectResponse(url="/pages/index.html", status_code=302)
+
+    @app.api_route("/healthz", methods=["GET", "HEAD"], include_in_schema=False)
+    def healthz():
+        return {"ok": True, "status": "ready"}
 
 else:
 
-    @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+    @app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
     def root_api_only():
         return HTMLResponse(content=_api_only_html())
 
