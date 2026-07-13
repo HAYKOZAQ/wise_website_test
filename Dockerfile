@@ -10,6 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Put this stamp before application copies. Changing CACHEBUST therefore gives
+# the COPY layers a new parent and forces Render to recopy frontend assets.
+ARG CACHEBUST=33
+ARG BUILD_SHA=dev
+ARG BUILD_TIME=unknown
+RUN printf '%s\n' "$CACHEBUST" > /tmp/wisef-cachebust
+
 # Backend code (includes data/ corpus, seed/, start.sh)
 COPY backend/ /app/
 
@@ -18,9 +25,6 @@ COPY src/ /app/frontend/
 
 # Deploy stamp — visible at GET /api/version so we can verify the live build.
 # CACHEBUST invalidates Docker layer cache when frontend/backend changes (Render sometimes reuses stale COPY layers).
-ARG CACHEBUST=32
-ARG BUILD_SHA=dev
-ARG BUILD_TIME=unknown
 RUN printf '{\n  "service": "wisef",\n  "frontend": "/app/frontend",\n  "build_sha": "%s",\n  "build_time": "%s",\n  "asset_version": "%s"\n}\n' "$BUILD_SHA" "$BUILD_TIME" "$CACHEBUST" > /app/version.json \
     && echo "cachebust=$CACHEBUST" > /app/frontend/.deploy-stamp \
     && test -f /app/frontend/css/dark.css \

@@ -416,7 +416,7 @@ def get_version():
     """Deploy stamp so we can confirm Render is on the latest build."""
     payload = {
         "ok": True,
-        "asset_version": "32",
+        "asset_version": "33",
         "frontend_root": str(FRONTEND_ROOT) if FRONTEND_ROOT else None,
         "frontend_mounted": bool(FRONTEND_ROOT),
     }
@@ -454,7 +454,7 @@ def get_version():
             if partners.is_file():
                 ph = partners.read_text(encoding="utf-8", errors="ignore")
                 payload["partners_inline_navy"] = "#0f2740" in ph and "wisef-page-header-critical" in ph
-                payload["partners_asset_v32"] = "?v=32" in ph
+                payload["partners_asset_v33"] = "?v=33" in ph
         except Exception as e:
             payload["probe_error"] = str(e)
     return payload

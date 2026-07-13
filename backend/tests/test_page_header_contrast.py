@@ -63,7 +63,7 @@ class TestPageHeaderContrast(unittest.TestCase):
         self.assertIn(NAVY, html)
         self.assertIn('class="page-header"', html)
         self.assertNotIn("page-header fade-in", html)
-        self.assertIn("?v=32", html)
+        self.assertIn("?v=33", html)
         # Inline style on section
         self.assertRegex(
             html,
@@ -80,7 +80,7 @@ class TestPageHeaderContrast(unittest.TestCase):
             self.assertIn("wisef-page-header-critical", html, name)
             self.assertIn(NAVY, html, name)
             self.assertNotIn("page-header fade-in", html, name)
-            self.assertIn("?v=32", html, name)
+            self.assertIn("?v=33", html, name)
 
     def test_main_js_force_function(self):
         js = (JS / "main.js").read_text(encoding="utf-8")
@@ -92,8 +92,8 @@ class TestPageHeaderContrast(unittest.TestCase):
         for p in PAGES.glob("*.html"):
             t = p.read_text(encoding="utf-8")
             if 'href="/css/' in t:
-                self.assertIn("?v=32", t, p.name)
-                self.assertNotIn("?v=31", t, p.name)
+                self.assertIn("?v=33", t, p.name)
+                self.assertNotIn("?v=32", t, p.name)
 
 
 if __name__ == "__main__":
