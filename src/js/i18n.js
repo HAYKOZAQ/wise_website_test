@@ -9,10 +9,6 @@
 (function () {
   'use strict';
 
-  // Immediately set theme to avoid flashing
-  const initialTheme = localStorage.getItem('wisef_theme') || 'light';
-  document.documentElement.setAttribute('data-theme', initialTheme);
-
   /* ══════════════════════════════════════════════════════
      TRANSLATIONS — Clean, correct Armenian Unicode & English
   ══════════════════════════════════════════════════════ */
@@ -376,7 +372,6 @@
       const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', theme);
       document.documentElement.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-      if (document.body) document.body.setAttribute('data-theme', theme);
       localStorage.setItem('wisef_theme', theme);
       applyHeaderLogo(theme);
     });

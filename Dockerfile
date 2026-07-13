@@ -11,7 +11,7 @@ COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Cache bust argument — MUST be before COPY to invalidate Docker layer cache on Render
-ARG CACHEBUST=37
+ARG CACHEBUST=38
 ARG BUILD_SHA=dev
 ARG BUILD_TIME=unknown
 
@@ -32,6 +32,18 @@ RUN test -f /app/frontend/css/base.css \
     && test -f /app/frontend/js/chat.js \
     && test -f /app/frontend/js/config.js \
     && test -f /app/frontend/pages/index.html \
+    && test -f /app/frontend/pages/about.html \
+    && test -f /app/frontend/pages/services.html \
+    && test -f /app/frontend/pages/partners.html \
+    && test -f /app/frontend/pages/contact.html \
+    && test -f /app/frontend/pages/blog.html \
+    && test -f /app/frontend/pages/en/index.html \
+    && test -f /app/frontend/pages/en/about.html \
+    && test -f /app/frontend/pages/en/services.html \
+    && test -f /app/frontend/pages/en/partners.html \
+    && test -f /app/frontend/pages/en/contact.html \
+    && test -f /app/frontend/pages/en/blog.html \
+    && test -f /app/frontend/assets/data/blog-posts.json \
     && echo "Frontend assets verified OK"
 
 # Deploy stamp — visible at GET /api/version to verify live build

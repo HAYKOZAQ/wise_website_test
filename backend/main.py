@@ -312,7 +312,7 @@ def _status_payload() -> dict:
     stats = load_eval_stats(limit=200)
     return {
         "status": "ready" if rag_engine else "error",
-        "version": "2.5",
+        "version": "2.6",
         "vector_search_active": rag_engine.vector_enabled if rag_engine else False,
         "vector_backend": getattr(rag_engine, "vector_backend", None) if rag_engine else None,
         "embed_skip_reason": getattr(rag_engine, "embed_skip_reason", None) if rag_engine else None,
@@ -454,7 +454,7 @@ def get_version():
             if partners.is_file():
                 ph = partners.read_text(encoding="utf-8", errors="ignore")
                 payload["partners_has_page_header"] = 'class="page-header"' in ph
-                payload["partners_asset_v33"] = "?v=33" in ph
+                payload["partners_asset_v37"] = "?v=37" in ph
         except Exception as e:
             payload["probe_error"] = str(e)
     return payload

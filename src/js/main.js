@@ -128,7 +128,9 @@ function initBlogModal() {
   async function loadBlogData() {
     if (blogData) return blogData;
     try {
-      const res = await fetch('../assets/data/blog-posts.json');
+      const apiBase = typeof window.WISEF_getApiBase === 'function' ? window.WISEF_getApiBase() : '';
+      const blogUrl = apiBase ? apiBase.replace(/\/$/, '') + '/assets/data/blog-posts.json' : '../assets/data/blog-posts.json';
+      const res = await fetch(blogUrl);
       if (!res.ok) throw new Error('Failed to load local database');
       blogData = await res.json();
       return blogData;
@@ -158,22 +160,18 @@ function initBlogModal() {
 
       const url = btn.getAttribute('data-url');
       const card = btn.closest('.blog-card, .project-card');
-      const articleTitle = card ? card.querySelector('h3').textContent : 'Article';
-
-      title.textContent = articleTitle;
-      body.innerHTML = '<div class="modal__loader">Բեռնվում է...</div>';
-      overlay.classList.add('open');
-      document.body.style.overflow = 'hidden';
+      const articleTitle = card?.querySelector('h3')?.textContent ?? 'Article';
 
       const db = await loadBlogData();
-      if (db && db[url]) {
-        const post = db[url];
-        body.innerHTML = post.content;
-      } else {
-        body.innerHTML = '<div class="modal__error">' +
-          'Չհաջողվեց բեռնել հոդվածը։ <a href="' + url + '" target="_blank" rel="noopener">Բացել օրիգինալ էջում</a>' +
-          '</div>';
+      if (!db || !db[url]) {
+        window.open(url, '_blank', 'noopener');
+        return;
       }
+
+      title.textContent = articleTitle;
+      body.innerHTML = db[url].content;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
 
       body.querySelectorAll('a').forEach(a => {
         a.setAttribute('target', '_blank');
@@ -383,7 +381,13 @@ function initBlogSearch() {
       });
     } else {
       if (pagination) pagination.style.display = 'none';
-      if (featured) featured.style.display = 'none';
+
+      if (featured) {
+        const featuredTitle = featured.querySelector('h3')?.textContent.toLowerCase() || '';
+        const featuredText = featured.querySelector('p')?.textContent.toLowerCase() || '';
+        const featuredMatch = featuredTitle.includes(query) || featuredText.includes(query);
+        featured.style.display = featuredMatch ? 'block' : 'none';
+      }
 
       cards.forEach(card => {
         const title = card.querySelector('.blog-card__title').textContent.toLowerCase();
