@@ -4,13 +4,32 @@ node_modules/
 .git/
 *.pyc
 __pycache__/
+.pytest_cache/
 .env
 backend/.env
-# Keep secrets and ephemeral logs out of git
+
+# Ephemeral runtime / local logs
 backend/data/qa_eval_log.jsonl
 backend/data/contact_messages.jsonl
 backend/data/reingest_state.json
 backend/data/reingest_mode.json
 
-_live.txt 
-_live_comp.txt 
+# Regeneratable caches (rebuild from pdfs/ + scraper)
+backend/data/embeddings_cache.json
+backend/data/pdf_cache/
+backend/data/web_cache/
+
+# Nested / accidental junk
+backend/backend/
+backend/nul*
+**/nul)
+
+# Local audit / temp scratch
+_audit*.py
+_cleanup*.py
+_audit*.txt
+_cleanup*.json
+_cmp.txt
+_pdf_dups.txt
+_live*.txt
+partners_live.html

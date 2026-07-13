@@ -937,8 +937,8 @@ html[data-theme="dark"] .contact-form .glass-input {
    Never use cream gradients here — they break white titles.
 */
 .page-header {
-  background: #0f2740;
-  color: #ffffff;
+  background: #0f2740 !important;
+  color: #ffffff !important;
   padding: 140px 24px 60px;
   text-align: center;
   position: relative;
@@ -948,7 +948,7 @@ html[data-theme="dark"] .contact-form .glass-input {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
   margin-bottom: 12px;
-  color: inherit;
+  color: #ffffff !important;
 }
 
 .page-header__breadcrumb {
@@ -979,61 +979,7 @@ html[data-theme="dark"] .contact-form .glass-input {
   animation: modalFadeIn 0.3s ease;
 }
 
-html[data-theme="dark"] .modal-overlay {
-  background: rgba(2, 6, 23, 0.78);
-}
-
-html[data-theme="dark"] .modal.glass,
-html[data-theme="dark"] .search-bar.glass,
-html[data-theme="dark"] .blog-card.glass {
-  background: rgba(30, 41, 59, 0.88);
-  border-color: rgba(148, 163, 184, 0.16);
-}
-
-html[data-theme="dark"] .search-bar input,
-html[data-theme="dark"] .search-bar .glass-input {
-  color: var(--color-text);
-  background: transparent;
-}
-
-html[data-theme="dark"] .nav__link {
-  color: var(--color-text-light);
-}
-
-html[data-theme="dark"] .nav__link:hover,
-html[data-theme="dark"] .nav__link--active {
-  color: var(--color-accent);
-}
-
-html[data-theme="dark"] .section--alt {
-  background: #121a2b !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .stats-banner {
-  background: #1e293b !important;
-}
-
-html[data-theme="dark"] .stats-banner .glass-stat {
-  background: #0f172a !important;
-  color: #f1f5f9 !important;
-}
-
-html[data-theme="dark"] .value-card__title,
-html[data-theme="dark"] .service-card__title {
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .value-card__text,
-html[data-theme="dark"] .service-card__text {
-  color: #94a3b8 !important;
-}
-
-html[data-theme="dark"] .hero__title span {
-  background: linear-gradient(135deg, #7dd3fc 0%, #fbbf24 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
+/* Dark-theme overrides live in dark.css (avoid duplicate rules here). */
 
 @keyframes modalFadeIn {
   from { opacity: 0; }
