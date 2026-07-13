@@ -7,6 +7,8 @@
   z-index: 1000;
   padding: 0 24px;
   transition: background var(--transition-base);
+  display: flex;
+  align-items: center;
 }
 
 .header.scrolled {
@@ -28,26 +30,42 @@ html[data-theme="dark"] .header.scrolled {
 }
 
 .header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) auto minmax(100px, 1fr);
   align-items: center;
-  justify-content: space-between;
+  column-gap: 16px;
   height: var(--header-height);
   max-width: var(--container-max);
   margin: 0 auto;
+  width: 100%;
 }
 
 .header__logo {
   display: flex;
   align-items: center;
+  justify-self: start;
   gap: 12px;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-text);
+  min-width: 0;
 }
 
 .header__logo img {
-  height: 60px;
+  height: 48px;
   width: auto;
+  display: block;
+}
+
+/* Right-side controls (lang + theme) — sibling of nav, not inside it */
+.header-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: end;
+  gap: 10px;
+  flex-shrink: 0;
+  grid-column: 3;
 }
 
 /* ===== THEME SWITCHER ===== */
@@ -96,9 +114,12 @@ html[data-theme="dark"] .theme-toggle .theme-toggle__moon {
 .nav {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 1;
+  justify-content: center;
+  justify-self: center;
+  gap: 2px;
+  flex-shrink: 0;
   min-width: 0;
+  grid-column: 2;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -110,13 +131,24 @@ html[data-theme="dark"] .theme-toggle .theme-toggle__moon {
 }
 
 .nav__link {
-  padding: 10px 18px;
-  font-size: 0.9375rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  font-size: 0.9rem;
   font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
   color: var(--color-text-light);
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
   position: relative;
+}
+
+/* English labels are shorter; keep same vertical rhythm as HY */
+html[lang="en"] .nav__link {
+  padding: 8px 14px;
+  font-size: 0.9375rem;
 }
 
 .nav__link:hover {
@@ -1183,12 +1215,21 @@ html[data-theme="dark"] .hero__title span {
 }
 
 @media (max-width: 768px) {
+  .header__inner {
+    grid-template-columns: 1fr auto auto;
+    column-gap: 10px;
+  }
+
   .nav {
     position: fixed;
     top: var(--header-height);
     left: 0;
     right: 0;
+    grid-column: 1 / -1;
+    justify-self: stretch;
     flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
     padding: 24px;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: var(--blur-lg);
@@ -1197,6 +1238,7 @@ html[data-theme="dark"] .hero__title span {
     transform: translateY(-120%);
     transition: transform var(--transition-base);
     gap: 4px;
+    z-index: 999;
   }
 
   html[data-theme="dark"] .nav {
@@ -1211,25 +1253,29 @@ html[data-theme="dark"] .hero__title span {
     width: 100%;
     padding: 14px 18px;
     font-size: 1.0625rem;
+    justify-content: flex-start;
+  }
+
+  .header-controls {
+    grid-column: 2;
+    justify-self: end;
   }
 
   .mobile-toggle {
     display: flex;
+    grid-column: 3;
+    justify-self: end;
+    align-self: center;
   }
 
   .lang-toggle {
-    width: 100%;
-    justify-content: center;
-    padding: 10px 18px;
-    gap: 12px;
-    margin-top: 4px;
-    background: var(--color-glass-bg);
-    border-radius: var(--radius-sm);
+    padding: 6px 4px;
+    gap: 6px;
   }
 
   .lang-toggle__hy,
   .lang-toggle__en {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
   }
 
   .grid-2, .grid-3, .grid-4 {

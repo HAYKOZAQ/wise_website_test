@@ -402,20 +402,24 @@
     cacheOriginals();
     applyHeaderLogo(document.documentElement.getAttribute('data-theme') || 'light');
 
-    document.querySelectorAll('.nav__lang-btn').forEach(old => {
+    // Build header controls as a sibling of .nav (centered nav, controls on right)
+    document.querySelectorAll('.header__inner').forEach((inner) => {
+      if (inner.querySelector('.header-controls')) return;
+
       const container = document.createElement('div');
       container.className = 'header-controls';
-      container.style.display = 'flex';
-      container.style.alignItems = 'center';
-      container.style.gap = '16px';
-      
-      const langToggle = buildToggle();
-      const themeToggle = buildThemeToggle();
-      
-      container.appendChild(langToggle);
-      container.appendChild(themeToggle);
-      
-      old.parentNode.replaceChild(container, old);
+      container.appendChild(buildToggle());
+      container.appendChild(buildThemeToggle());
+
+      // Remove legacy lang button inside nav if present
+      inner.querySelectorAll('.nav__lang-btn').forEach((old) => old.remove());
+
+      const mobile = inner.querySelector('.mobile-toggle');
+      if (mobile) {
+        inner.insertBefore(container, mobile);
+      } else {
+        inner.appendChild(container);
+      }
     });
 
     if (lang === 'en') applyLang('en');
