@@ -413,13 +413,22 @@ html[data-theme="dark"] .theme-toggle .theme-toggle__moon {
 
 /* ===== FOOTER ===== */
 .footer {
-  background: #0f2740;
-  color: rgba(255, 255, 255, 0.8);
+  background: #0f2740 !important;
+  color: rgba(255, 255, 255, 0.88) !important;
   padding: 60px 24px 40px;
 }
 
+.footer a {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.footer a:hover {
+  color: #fff;
+}
+
 html[data-theme="dark"] .footer {
-  background: #020617;
+  background: #020617 !important;
+  color: #e2e8f0 !important;
   border-top: 1px solid rgba(148, 163, 184, 0.12);
 }
 
@@ -1407,6 +1416,10 @@ html[data-theme="dark"] .wise-help {
   bottom: 68px;
   width: min(400px, calc(100vw - 24px));
   height: min(620px, calc(100dvh - 100px));
+  min-width: 300px;
+  min-height: 360px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 72px);
   display: flex;
   flex-direction: column;
   background: var(--wh-bg);
@@ -1425,6 +1438,77 @@ html[data-theme="dark"] .wise-help {
     visibility 0.38s,
     box-shadow 0.35s ease;
   will-change: transform, opacity;
+  resize: none; /* custom handle */
+}
+
+/* Resize handle (top-left) */
+.wise-help__resize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  z-index: 5;
+  cursor: nwse-resize;
+  border-top-left-radius: var(--wh-radius);
+  background:
+    linear-gradient(135deg, var(--wh-brand) 0 35%, transparent 35% 100%);
+  opacity: 0.55;
+}
+
+.wise-help__resize:hover,
+.wise-help__resize:active {
+  opacity: 1;
+}
+
+body.wise-help-resizing {
+  cursor: nwse-resize !important;
+  user-select: none !important;
+}
+
+body.wise-help-resizing iframe {
+  pointer-events: none;
+}
+
+.wise-help__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.wise-help__new {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: background 0.15s ease;
+}
+
+.wise-help__new:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.wise-help__new-label {
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 420px) {
+  .wise-help__new-label {
+    display: none;
+  }
 }
 
 /* Keep layout when animating (override [hidden] display:none during transition) */

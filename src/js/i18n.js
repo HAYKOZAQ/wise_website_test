@@ -240,6 +240,7 @@
     'chat.status_offline': { hy: 'Սերվերը անջատված է', en: 'Server is offline' },
     'chat.thinking':       { hy: 'Մտածում եմ…', en: 'Thinking…' },
     'chat.sources_label':  { hy: 'Աղբյուրներ', en: 'Sources' },
+    'chat.new':            { hy: 'Նոր զրույց', en: 'New chat' },
 
     /* Topic buttons */
     'chat.q1': { hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
