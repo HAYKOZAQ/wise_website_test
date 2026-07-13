@@ -432,3 +432,125 @@ html[data-theme="dark"] .wise-help__header {
 html[data-theme="dark"] .wise-help__msg--user .wise-help__bubble {
   color: #fff !important;
 }
+
+/* ── Subpage hero / page-header (keep navy but ensure text contrast) ── */
+html[data-theme="dark"] .page-header {
+  background: #0f2740 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .page-header__title,
+html[data-theme="dark"] .page-header__title *,
+html[data-theme="dark"] .page-header h1,
+html[data-theme="dark"] .page-header h1 * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html[data-theme="dark"] .page-header__breadcrumb,
+html[data-theme="dark"] .page-header__breadcrumb a {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+html[data-theme="dark"] .page-header__breadcrumb a:hover {
+  color: #fbbf24 !important;
+}
+
+/* ── Partners grid & cards ── */
+html[data-theme="dark"] .grid-auto > .glass.partner-card,
+html[data-theme="dark"] .partner-card {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .partner-card__name {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .partner-card:hover .partner-card__name {
+  color: #38bdf8 !important;
+}
+
+/* ── Services page project cards ── */
+html[data-theme="dark"] .project-card {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .project-card__title {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .project-card__text {
+  color: #94a3b8 !important;
+}
+
+/* ── About page timeline & values ── */
+html[data-theme="dark"] .value-card__icon,
+html[data-theme="dark"] .value-card__title {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .value-card__text {
+  color: #94a3b8 !important;
+}
+
+/* ── Blog cards ── */
+html[data-theme="dark"] .blog-card {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .blog-card__title {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .blog-card__date,
+html[data-theme="dark"] .blog-card__excerpt {
+  color: #94a3b8 !important;
+}
+
+/* ── Featured post (blog page) ── */
+html[data-theme="dark"] .featured-post {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .featured-post h2,
+html[data-theme="dark"] .featured-post h3 {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .featured-post p {
+  color: #94a3b8 !important;
+}
+
+/* ── Section headers in all pages ── */
+html[data-theme="dark"] .section__header,
+html[data-theme="dark"] .section__label,
+html[data-theme="dark"] .section__title,
+html[data-theme="dark"] .section__subtitle {
+  color: inherit;
+}
+
+html[data-theme="dark"] .section__label {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+/* ── Stats banner on about page ── */
+html[data-theme="dark"] .stats-banner .glass-stat:not(:last-child) {
+  border-right-color: #1e293b !important;
+}
+
+/* ── Why cards (home page) ── */
+html[data-theme="dark"] .why-card__icon {
+  background: rgba(56, 189, 248, 0.15) !important;
+}
+
+/* ── Service cards (home page preview) ── */
+html[data-theme="dark"] .service-card__icon {
+  background: rgba(56, 189, 248, 0.15) !important;
+}

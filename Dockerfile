@@ -10,25 +10,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Put this stamp before application copies. Changing CACHEBUST therefore gives
-# the COPY layers a new parent and forces Render to recopy frontend assets.
-ARG CACHEBUST=33
+# Cache bust argument — MUST be before COPY to invalidate Docker layer cache on Render
+ARG CACHEBUST=34
 ARG BUILD_SHA=dev
 ARG BUILD_TIME=unknown
-RUN printf '%s\n' "$CACHEBUST" > /tmp/wisef-cachebust
 
 # Backend code (includes data/ corpus, seed/, start.sh)
 COPY backend/ /app/
 
 # Frontend static site (HTML/CSS/JS) served by FastAPI
+# This COPY layer will be invalidated when CACHEBUST changes
 COPY src/ /app/frontend/
 
-# Deploy stamp — visible at GET /api/version so we can verify the live build.
-# CACHEBUST invalidates Docker layer cache when frontend/backend changes (Render sometimes reuses stale COPY layers).
+# Verify frontend assets were copied correctly
+RUN test -f /app/frontend/css/base.css \
+    && test -f /app/frontend/css/glass.css \
+    && test -f /app/frontend/css/components.css \
+    && test -f /app/frontend/css/dark.css \
+    && test -f /app/frontend/js/main.js \
+    && test -f /app/frontend/js/i18n.js \
+    && test -f /app/frontend/js/chat.js \
+    && test -f /app/frontend/js/config.js \
+    && test -f /app/frontend/pages/index.html \
+    && echo "Frontend assets verified OK"
+
+# Deploy stamp — visible at GET /api/version to verify live build
 RUN printf '{\n  "service": "wisef",\n  "frontend": "/app/frontend",\n  "build_sha": "%s",\n  "build_time": "%s",\n  "asset_version": "%s"\n}\n' "$BUILD_SHA" "$BUILD_TIME" "$CACHEBUST" > /app/version.json \
     && echo "cachebust=$CACHEBUST" > /app/frontend/.deploy-stamp \
-    && test -f /app/frontend/css/dark.css \
-    && test -f /app/frontend/js/i18n.js \
     && test -f /app/start.sh
 
 RUN mkdir -p /app/data/corpus
@@ -39,7 +47,5 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-# Fast boot: serve immediately using baked corpus (data/ + seed/).
-# Full re-scrape only if FORCE_SCRAPE_ON_BOOT=1 or corpus missing.
 RUN chmod +x /app/start.sh
 CMD ["/app/start.sh"]
