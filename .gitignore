@@ -12,3 +12,5 @@ backend/data/contact_messages.jsonl
 backend/data/reingest_state.json
 backend/data/reingest_mode.json
 
+_live.txt 
+_live_comp.txt 
