@@ -518,6 +518,134 @@ html[data-theme="dark"] .blog-card__excerpt {
   color: #94a3b8 !important;
 }
 
+/* ── Partners page specific ───────────────────────────── */
+html[data-theme="dark"] .partner-card {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .partner-card__name {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .partner-card:hover .partner-card__name {
+  color: #38bdf8 !important;
+}
+
+/* ── Services page project cards ── */
+html[data-theme="dark"] .project-card {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .project-card__title {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .project-card__text {
+  color: #94a3b8 !important;
+}
+
+/* ── About page timeline & values ── */
+html[data-theme="dark"] .value-card__icon,
+html[data-theme="dark"] .value-card__title {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .value-card__text {
+  color: #94a3b8 !important;
+}
+
+/* ── Search bar ── */
+html[data-theme="dark"] .search-bar {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .search-bar .glass-input,
+html[data-theme="dark"] .search-bar input {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Featured post / thumb ── */
+html[data-theme="dark"] .featured-thumb,
+html[data-theme="dark"] .featured-thumb[style] {
+  background: linear-gradient(135deg, #1e3a5f, #312e81) !important;
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .featured-post {
+  background: rgba(30, 41, 59, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .featured-post h2,
+html[data-theme="dark"] .featured-post h3 {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .featured-post p {
+  color: #94a3b8 !important;
+}
+
+/* ── Pagination ── */
+html[data-theme="dark"] .pagination__btn {
+  background: rgba(30, 41, 59, 0.9) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+html[data-theme="dark"] .pagination__btn--active {
+  background: #38bdf8 !important;
+  color: #0b1220 !important;
+}
+
+/* ── Header controls (lang + theme toggles) ── */
+html[data-theme="dark"] .header-controls {
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .lang-toggle__track {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+html[data-theme="dark"] .lang-toggle__hy,
+html[data-theme="dark"] .lang-toggle__en {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .lang-toggle:not(.lang-toggle--en) .lang-toggle__hy,
+html[data-theme="dark"] .lang-toggle.lang-toggle--en .lang-toggle__en {
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .lang-toggle__thumb {
+  background: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .lang-toggle.lang-toggle--en .lang-toggle__thumb {
+  background: white !important;
+}
+
+html[data-theme="dark"] .lang-toggle:hover .lang-toggle__track {
+  border-color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .theme-toggle {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .theme-toggle:hover {
+  background: rgba(51, 65, 85, 0.95) !important;
+  color: #fbbf24 !important;
+}
+
 /* ── Subpage hero / page-header (keep navy but ensure text contrast) ── */
 html[data-theme="dark"] .page-header {
   background: #0f2740 !important;

@@ -30,8 +30,7 @@ html[data-theme="dark"] .header.scrolled {
 }
 
 .header__inner {
-  /* Flex + absolute-centered nav = true visual center for EN/HY */
-  position: relative;
+  /* 3-column flex: logo | centered nav | controls */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,6 +38,7 @@ html[data-theme="dark"] .header.scrolled {
   max-width: var(--container-max);
   margin: 0 auto;
   width: 100%;
+  gap: 24px;
 }
 
 .header__logo {
@@ -115,19 +115,14 @@ html[data-theme="dark"] .theme-toggle .theme-toggle__moon {
 }
 
 
+/* Centered nav — flex child that centers its content */
 .nav {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  flex-shrink: 0;
+  flex: 1 1 auto;
   min-width: 0;
-  /* True horizontal center of the header bar (independent of logo width) */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
-  max-width: min(720px, calc(100% - 280px));
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
