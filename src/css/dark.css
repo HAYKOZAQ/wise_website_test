@@ -11,7 +11,7 @@ html[data-theme="dark"] body {
 }
 
 /* ── Top banners / heroes ─────────────────────────── */
-html[data-theme="dark"] .page-header,
+/* page-header is always navy (see components.css) — do not re-theme it here */
 html[data-theme="dark"] .hero,
 html[data-theme="dark"] .hero--small,
 html[data-theme="dark"] .glass-hero {
@@ -20,9 +20,7 @@ html[data-theme="dark"] .glass-hero {
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-/* Titles: do NOT force all h1 white (breaks light page-header if theme attr glitches).
-   Scope to dark surfaces only. */
-html[data-theme="dark"] .page-header__title,
+/* Section/card titles only (NOT page-header — that is always white on navy) */
 html[data-theme="dark"] .hero__title,
 html[data-theme="dark"] .section__title,
 html[data-theme="dark"] .service-card__title,
@@ -39,11 +37,6 @@ html[data-theme="dark"] .hero h2 {
   -webkit-text-fill-color: #f8fafc !important;
 }
 
-html[data-theme="dark"] .page-header__title {
-  color: #f8fafc !important;
-  -webkit-text-fill-color: #f8fafc !important;
-}
-
 /* Keep gradient text readable on hero titles */
 html[data-theme="dark"] .hero__title span {
   background: linear-gradient(135deg, #7dd3fc 0%, #fbbf24 100%) !important;
@@ -53,7 +46,6 @@ html[data-theme="dark"] .hero__title span {
   color: transparent !important;
 }
 
-html[data-theme="dark"] .page-header__breadcrumb,
 html[data-theme="dark"] .hero__text,
 html[data-theme="dark"] .section__subtitle,
 html[data-theme="dark"] .section__label,
@@ -61,13 +53,8 @@ html[data-theme="dark"] .service-card__text,
 html[data-theme="dark"] .value-card__text,
 html[data-theme="dark"] .why-card__text,
 html[data-theme="dark"] .section p,
-html[data-theme="dark"] .page-header p,
 html[data-theme="dark"] .container > p {
   color: #94a3b8 !important;
-}
-
-html[data-theme="dark"] .page-header__breadcrumb a {
-  color: #38bdf8 !important;
 }
 
 html[data-theme="dark"] .section a:not(.glass-btn):not(.wise-help a) {

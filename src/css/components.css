@@ -931,61 +931,65 @@ html[data-theme="dark"] .contact-form .glass-input {
   color: var(--color-text-light);
 }
 
-/* ===== PAGE HEADER ===== */
-/* Light mode: cream bg + dark navy title (never white-on-cream) */
-.page-header {
-  background: linear-gradient(135deg, #f8f6f0 0%, #ede8dd 100%) !important;
+/* ===== PAGE HEADER =====
+   Always solid brand navy + white title (light AND dark).
+   Prevents white-on-cream / theme-mismatch bugs on Partners/About/etc.
+*/
+.page-header,
+section.page-header,
+html[data-theme="light"] .page-header,
+html[data-theme="dark"] .page-header,
+html:not([data-theme]) .page-header {
+  background: #0f2740 !important;
+  background-image: none !important;
+  background-color: #0f2740 !important;
   padding: 140px 24px 60px;
   text-align: center;
   position: relative;
-  color: #183960 !important;
+  color: #ffffff !important;
+  border-bottom: none !important;
   transition: background 0.25s ease, color 0.2s ease;
 }
 
-.page-header__title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: #183960 !important;
-  -webkit-text-fill-color: #183960 !important;
+.page-header__title,
+section.page-header .page-header__title,
+html[data-theme="light"] .page-header__title,
+html[data-theme="dark"] .page-header__title,
+.page-header h1 {
+  font-size: clamp(2rem, 4vw, 3rem) !important;
+  font-weight: 800 !important;
+  margin-bottom: 12px !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
   opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
 }
 
-.page-header__breadcrumb {
-  font-size: 0.875rem;
-  color: #5a6a7e !important;
-  -webkit-text-fill-color: #5a6a7e !important;
+.page-header__breadcrumb,
+html[data-theme="light"] .page-header__breadcrumb,
+html[data-theme="dark"] .page-header__breadcrumb,
+.page-header p {
+  font-size: 0.875rem !important;
+  color: rgba(255, 255, 255, 0.78) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.78) !important;
 }
 
-.page-header__breadcrumb a {
-  color: #183960 !important;
-  -webkit-text-fill-color: #183960 !important;
+.page-header__breadcrumb a,
+html[data-theme="light"] .page-header__breadcrumb a,
+html[data-theme="dark"] .page-header__breadcrumb a {
+  color: #7dd3fc !important;
+  -webkit-text-fill-color: #7dd3fc !important;
 }
 
 .page-header__breadcrumb a:hover {
-  color: #0ea5e9 !important;
-  -webkit-text-fill-color: #0ea5e9 !important;
-}
-
-/* Dark mode: solid navy + white title */
-html[data-theme="dark"] .page-header {
-  background: linear-gradient(135deg, #0b1220 0%, #111827 55%, #0f172a 100%) !important;
-  color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .page-header__title {
-  color: #f8fafc !important;
-  -webkit-text-fill-color: #f8fafc !important;
-}
-
-html[data-theme="dark"] .page-header__breadcrumb {
-  color: #94a3b8 !important;
-  -webkit-text-fill-color: #94a3b8 !important;
-}
-
-html[data-theme="dark"] .page-header__breadcrumb a {
-  color: #38bdf8 !important;
-  -webkit-text-fill-color: #38bdf8 !important;
+  color: #fbbf24 !important;
+  -webkit-text-fill-color: #fbbf24 !important;
 }
 
 /* ===== MODAL ===== */

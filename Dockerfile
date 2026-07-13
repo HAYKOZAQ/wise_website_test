@@ -18,7 +18,7 @@ COPY src/ /app/frontend/
 
 # Deploy stamp — visible at GET /api/version so we can verify the live build.
 # CACHEBUST invalidates Docker layer cache when frontend/backend changes (Render sometimes reuses stale COPY layers).
-ARG CACHEBUST=30
+ARG CACHEBUST=31
 ARG BUILD_SHA=dev
 ARG BUILD_TIME=unknown
 RUN printf '{\n  "service": "wisef",\n  "frontend": "/app/frontend",\n  "build_sha": "%s",\n  "build_time": "%s",\n  "asset_version": "%s"\n}\n' "$BUILD_SHA" "$BUILD_TIME" "$CACHEBUST" > /app/version.json \
