@@ -936,66 +936,32 @@ html[data-theme="dark"] .contact-form .glass-input {
    Prevents white-on-cream / theme-mismatch bugs on Partners/About/etc.
    Never use cream gradients here — they break white titles.
 */
-.page-header,
-section.page-header,
-html[data-theme="light"] .page-header,
-html[data-theme="dark"] .page-header,
-html:not([data-theme]) .page-header,
-.page-header.fade-in,
-.page-header.visible {
-  background: #0f2740 !important;
-  background-image: none !important;
-  background-color: #0f2740 !important;
+.page-header {
+  background: #0f2740;
+  color: #ffffff;
   padding: 140px 24px 60px;
   text-align: center;
   position: relative;
-  color: #ffffff !important;
-  border-bottom: none !important;
-  opacity: 1 !important;
-  transform: none !important;
-  filter: none !important;
-  transition: none;
 }
 
-.page-header__title,
-section.page-header .page-header__title,
-html[data-theme="light"] .page-header__title,
-html[data-theme="dark"] .page-header__title,
-.page-header h1 {
-  font-size: clamp(2rem, 4vw, 3rem) !important;
-  font-weight: 800 !important;
-  margin-bottom: 12px !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  background: none !important;
-  background-image: none !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
-  opacity: 1 !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  text-shadow: none !important;
+.page-header__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: inherit;
 }
 
-.page-header__breadcrumb,
-html[data-theme="light"] .page-header__breadcrumb,
-html[data-theme="dark"] .page-header__breadcrumb,
-.page-header p {
-  font-size: 0.875rem !important;
-  color: rgba(255, 255, 255, 0.78) !important;
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.78) !important;
+.page-header__breadcrumb {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.78);
 }
 
-.page-header__breadcrumb a,
-html[data-theme="light"] .page-header__breadcrumb a,
-html[data-theme="dark"] .page-header__breadcrumb a {
-  color: #7dd3fc !important;
-  -webkit-text-fill-color: #7dd3fc !important;
+.page-header__breadcrumb a {
+  color: #7dd3fc;
 }
 
 .page-header__breadcrumb a:hover {
-  color: #fbbf24 !important;
-  -webkit-text-fill-color: #fbbf24 !important;
+  color: #fbbf24;
 }
 
 /* ===== MODAL ===== */
@@ -1205,12 +1171,6 @@ html[data-theme="dark"] .hero__title span {
 }
 
 /* Page headers never start invisible (white-on-cream flash / stuck opacity) */
-.page-header.fade-in,
-section.page-header.fade-in {
-  opacity: 1 !important;
-  transform: none !important;
-}
-
 .fade-in-left {
   opacity: 0;
   transform: translateX(-30px);

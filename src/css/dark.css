@@ -22,19 +22,6 @@ html[data-theme="dark"] .glass-hero {
 }
 
 /* Explicit guard: dark theme must never paint page-header cream */
-html[data-theme="dark"] .page-header,
-html[data-theme="dark"] section.page-header {
-  background: #0f2740 !important;
-  background-color: #0f2740 !important;
-  background-image: none !important;
-  color: #ffffff !important;
-}
-html[data-theme="dark"] .page-header__title,
-html[data-theme="dark"] .page-header h1 {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
-
 /* Section/card titles only (NOT page-header — that is always white on navy) */
 html[data-theme="dark"] .hero__title,
 html[data-theme="dark"] .section__title,

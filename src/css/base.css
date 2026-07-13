@@ -41,8 +41,6 @@
   --hero-grad-mid: #f5f2eb;
   --hero-grad-end: #ede8dd;
   /* Page-header is always brand navy (never cream) — light and dark */
-  --page-header-grad-start: #0f2740;
-  --page-header-grad-end: #0f2740;
 }
 
 /* ── Dark Mode Custom Overrides ────────────────────────── */
@@ -68,8 +66,6 @@ html[data-theme="dark"] {
   --hero-grad-start: #0b1220;
   --hero-grad-mid: #111827;
   --hero-grad-end: #0f172a;
-  --page-header-grad-start: #0f2740;
-  --page-header-grad-end: #0f2740;
 }
 
 
