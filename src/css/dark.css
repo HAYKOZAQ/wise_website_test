@@ -20,6 +20,8 @@ html[data-theme="dark"] .glass-hero {
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
+/* Titles: do NOT force all h1 white (breaks light page-header if theme attr glitches).
+   Scope to dark surfaces only. */
 html[data-theme="dark"] .page-header__title,
 html[data-theme="dark"] .hero__title,
 html[data-theme="dark"] .section__title,
@@ -27,11 +29,19 @@ html[data-theme="dark"] .service-card__title,
 html[data-theme="dark"] .value-card__title,
 html[data-theme="dark"] .why-card__title,
 html[data-theme="dark"] .partner-card__name,
-html[data-theme="dark"] h1,
-html[data-theme="dark"] h2,
-html[data-theme="dark"] h3,
-html[data-theme="dark"] h4 {
+html[data-theme="dark"] .section h1,
+html[data-theme="dark"] .section h2,
+html[data-theme="dark"] .section h3,
+html[data-theme="dark"] .section h4,
+html[data-theme="dark"] .hero h1,
+html[data-theme="dark"] .hero h2 {
   color: #f8fafc !important;
+  -webkit-text-fill-color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .page-header__title {
+  color: #f8fafc !important;
+  -webkit-text-fill-color: #f8fafc !important;
 }
 
 /* Keep gradient text readable on hero titles */
@@ -282,10 +292,7 @@ html[data-theme="dark"] .timeline-item__text {
   color: #94a3b8 !important;
 }
 
-html[data-theme="dark"] .page-header {
-  background: linear-gradient(135deg, #0b1220 0%, #111827 100%) !important;
-  color: #f1f5f9 !important;
-}
+
 
 /* ── Timeline ─────────────────────────────────────── */
 html[data-theme="dark"] .timeline-item::before {
