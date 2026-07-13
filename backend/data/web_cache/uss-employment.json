@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "uss-employment",
+    "url": "https://uss.social.gov.am/%D5%A1%D5%B7%D5%AD%D5%A1%D5%BF%D5%A1%D5%B6%D6%84-%D6%87-%D5%A6%D5%A2%D5%A1%D5%B2%D5%BE%D5%A1%D5%AE%D5%B8%D6%82%D5%A9%D5%B5%D5%B8%D6%82%D5%B6",
+    "title_hy": "ՄՍԾ — Աշխատանք և զբաղվածություն",
+    "category": "employment",
+    "program_keys": [
+      "unemployment",
+      "job_placement"
+    ],
+    "priority": 1
+  },
+  "text": "Աշխատանք և զբաղվածություն\nՄիասնական սոցիալական ծառայության կողմից գործատուներին և աշխատանք փնտրողներին մատուցվող բոլոր ծառայություններն անվճար են:",
+  "sha256": "179e71008d80ebd4c535f437cdf60f3209912e4dab10b18aab7658a3156fd6cf",
+  "char_count": 146
+}

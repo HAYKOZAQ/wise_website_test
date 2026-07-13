@@ -6,12 +6,9 @@ node_modules/
 __pycache__/
 .env
 backend/.env
-# Runtime caches / logs (regenerated)
-backend/data/
-# Keep committed seed snapshot for offline deploy
-!backend/seed/
-!backend/seed/**
-# Local PDF drops may be large; allow README only under pdfs/
-backend/pdfs/*
-!backend/pdfs/README.md
+# Keep secrets and ephemeral logs out of git
+backend/data/qa_eval_log.jsonl
+backend/data/contact_messages.jsonl
+backend/data/reingest_state.json
+backend/data/reingest_mode.json
 
