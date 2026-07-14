@@ -11,7 +11,7 @@ COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Cache bust argument — MUST be before COPY to invalidate Docker layer cache on Render
-ARG CACHEBUST=43
+ARG CACHEBUST=44
 ARG BUILD_SHA=dev
 ARG BUILD_TIME=unknown
 
