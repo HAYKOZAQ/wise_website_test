@@ -145,12 +145,84 @@ function initBlogModal() {
     document.body.style.overflow = '';
   }
 
+  function showToast(message) {
+    let t = document.getElementById('blogToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'blogToast';
+      t.className = 'blog-toast';
+      t.setAttribute('role', 'status');
+      t.setAttribute('aria-live', 'polite');
+      document.body.appendChild(t);
+    }
+    t.textContent = message;
+    t.classList.add('blog-toast--show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('blog-toast--show'), 3200);
+  }
+
+  function slugify(s) {
+    // Include ASCII letters/digits + Armenian (U+0531–U+0587) + apostrophe & dot
+    return String(s || '')
+      .replace(/[^\w\u0531-\u0587\s.-]+/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^[-.]+|[-.]+$/g, '')
+      .slice(0, 80) || 'article';
+  }
+
+  function todayStamp() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+
+  function buildDownloadHtml({ title, date, content, sourceUrl }) {
+    const safeTitle = String(title || 'Article').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeDate = String(date || '').replace(/</g, '&lt;');
+    const safeSource = String(sourceUrl || '').replace(/"/g, '&quot;');
+    return `<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="UTF-8">
+<title>${safeTitle}</title>
+<style>
+  body { font-family: 'Inter','Noto Sans Armenian',system-ui,sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.7; color: #183960; }
+  h1 { font-size: 1.875rem; margin-bottom: 0.5rem; line-height: 1.25; }
+  .meta { color: #5a6a7e; font-size: 0.9rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+  .source { display: inline-block; margin-top: 1.5rem; padding: 8px 14px; background: #183960; color: #fff; border-radius: 6px; text-decoration: none; font-size: 0.875rem; }
+  figure { margin: 1rem 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #183960; padding: 0.5rem 1rem; margin: 1rem 0; color: #5a6a7e; }
+</style>
+</head>
+<body>
+<h1>${safeTitle}</h1>
+<p class="meta">${safeDate ? safeDate + ' • ' : ''}Source: <a href="${safeSource}">${safeSource}</a></p>
+${content || '<p>Content not available offline.</p>'}
+<p><a class="source" href="${safeSource}" target="_blank" rel="noopener">View original →</a></p>
+</body>
+</html>`;
+  }
+
+  function triggerDownload(filename, html) {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   closeBtn.addEventListener('click', closeModal);
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeModal();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
   });
 
   document.querySelectorAll('.blog-read-more').forEach(btn => {
@@ -162,14 +234,52 @@ function initBlogModal() {
       const card = btn.closest('.blog-card, .project-card');
       const articleTitle = card?.querySelector('h3')?.textContent ?? 'Article';
 
-      const db = await loadBlogData();
-      if (!db || !db[url]) {
-        window.open(url, '_blank', 'noopener');
+      // Always allow the original URL to be opened from the modal/view-original link
+      const openOriginal = () => window.open(url, '_blank', 'noopener');
+
+      let entry = null;
+      try {
+        const db = await loadBlogData();
+        if (db) entry = db[url] || null;
+      } catch (_) { /* fall through */ }
+
+      if (!entry) {
+        showToast('Բեռնվում է բնօրինակը…');
+        openOriginal();
         return;
       }
 
+      // 1) Build a clean, self-contained HTML file and trigger download
+      const slug = slugify(articleTitle);
+      const filename = `wisef-${todayStamp()}-${slug}.html`;
+      const fileHtml = buildDownloadHtml({
+        title: articleTitle,
+        date: entry.date || '',
+        content: entry.content || '',
+        sourceUrl: url,
+      });
+      try {
+        triggerDownload(filename, fileHtml);
+        showToast('Ֆայլը բեռնվեց՝ ' + filename);
+      } catch (err) {
+        console.error('[Blog] download failed', err);
+        showToast('Բեռնումը ձախողվեց — բացվում է բնօրինակը');
+        openOriginal();
+        return;
+      }
+
+      // 2) Open modal as a confirmation preview
       title.textContent = articleTitle;
-      body.innerHTML = db[url].content;
+      body.innerHTML =
+        `<div class="blog-download-banner">
+           <span class="blog-download-banner__icon">⬇</span>
+           <div class="blog-download-banner__text">
+             <strong>Ֆայլը բեռնվեց՝</strong>
+             <code>${filename}</code>
+             <a class="blog-download-banner__view" href="${url}" target="_blank" rel="noopener">Բացել բնօրինակ էջը →</a>
+           </div>
+         </div>
+         <div class="blog-download-body">${entry.content || '<p>Content not available.</p>'}</div>`;
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
 

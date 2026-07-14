@@ -684,17 +684,34 @@ html[lang="en"] .nav__link {
   align-items: center;
   justify-content: center;
   height: 64px;
+  width: 100%;
+  max-width: 180px;
 }
 
 .partner-card__img img {
   max-height: 64px;
   max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   filter: grayscale(100%);
   opacity: 0.6;
   transition: all var(--transition-base);
 }
 
 .partner-card:hover .partner-card__img img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* Generated monogram placeholders always look better in color */
+.partner-card__img img[src$=".svg"] {
+  /* keep them slightly softer but not fully gray */
+  filter: grayscale(30%);
+  opacity: 0.92;
+}
+
+.partner-card:hover .partner-card__img img[src$=".svg"] {
   filter: grayscale(0%);
   opacity: 1;
 }
@@ -1060,6 +1077,110 @@ html[lang="en"] .nav__link {
 .modal__body a {
   color: var(--color-accent);
   text-decoration: underline;
+}
+
+/* ===== BLOG DOWNLOAD (toast + download banner) ===== */
+.blog-download-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04));
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: var(--radius-md);
+}
+
+.blog-download-banner__icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  color: #059669;
+  flex: 0 0 auto;
+}
+
+.blog-download-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.blog-download-banner__text code {
+  background: rgba(15, 39, 64, 0.08);
+  border: 1px solid rgba(15, 39, 64, 0.15);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  color: var(--color-accent-dark);
+  word-break: break-all;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.blog-download-banner__view {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+  margin-top: 2px;
+}
+
+.blog-download-banner__view:hover {
+  text-decoration: underline;
+}
+
+.blog-download-body {
+  border-top: 1px solid rgba(15, 39, 64, 0.12);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.blog-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(24px);
+  background: #0f2740;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  box-shadow: 0 12px 32px rgba(15, 39, 64, 0.35);
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+}
+
+.blog-toast--show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+html[data-theme="dark"] .blog-toast {
+  background: #38bdf8;
+  color: #0b1220;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"] .blog-download-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(56, 189, 248, 0.06));
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+html[data-theme="dark"] .blog-download-banner__icon {
+  color: #38bdf8;
+}
+
+html[data-theme="dark"] .blog-download-banner__text code {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
 }
 
 .modal__loader {
