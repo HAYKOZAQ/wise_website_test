@@ -219,6 +219,8 @@
     'svc.sd5_text': { hy: 'Տեղեկատվական անվտանգության ապահովում, ցանցային ենթակառուցվածքի պաշտպանություն: Տվյալների պաշտպանություն և կիբեռահարձադույց', en: 'Information security, network infrastructure protection.' },
     'svc.sd6_title': { hy: 'Համակարգիչների և հարակից տեխնիկայի սպասարկում', en: 'Computer and Equipment Maintenance' },
     'svc.sd6_text': { hy: 'Համակարգչային տեխնիկայի դիագնոստիկա, տեղադրում, ծրագրային ապահովման կարգավորում, ցանցային կառուցում: 13,000+ միավոր սարքավորում', en: 'Computer diagnostics, installation, software setup: 13,000+ units.' },
+    'svc.loading': { hy: 'Բեռնվում է...', en: 'Loading...' },
+    'svc.contact_about': { hy: 'Կապնվել այս ծրագրի շուրջ', en: 'Contact us about this project' },
 
     /* Partners page */
     'partners.pagetitle':  { hy: 'Գործընկերներ', en: 'Partners' },

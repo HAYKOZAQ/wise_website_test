@@ -291,6 +291,115 @@ ${content || '<p>Content not available offline.</p>'}
   });
 }
 
+function initServiceDetailModal() {
+  const overlay = document.getElementById('serviceModal');
+  if (!overlay) return;
+
+  const titleEl = document.getElementById('serviceModalTitle');
+  const bodyEl = document.getElementById('serviceModalBody');
+  const closeBtn = document.getElementById('serviceModalClose');
+
+  let detailData = null;
+  let currentKey = null;
+
+  async function loadDetailData() {
+    if (detailData) return detailData;
+    try {
+      const apiBase = typeof window.WISEF_getApiBase === 'function' ? window.WISEF_getApiBase() : '';
+      const dataUrl = apiBase ? apiBase.replace(/\/$/, '') + '/assets/data/services-detail.json' : '../assets/data/services-detail.json';
+      const res = await fetch(dataUrl);
+      if (!res.ok) throw new Error('Failed to load service details');
+      detailData = await res.json();
+      return detailData;
+    } catch (err) {
+      console.error('[ServiceDetailModal] Error loading details:', err);
+      return null;
+    }
+  }
+
+  function getLang() {
+    return (window.wisefI18n && window.wisefI18n.getLang()) ||
+      localStorage.getItem('wisef_lang') ||
+      (document.documentElement.getAttribute('lang') === 'en' ? 'en' : 'hy');
+  }
+
+  function t(key, fallback) {
+    if (!window.wisefI18n || !window.wisefI18n.t) return fallback;
+    return window.wisefI18n.t(key) || fallback;
+  }
+
+  function render() {
+    if (!currentKey || !detailData) return;
+    const entry = detailData[currentKey];
+    if (!entry) return;
+    const lang = getLang();
+    const loc = entry[lang] || entry.en || entry.hy;
+    const icon = entry.icon || '';
+
+    titleEl.textContent = loc.title || '';
+    bodyEl.innerHTML = `
+      <div class="service-detail-modal__icon">${icon}</div>
+      <h2 class="service-detail-modal__title">${loc.title || ''}</h2>
+      <div class="service-detail-modal__content">${loc.content || ''}</div>
+      <div class="service-detail-modal__footer">
+        <a href="contact.html?service=${currentKey}" class="glass-btn">${t('svc.contact_about', 'Contact us about this project')}</a>
+      </div>
+    `;
+  }
+
+  function openModal(key) {
+    currentKey = key;
+    render();
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    currentKey = null;
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  document.querySelectorAll('.service-detail-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const href = btn.getAttribute('href') || '';
+      const match = href.match(/[?&]service=(p\d+)/);
+      const key = match ? match[1] : null;
+      if (!key) return;
+
+      const card = btn.closest('.project-card');
+      const icon = card ? (card.querySelector('div[style*="font-size"], .project-card__icon')?.textContent?.trim() || '') : '';
+
+      const data = await loadDetailData();
+      if (!data || !data[key]) {
+        window.location.href = href;
+        return;
+      }
+
+      if (data[key] && icon && !data[key].icon) {
+        data[key].icon = icon;
+      }
+
+      openModal(key);
+    });
+  });
+
+  document.addEventListener('wisefLangChanged', () => {
+    if (overlay.classList.contains('open')) render();
+  });
+}
+
 function initBlogPagination() {
   const pagination = document.querySelector('.pagination');
   if (!pagination) return;
@@ -533,6 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initPageTransitions();
   initBlogModal();
+  initServiceDetailModal();
   initBlogPagination();
   initContactForm();
   initBlogSearch();

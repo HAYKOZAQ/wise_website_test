@@ -1,0 +1,200 @@
+{
+  "p1": {
+    "icon": "",
+    "hy": {
+      "title": "Ընտանիքի անապահովության գնահատման համակարգ",
+      "content": "<p>Ընտանիքի անապահովության գնահատման համակարգը նախատեսված է ընտանիքների սոցիալական կարգավիճակի գնահատման և աջակցության ծրագրերի կառավարման ավտոմատացման համար։ Այն ապահովում է դիմումների հաշվառում, իրավունքի և չափի ամրագրում, էլեկտրոնային ցուցակների ձևավորում և վճարման գործընթացների համակարգում։</p>"
+    },
+    "en": {
+      "title": "Family Vulnerability Assessment System",
+      "content": "<p>An automated system for assessing the social status of families and managing support programs. It enables unified registration, needs evaluation, and eligibility verification for social assistance across Armenia.</p>"
+    }
+  },
+  "p10": {
+    "icon": "",
+    "hy": {
+      "title": "Քաղաքացիական ծառայողների ատեստավորման ՏՀ",
+      "content": "<p>Քաղաքացիական ծառայողների ատեստավորման հարցաշարերի տեղեկատվական համակարգը մշակվել է 2010 թվականին։ Տեղեկատվական համակարգում ավտոմատացված են քաղաքացիական ծառայության գրավոր և բանավոր հարցաշարերի մուտքագրման, որոնման, դիտման և խմբագրման, այդ հարցաշարերի հիման վրա հարցատոմսերի ավտոմատ ձևավորման, գրավոր հարցատոմսերի արդյունքների ավտոմատ հաշվարկման գործընթացները։</p>"
+    },
+    "en": {
+      "title": "Civil Servants Attestation IS",
+      "content": "<p>Developed in 2010, this system automates the creation, search, viewing, and editing of written and oral civil-service attestation questionnaires, automatic test-item generation, and automatic scoring of written exams.</p>"
+    }
+  },
+  "p11": {
+    "icon": "",
+    "hy": {
+      "title": "Համալիր սոցիալական ծառայությունների ընդունարանների ՏՀ",
+      "content": "<p>Սկսած 2015 թվականից Դիմումների հաշվառման միասնական տեղեկատվական համակարգի լրամշակված տարբերակը հանձնվել է շահագործման։     </p>\n<p>Դիմումների հաշվառման միասնական ՏՀ-ն մշակվել և ներդրվել է Համալիր սոցիալական ծառայությունների տարածքային կենտրոններում քաղաքացիներից ստացվող դիմումների հաշվառման գործընթացն ավոտամատացնելու նպատակով։ Համակարգը նախատեսված է քաղաքացիների կողմից ներկայացված դիմումները հաշվառելու և դրանց համապատասխան ըստ ուղղությունների, նպատակների, դիմումների քանակի և դրանց կատարման վերաբերյալ տեղեկատվության ստացման համար։</p>\n<p>Ներկայումս տեղեկատվական համակարգը շահագործվում է թվով 27 Համալիր սոցիալական ծառայությունների տարածքային կենտրոններում: Նախատեսվում է համակարգը շահագործել ևս 22 Համալիր սոցիալական ծառայությունների տարածքային կենտրոններում:</p>\n<p>Դիմումների ընդունման հիմնական ուղղություններն են՝ աշխատանքը և զբաղվածությունը, բժշկասոցիալական փորձաքննություն, սոցիալական ապահովությունը և սոցիալական աջակցություն:</p>\n<p>Այս պահին ՏՀ-ում հաշվառված է թվով<strong> <em>825711 </em></strong>դիմում։</p>"
+    },
+    "en": {
+      "title": "Integrated Social Services Reception IS",
+      "content": "<p>Since 2015, this unified application-registration system has been used by integrated social-service territorial centers to record citizen applications by direction, purpose, quantity, and status. It is deployed in 27 centers with plans to expand to additional centers.</p>"
+    }
+  },
+  "p12": {
+    "icon": "",
+    "hy": {
+      "title": "Տարեցների և հաշմանդամների հաշվառման ՏՀ",
+      "content": "<p align=\"justify\">«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամը 2014-ին ներդրել է սոցիալական պաշտպանության ծրագրերում ընդգրկված և խնամք ստացող տարեցների ու հաշմանդամների հաշվառման տեղեկատվական համակարգը: Այն ներառում է ամբողջական տեղեկատվություն սոցիալական պաշտպանության ծրագրերում ընդգրկված՝ տնային պայմաններում, բնակչության սոցիալական պաշտպանության հաստատություններում, սոցիալական հոգածության ցերեկային կենտրոններում խնամք ստացող տարեցների ու հաշմանդամություն ունեցող անձանց ,  ինչպես նաև ժամանակավոր կացարանում սոցիալական ծառայություն ստացող անօթևան անձանց հաշվառման վերաբերյալ համապարփակ տեղեկատվություն:              Տեղեկատվական համակարգի շահագործումն իրականացնում են Աշխատանքի և սոցիալական հարցերի նախարարությունն ու այն հաստատությունները, որոնք իրականացնում են տարեցների, հաշմանդամների, ինչպես նաև մինչև 18 տարեկան հաշմանդամություն ունեցող շահառուների խնամքը մեր երկրում:</p>\n<p><span lang=\"EN-GB\">Համակարգն ինքնաշխատ եղանակով տեղեկատվություն է ստանում Բնակչության պետական ռեգիստրից, հաշմանդամների հաշվառման «Փյունիկ», </span><span lang=\"HY\">ինչպես նաև Անձի ֆունկցիոնալության գնահատման </span><span lang=\"EN-GB\">«e-disability»  և «Էլեկտրոնային կենսաթոշակ» տեղեկատվական համակարգերից:</span></p>"
+    },
+    "en": {
+      "title": "Senior Citizens and Disabled Registration IS",
+      "content": "<p>Introduced in 2014, this system records elderly persons and persons with disabilities included in social-protection programs and receiving care at home, in social-protection institutions, daycare centers, and temporary shelters. It integrates data from the State Population Register, the \"Pyunik\" disability system, e-disability assessments, and the electronic pension system.</p>"
+    }
+  },
+  "p13": {
+    "icon": "",
+    "hy": {
+      "title": "Հաշմանդամների հաշվառման «Փյունիկ» ՏՀ",
+      "content": "<p><span style='font-size:\n12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";mso-bidi-font-family:Arial'>Registration\nof Persons with Disabilities “Pyunik” Information System </span><span lang=\"HY\" style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-bidi-font-family:Arial;mso-ansi-language:HY'>was </span><span style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-bidi-font-family:Arial'>develop</span><span lang=\"HY\" style='font-size:12.0pt;\nline-height:150%;font-family:\"GHEA Grapalat\";mso-bidi-font-family:Arial;\nmso-ansi-language:HY'>ed and</span><span style='font-size:12.0pt;line-height:\n150%;font-family:\"GHEA Grapalat\";mso-bidi-font-family:Arial'> put into</span><span lang=\"HY\" style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-bidi-font-family:Arial;mso-ansi-language:HY'> operat</span><span style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-bidi-font-family:Arial'>ion in</span><span lang=\"HY\" style='font-size:12.0pt;\nline-height:150%;font-family:\"GHEA Grapalat\";mso-bidi-font-family:Arial;\nmso-ansi-language:HY'> 2001. </span><span lang=\"HY\" style='font-size:12.0pt;\nline-height:150%;font-family:\"GHEA Grapalat\";mso-bidi-font-family:Arial'> </span><span><span lang=\"EN\" style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-ansi-language:EN'>The main function of this system is to collect\ninformation on persons with disabilities, the source of which is the paper\nbased information formed in </span></span><span><span lang=\"EN\" style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-bidi-font-family:Arial;mso-ansi-language:EN'>the </span></span><span style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-bidi-font-family:Arial'>Medical and Social Expertise Commission.       </span></p>\n<p><span style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>Within the framework of\n“Pyunik” IS, “Nork” Technology Center provides software\nmaintenance, carries out data collection from MSECs, reviews and updates the\ndatabase, provides reports and analysis.</span><span lang=\"HY\" style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'> Starting from 2010, Pyunik IS has been operated by the\nRA MLSA,  Medical and Social Expertise\nCommision and its regional  bodies.     </span><span><span lang=\"EN\" style='font-size:12.0pt;line-height:150%;font-family:\"GHEA Grapalat\";\nmso-ansi-language:EN'>As a result of the development and implementation of a\nnew software  system, we have an updated\ninformation system that works in the Internet environment and  is available to users in every part of the\ncountry. </span></span><span lang=\"HY\" style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>The </span><span style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>operation</span><span lang=\"HY\" style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'> of modernized IS </span><span style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>lends </span><span lang=\"HY\" style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>an opportunity to automate </span><span style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>the </span><span lang=\"HY\" style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>functions </span><span style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>of Medical and Social Expertise Commissions, thus\ndecreasing </span><span lang=\"HY\" style='color: var( --e-global-color-text ); font-weight: var( --e-global-typography-text-font-weight ); letter-spacing: 0px; font-size: 12pt; line-height: 150%; font-family: \"GHEA Grapalat\";'>the cost of services.</span><br/></p>"
+    },
+    "en": {
+      "title": "Pyunik Disability Registration IS",
+      "content": "<p>Developed and put into operation in 2001, the \"Pyunik\" system collects information on persons with disabilities based on records from the Medical and Social Expertise Commission. It supports registration, decision-making, and reporting throughout the disability-status process.</p>"
+    }
+  },
+  "p14": {
+    "icon": "",
+    "hy": {
+      "title": "Բարեգործական ծրագրերի հաշվառման ՏՀ",
+      "content": "<p>Սոցիալական պաշտպանության ոլորտում իրականացվող բարեգործական ծրագրերի արդյունավետության բարձրացման, շահառուների հասցեականության, իրականացվող  ծրագրերի հավասարաչափ  տեղաբաշխման /ըստ մարզերի/ ապահովման ինչպես նաև անհրաժեշտ վերլուծությունների կատարման նպատակով 2008 թվականին մշակվել  է Բարեգործական ծրագրերի հաշվառման տեղեկատվական համակարգը:                                      Տեղեկատվական համակարգի միջոցով իրականացվում է ՀՀ կառավարության բարեգործական ծրագրերի համակարգման հանձնաժողովի կողմից  սոցիալական ոլորտում  բարեգործական որակված ծրագրերի և նրանց շահառուների հաշվառում:             Համակարգը պարունակում է սոցիալական ծառայություններ ստանալու համար դիմած քաղաքացիների անհատական տվյալները, բարեգործական ծրագրերի իրականացման ժամկետները, սոցիալական աջակցության չափը, տրամադրման և դադարեցման ժամկետները:</p>"
+    },
+    "en": {
+      "title": "Charitable Programs Registration IS",
+      "content": "<p>Developed in 2008, this system records qualified charitable programs and their beneficiaries in the social sector. It stores individual applicant data, program implementation periods, assistance amounts, and start/end dates to improve targeting and equitable distribution.</p>"
+    }
+  },
+  "p15": {
+    "icon": "",
+    "hy": {
+      "title": "Սոցիալական բնակարանային ֆոնդի ՏՀ",
+      "content": "<p>ՀՀ Կառավարության 2013 թվականի օգոստոսի 1-ի որոշմամբ բնակելի տարածություն ստանալու իրավունք ունեցող՝ հատուկ խմբերի դասված անձանց, բնակելի տարածության կարիք ունեցող, սոցիալապես  անապահով անձանց (ընտանիքներին) հաշվառելու, կացարանի և այլ սոցիալական ծառայությունների տրամադրման կարգը հաստատելուց հետո անհրաժեշտություն էր առաջացել մշակել և ներդնել սոցիալական բնակարանային ֆոնդի կացարանների, բնակելի տարածության կարիք ունեցող անձանց տվյալների հաշվառման և համապատասխան հերթացուցակի ձևավորման տեղեկատվական համակարգ, որը հնարավորություն կընձեռեր այդ ծառայությունները դարձնել առավել կառավարելի, թափանցիկ և վերահսկելի:              Համակարգը դրել է շահագործման «Նորք» տեխնոլոգիաների կենտրոնի կողմից 2014 թվականին: Համակարգը շահագործվում է ՀՀ Աշխատանքի և սոցիալական հարցերի նախարարության և Միասնական սոցիալական ծառայության կողմից:    Համակարգում հաշվառվածների թիվը 10.05.2021թ. դրությամբ կազմում է <strong>237</strong> անձ (որից <strong>231</strong>-ը ընդգրկված է նաև հերթացուցակում), կացարանում տեղավորված բնակիչների թիվը կազմում է <strong>52</strong> անձ:</p>"
+    },
+    "en": {
+      "title": "Social Housing Fund Registration IS",
+      "content": "<p>Launched in 2014, this system registers applicants eligible for social housing, records social-housing-fund dormitories, and forms the corresponding waiting list. It is operated by the Ministry of Labor and Social Affairs and the Unified Social Service.</p>"
+    }
+  },
+  "p16": {
+    "icon": "",
+    "hy": {
+      "title": "Սոցիալական դեպքի վարման ՏՀ",
+      "content": "<p>Սոցիալական դեպքի վարման ՏՀ-Ի գործառույթներն են՝ Սոցիալական դեպքի մասին իրազեկում, դիմողի և նրա ընտանիքի անդամների նույնականացում, ընտանիքի սոցիալական կարիքների գնահատման անձնագրի հաշվառում և գնահատում՝ ընտանիքի տվյալների հաշվառում, նախնական որոշումների կայացում, սոցիալական անհատական ծրագրի կազմում, իրականացված աշխատանքների վերահսկում, մոնթորինգ և գնահատում, ինչպես նաև<strong> հ</strong>աշվետվություններ և վերլուծությունների իրականացում։</p>"
+    },
+    "en": {
+      "title": "Social Case Management IS",
+      "content": "<p>This system supports the full social-case management workflow: notification, applicant and family identification, needs assessment, individual social-program development, monitoring, evaluation, and reporting.</p>"
+    }
+  },
+  "p17": {
+    "icon": "",
+    "hy": {
+      "title": "ԽՍՀՄ խնայբանկի ավանդների փոխհատուցման ՏՀ",
+      "content": "<p>ՎՏԲ բանկում նախկին ԽՍՀՄ խնայբանկի ՀԽՍՀ հանրապետական բանկի ավանդատուների ավանդների փոխհատուցման տեղեկատվական համակարգի (այսուհետ` “Ավանդ” ՏՀ) միջոցով իրականացվում է ավանդի փոխհատուցման համար միասնական սոցիալական ծառայության տարածքային կենտրոնների (ՄՍԾՏԿ) դիմած քաղաքացիների հաշվառումը, ավանդի փոխհատուցման իրավունքի, չափի, ինչպես նաև դրանց վիճահարույց հանգամանքների ամրագրումը, վճարման ցուցակների ձևավորումը, դրանց տպագրությունը և վճարումից հետո տվյալների ամփոփումը:</p>\n<p>ՄՍԾՏԿ-ներից ստացված տեղական շտեմարաններից ձևավորում է կենտրոնական շտեմարանը և ամենամսյա հավաքագրված տեղեկատվության միջոցով կատարվում է կենտրոնական շտեմարանի ձևավորում, ՏՀ-ում հաշվառված փոխհատուցման իրավունք ունեցող անձանց տվյալների տրամադրում Բնակչության պետական ռեգիստրի  բազաի հետ համադրման համար, համադրման արդյունքում հայտնաբերված չնույնականացված անձանց տվյալների կասեցում, կրկնակի հաշվառված անձանց հայտնաբերում և կասեցում և այլն։</p>"
+    },
+    "en": {
+      "title": "USSR Savings Bank Compensation IS",
+      "content": "<p>The \"Avand\" system handles compensation for monetary deposits placed before 10 June 1993 in the former USSR Savings Bank. It records applicants, verifies rights and amounts, generates payment lists, and reconciles data with the State Population Register.</p>"
+    }
+  },
+  "p18": {
+    "icon": "",
+    "hy": {
+      "title": "Ընտանիքների անապահովության «Նպաստ» ՏՀ",
+      "content": "<p><span>Ընտանիքների անապահովության գնահատման «Նպաստ» տեղեկատվական համակարգի միջոցով Պետական նպաստների մասին ՀՀ օրենքով և օրենսդրական այլ ակտերով սահմանված կարգով իրականացվում է նպաստ ստանալու համար Միասնական սոցիալական ծառայության տարածքային կենտրոններ դիմած ընտանիքների հաշվառումը, նպաստի իրավունքի և չափի ամրագրումը, էլեկտրոնային ցուցակների ստացումը վճարվող կազմակերպություններին տրամադրելու համար:</span></p>\n<p> «WISE» հիմնադրամը տեղեկատվական բազայի պատասխանատուներին  տրամադրվում է նաև խորհրդատվություն, համակարգում առաջացած խնդիրների պարզաբանան,  լուծման, ինչպես նաև տեխնիկական խնդիրների կարգավորման հետ կապված:                                                       </p>\n<p>Ցուցակների տպագրությունից և տարածքներին տրամադրելուց հետո ՀՀ Աշխատանքի և սոցիալական հարցերի նախարարության վեբկայքում (mlsa.am) ամենամսյա պարբերականությամբ թարմացվում է «Նպաստ» ՏՀ տեղեկատվական շտեմարանը:</p>"
+    },
+    "en": {
+      "title": "Npast Family Vulnerability Assessment IS",
+      "content": "<p>The \"Npast\" system registers families applying for state benefits, determines eligibility and benefit amounts, and generates electronic payment lists. The WISE Foundation provides database administration, consulting, and technical support for the system.</p>"
+    }
+  },
+  "p2": {
+    "icon": "",
+    "hy": {
+      "title": "Սոցիալական արագ արձագանքման ՏՀ",
+      "content": "<p><span>Սոցիալական</span><span> արագ արձագանքման հարթակը կենտրոնի կողմից մշակվել է 2020 թվականին ռազմական դրության պայմաններում։ Հարթակի շրջանակներում առանձնացված են առցանց դիմում </span><span>ներկայացնելու</span> <span>շահառուների</span><span> կողմից կարիքների առցանց հաշվառման գործիք՝ «Կարիք ունեմ» և </span><span>աջակցություն</span><span> տրամադրողների կողմից աջակցության տեսակների առցանց հաշվառման գործիք՝ «Աջակցում եմ»  անվանմամբ գործիքները, որտեղ աջակցության վերաբերյալ տվյալներ կարող են ներկայացնել ինչպես ֆիզիկական, այնպես էլ իրավաբանական անձինք։</span></p>\n<p>ՏՀ-ի շրջանակներում գործում է նաև Սոցիալական աշխատողի ենթահամակարգ, որում առանձնացված են հետևյալ հիմնական բաժինները՝</p>\n<ul>\n<li>Աջակցության հաշվառում, որի միջոցով սոցիալական աշխատողը ֆիզիկական և իրավաբանական անձանց կողմից տրամադրվող աջակցությունների վերաբերյալ տվյալները ներառում է Սոցիալական աշատողի ենթահամակարգում,</li>\n<li>Կառավարում, որի միջոցով կառավարվում են տեղեկատվական համակարգում ներառված բառարանները, ինչպես նաև տեղեկատվական համակարգի օգտվողները՝ համապատասխան իրավասությունների տրամադրման մեխանիզմով։</li>\n</ul>"
+    },
+    "en": {
+      "title": "Social Rapid Response IS",
+      "content": "<p>A platform developed in 2020 under martial law conditions to coordinate rapid social support. It includes online tools for registering needs (\"I need help\") and offers of assistance (\"I can help\"), along with a social worker subsystem for tracking and managing aid.</p>"
+    }
+  },
+  "p3": {
+    "icon": "",
+    "hy": {
+      "title": "Տվյալների փոխանակման ՏՀ",
+      "content": "<p align=\"justify\">Տվյալների փոխանակման տեղեկատվական համակարգը մշակվել ենք 2009-ին։ Տեղեկատվական համակարգի մշակման նպատակն է ապահովել ՀՀ սոցիալական պաշտպանության ոլորտի տեղեկատվական համակարգերի և հարակից տվյալների շտեմարանների միջև տեղեկատվության փոխանակման գործընթացի պատշաճ իրականացումը։</p>"
+    },
+    "en": {
+      "title": "Data Exchange IS",
+      "content": "<p>Developed in 2009, this system ensures proper information exchange between information systems and databases in the RA social protection sector, enabling integrated and up-to-date records across agencies.</p>"
+    }
+  },
+  "p4": {
+    "icon": "",
+    "hy": {
+      "title": "«Գործ» զբաղվածության ՏՀ",
+      "content": "<p align=\"justify\">2008 թվականից սկսելով ինտերնետային համակարգի շահագործումը՝ «Նորք» կենտրոնի կողմից «Գործ» տեղեկատվական համակարգում պարբերաբար ներառվել և շարունակաբար ներառվում են  զբաղվածության ոլորտի օրենսդրական փոփոխությունները և համակարգի արդիականացման աշխատանքները:</p>\n<p align=\"justify\">«Գործ» ՏՀ-ի միջոցով իրականացվում է աշխատանք փնտրող անձանց  հաշվառումը, գործազուրկի կարգավիճակի տրամադրումը, օրենսդրությամբ սահմանված կարգով կասեցումը, դադարեցումը, աշխատաշուկայում գործազուրկի անմրցունակության որոշարկումը, Միասնական սոցիալական ծառայության կենտրոնների հետ համագործակցող գործատուների հաշվառումը, գործատուի կողմից ներկայացվող աշխատուժի պահանջարկի (առկա թափուր և նոր ստեղծվող աշխատատեղերի) հաշվառումը, աշխատուժի առաջարկի և պահանջարկի համադրումը, որի միջոցով ավտոմատացվում է գործատու-աշխատանք փնտրող իրավահարաբերությունը, գործատուն գտնում է իր պահանջներին համապատասխան աշխատակցի, իսկ աշխատանք փնտրողը՝ իր համար նախընտրելի գործատուին։ «Գործ» ՏՀ-ն նպաստում է Զբաղվածության ոլորտի կառույցների արդյունավետ կառավարմանը, հաճախորդների սպասարկման որակի բարձրացմանը, ինչպես նաև իրականացվող ծրագրերի հասցեականության և վերահսկելիության բարձրացմանը։</p>\n<p align=\"justify\">Ներկայումս համակարգում հաշվառված աշխատանք փնտրող անձանց թիվը 60․837 է</p>"
+    },
+    "en": {
+      "title": "\"Gorts\" Employment IS",
+      "content": "<p>Operational since 2008, the \"Gorts\" system automates employment-sector business processes: registration of job seekers, unemployment status management, employer-demand matching, and analysis of labor-market supply and demand.</p>"
+    }
+  },
+  "p5": {
+    "icon": "",
+    "hy": {
+      "title": "Պրոթեզաօրթոպեդիկ պարագաների ՏՀ",
+      "content": "<p>Պրոթեզաօրթոպեդիկ և վերականգողական պարագաների տրամադրման տեղեկատվական համակարգը մշակվել և շահագործման է հանձնվել 2011 թվականին «Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամի կողմից։ Պրոթեզաօրթոպեդիկ և վերականգնողական պարագաների տրամադրման տեղեկատվական համակարգը նախատեսված է պետական հավաստագրերի հիման վրա հաշմանդամություն և սոցիալական այլ կարգավիճակ ունեցող շահառուներին տրամադրված աջակցող միջոցներն ու դրանց վերանորոգումները հաշվառելու, ինչպես նաև այդ տեղեկատվության հիման վրա տարատեսակ հաշվետվություններ ու վերլուծություններ ստանալու համար:<span>ՏՀ-ն իրականացնում  է պետական հավաստագրերի ձևավորում, աջակցող միջոցներ ստացող անձի հաշվառում, աջակցող միջոցներ տրամադրող կազմակերպությունների հաշվառում, պայմանագրերի կնքում, պետական բյուջեի մուտքագրում, ստանդարտ հաշվետվությունների գեներացում, վերլուծությունների իրականացում, մահացած անձանց տվյալների թարմացում և այլն։</span><span>Ներկայումս ՏՀ-ում հաշվառված են 34214 անձ, իսկ տրամադրված պարագաների քանակը՝ 120609:</span></p>"
+    },
+    "en": {
+      "title": "Prosthetic-Orthopedic Devices IS",
+      "content": "<p>Developed and launched in 2011, this system records state-issued certificates for assistive devices and repairs for beneficiaries with disabilities or other social statuses. It supports certificate generation, beneficiary registration, contracting, and reporting.</p>"
+    }
+  },
+  "p6": {
+    "icon": "",
+    "hy": {
+      "title": "«Մանուկ» երեխաների հաշվառման ՏՀ",
+      "content": "<p><span lang=\"HY\">«Մանուկ» տեղեկատվական համակարգը </span><span lang=\"EN-GB\">«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամի</span> <span lang=\"HY\">կողմից ստեղծվել է 2003 թվականին, որում ներառվել  են  «Մանկատուն» և «Որդեգրում» ենթահամակարգերը:</span></p>\n<p><span lang=\"HY\">«Մանկատուն» ենթահամակարգում իրականացվել է պետական մանկատներում խնամվող երեխաների հաշվառումը «Նորք» ՏՎԿ-ի մասնագետների կողմից, մանկատների կողմից տրամադրված թղթային կրիչների հիման վրա:</span></p>\n<p><span lang=\"HY\">«Որդեգրում» ենթահամակարգում ներառվել են որդեգրման ենթակա երեխաների և երեխա</span><span lang=\"HY\"> </span><span lang=\"HY\">որդեգրել</span><span lang=\"HY\"> </span><span lang=\"HY\">ցանկացող</span><span lang=\"HY\"> </span><span lang=\"HY\">անձանց տվյալները, որոնք որդեգրման հարցերով հանրապետական հանձնաժողովի և մարզային բաժինների կողմից տրամադրված տեղեկատվության հիման վրա մուտքագրվել են ՀՀ ԱՍՀՆ աշխատակազմի ընտանիքի կանանաց և երեխաների հիմնահարցերի վարչությունում:</span></p>\n<p><span lang=\"HY\">2010 թվականին համակարգի արդիականացման շրջանակներում ստեղծվեց Կյանքի դժվարին իրավիճակներում հայտնված երեխաների հաշվառման «Մանուկ» տեղեկատվական համակարգը՝ իր մեջ ներառելով «Կյանքի դժվարին իրավիճակում հայտնված երեխա», «Որդեգրման</span><span lang=\"HY\"> </span><span lang=\"HY\">ենթակա</span><span lang=\"HY\"> </span><span lang=\"HY\">երեխա» և  «Երեխա</span><span lang=\"HY\"> </span><span lang=\"HY\">որդեգրել</span><span lang=\"HY\"> </span><span lang=\"HY\">ցանկացող</span><span lang=\"HY\"> </span><span lang=\"HY\">անձ» ենթահամակարգերը, ինչպես նաև հաշվետվությունների  բաժինը:</span></p>\n<p><span lang=\"HY\">Համակարգը շահագործվում է նաև /խմբագրման հնարավորությամբ/ պետական և ոչ պետական մանկատներում:</span></p>\n<p><span lang=\"HY\">Ներկայումս «Մանուկ» տեղեկատվական համակարգի միջոցով </span><span lang=\"HY\">իրականացվում են հետևյալ  գործառույթները՝</span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>     </span></span><span lang=\"HY\">կյանքի դժվարին իրավիճակներում հայտնված երեխայի, որդեգրման ենթակա երեխայի, որդեգրել ցանկացող անձի, խնամատար ծնող դառնալու ցանկություն ունեցող անձանց, պետտության կողմից պատվիրակված ՀԿ-ների կողմից ցերեկային խնամք ստացող երեխաների տվյալների էլեկտրոնային հաշվառում,</span></p>\n<p><span lang=\"HY\"><span>·          անհատական տվյալների դիտարկում, որոնում և խմբագրում</span></span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>         </span></span><!--[endif]--><span lang=\"HY\">սոցիալ-հոգեբանական վերականգնողական անհատական ծրագրերի ներառում (պարբերաբար թարմացում),</span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>         </span></span><!--[endif]--><span lang=\"HY\">երեխայի իրավական կարգավիճակի փոփոխման տվյալների` իրավական հիմքի ներառում,</span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>         </span></span><!--[endif]--><span lang=\"HY\">ՀՀ օրենսդրությամբ սահմանված կարգով որդեգրման գործընթացի կասեցման կամ դադարեցման մասին տվյալների ներառում,</span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>         </span></span><!--[endif]--><span lang=\"HY\">դատարանների որդեգրման մասին կայացված վճիռների մուտքագրում՝ որդեգրված երեխայի և որդեգրողի տվյալների միավորում,</span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>         </span></span><!--[endif]--><span lang=\"HY\">18 տարին լրացած որդեգրման ենթակա երեխայի տվյալների ավտոմատ դուրս գրում,</span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>         </span></span><!--[endif]--><span lang=\"HY\">դրական եզրակացության 18 ամիսը լրացած օտարերկրյա և 12 ամիսը լրացած ՀՀ որդեգրել ցանկացող անձանց /չորդեգրած/ տվյալների ավտոմատ դուրս գրում,</span></p>\n<p><!-- [if !supportLists]--><span lang=\"HY\">·<span>         </span></span><!--[endif]--><span lang=\"HY\">հաստատված ձևաչափերով վիճակագրական ամփոփ հաշվետվությունների ձևավորում:</span></p>\n<p><span lang=\"HY\">«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամի կողմից իրականացվում է ՏՀ-ի </span><span lang=\"HY\">ծրագրային ապահովումը:</span></p>\n<p><span lang=\"HY\">2014 թվականից տեղեկատվական համակարգում ներառվել է նաև «Մշտադիտարկման և գնահատման» ենթահամակարգը /թվով 11 ծրագիր/:</span></p>\n<p><span lang=\"HY\">2018 թվականից Հայաստանի Հանրապետությունում կյանքի դժվարին իրավիճակում հայտնված երեխաների խնամքի այլընտրանքային ծառայությունների տրամադրման շրջանակներում մշակվել և տեղեկատվական համակարգ է ներառվել նաև «Խնամատար ընտանիք» ենթահամակարգը: </span><span lang=\"HY\">«Խնամատար ընտանիք» ենթահամակարգում տեղեկատվությունը մուտքագրվում</span> <span lang=\"HY\">է ՀՀ մարզպետների  աշխատակազմերի առողջապահության և սոցիալական ոլորտի հարցերի վարչություններում, Երևանում` Երևանի քաղաքապետարանի աշխատակազմի երեխաների և սոցիալական պաշտպանության վարչության երեխաների պաշտպանության բաժնում։</span></p>"
+    },
+    "en": {
+      "title": "\"Manuk\" Child Registration IS",
+      "content": "<p>Created in 2003, the \"Manuk\" system includes \"Orphanage\" and \"Adoption\" subsystems. It records children in difficult life situations, children eligible for adoption, and prospective adoptive parents, and is used by state and non-state child-care institutions.</p>"
+    }
+  },
+  "p7": {
+    "icon": "",
+    "hy": {
+      "title": "Ընտանիքում բռնության դեպքերի հաշվառման ՏՀ",
+      "content": "<p>Ընտանիքում բռնության դեպքերի կենտրոնացված հաշվառման համակարգը լուծում է մի շարք խնդիրներ, որոնք առնչվում են ընտանեկան բռնությանը։<br/>Ընտանեկան բռնության դեպքերի կառավարման մեջ ներգրավված են մի քանի պետական մարմիններ և աջակցության կենտրոններ։ Առանց միասնական համակարգի, այս մարմինները գործում են առանձին, ինչը հանգեցնում է մասնատված հաշվետվության, գործողությունների ուշացման և կարևոր տեղեկատվության բացերի։<br/>Այս հարթակը միավորում է բոլոր համապատասխան կողմերից ստացված տվյալները մեկ կենտրոնացված համակարգում՝ ապահովելով, որ տեղեկատվության հասանելիությունն իրական ժամանակում, ինչը նպաստում է համագործակցության և արձագանքման որակի բարելավմանը։ Բացի այդ, տարբեր պետական բաժիններ հաճախ օգտագործում են տարբեր ձևաչափեր հաշվետվության համար, ինչը դժվարացնում է տվյալների համախմբումն ու վերլուծությունը։ Ստանդարտացված հաշվետվության ձևի ներդրման շնորհիվ հարթակը ապահովում է տվյալների մուտքագրման միատեսակություն, ինչը հնարավորություն է տալիս ավելի արդյունավետ գործել դեպքերի կառավարման և գործակալությունների միջև ամբողջական վերլուծության համար։<br/>Այս համակարգի ներդրումը և ընտանեկան բռնության դեպքերի գրանցումը թույլ կտան հավաքագրել ավելի ճշգրիտ և հստակ տեղեկատվություն, որը կօգնի կանխատեսումներին։ Նախորդ ցուցանիշների և փորձի հիման վրա կանխատեսվում է, որ համակարգի պաշտոնական գործարկումից հետո տարեկան 1,500-2,000 ընտանեկան բռնության դեպքեր կգրանցվեն համակարգում։<br/></p>"
+    },
+    "en": {
+      "title": "Domestic Violence Registration IS",
+      "content": "<p>A centralized platform for managing domestic-violence cases. It unifies data from all relevant state bodies and support centers, standardizes reporting, and improves real-time collaboration and response quality.</p>"
+    }
+  },
+  "p8": {
+    "icon": "",
+    "hy": {
+      "title": "Տեղահանված ընտանիքների բնակարանային ապահովման ՏՀ",
+      "content": "<p>Հայաստանի Հանրապետության կարևորագույն խնդիրներից է Ադրբեջանի կողմից 2020թ․ սեպտեմբերի 27-ին սանձազերծված պատերազմից, ինչպես նաև 2023թ․ սեպտեմբերի 19-ից հետո Լեռնային Ղարաբաղից բռնի տեղահանված և փաստացի Հայաստանի Հանրապետությունում բնակվող ընտանիքների բնակարանային ապահովությունը, որի իրագործման նպատակով ներդրվել է Լեռնային Ղարաբաղից բռնի տեղահանված ընտանիքների բնակարանային ապահովման պետական աջակցության ծրագրի կառավարման տեղեկատվական համակարգը։</p>\n<p>Ծրագրի հիմնական նպատակն է Լեռնային Ղարաբաղից բռնի տեղահանված անձանց սոցիալական և տնտեսական ներառումը՝ Հայաստանի Հանրապետությունում երկարաժամկետ բնակության համար անհրաժեշտ պայմաններ ստեղծելու միջոցով։</p>\n<p>Համակարգը ընձեռում է հետևյալ հնարավորությունները՝</p>\n<ul><li>աջակցության միջոցառման շահառու դառնալու նպատակով թվային միջավայրում դիմում ներկայացնելու հնարավորություն,</li><li>աջակցության ծրագրից օգտվելու նպատակով անհրաժեշտ տվյալների հավաքագրում,</li><li>տվյալների շտեմարաններից ինքնաշխատ եղանակով համապատասխան տվյալների ստացում,</li><li>աջակցության ծրագրի շահառու լինելու որոշման կայացում,</li><li>աջակցությունից օգտվելու նպատակով հավաստագրի գեներացում,</li><li>ՀՀ-ում գործող գործընկեր ֆինանսական կազմակերպությունների հետ աջակցության տրամադրման և վճարման գործընթացի կազմակերպում,</li><li>աջակցության ծրագրի համար ներկայացված հայտերի վերաբերյալ վիճակագրության գեներացում և մշտադիտարկում։</li></ul>\n<p>Հղում՝ <a href=\"https://housing.socservice.am/\">https://housing.socservice.am/</a> </p>\n<p>Հարթակի ծրագրային ապահովումը մշակվել է «Նորք» տեխնոլոգիաների կենտրոնի կողմից։<br/></p>"
+    },
+    "en": {
+      "title": "Housing Support for Displaced Families IS",
+      "content": "<p>Developed for families forcibly displaced from Nagorno-Karabakh, this system manages the state housing-support program. It supports online applications, eligibility decisions, certificate generation, partner-bank payment workflows, and statistical monitoring.</p>"
+    }
+  },
+  "p9": {
+    "icon": "",
+    "hy": {
+      "title": "Հրատապ արձագանքման հարթակ",
+      "content": "<p><strong>Գործարկվել է Հրատապ արձագանքման հարթակը </strong></p>\n<p>Աշխատանքի և սոցիալական հարցերի նախարարությունը սոցիալական պաշտպանության ոլորտի ընթացիկ բարեփոխումների շրջանակում գործարկել է Հրատապ արձագանքման հարթակը, որը բարելավվել և արդիականացվել է ԱՄՆ Միջազգային զարգացման գործակալության ֆինանսավորմամբ Դիմոքրասի Ինթերնեյշնլ կազմակերպության կողմից իրականացվող «Սոցիալական պաշտպանություն, ներառում և հզորացում» ծրագրի շրջանակում։</p>\n<p>Հրատապ արձագանքման հարթակի նպատակն է հասցեագրել հրատապ արձագանքման իրավիճակներում հայտնված անձանց և ընտանիքների առաջնային կարիքները, ինչպես նաև ըստ կարիքի կազմակերպել հանրային ռեսուրսների արդյունավետ, հասցեական բաշխումը։</p>\n<p>Հրատապ արձագանքման ենթակա իրավիճակներից տուժած անձանց և ընտանիքների առաջնային կարիքների հասցեագրման, ինչպես նաև հանրային ռեսուրսների արդյունավետ և հասցեական բաշխման կազմակերպման նպատակով հրատապ արձագանքման հարթակում կարող են հայտ ներկայացնել՝</p>\n<ul>\n<li>այն անձինք կամ ընտանիքները, որոնք հրատապ արձագանքման ենթակա իրավիճակով (բնական, կլիմայական, տեխնոլոգիական կամ այլ աղետների կամ անձի կյանքին կամ առողջությանը վտանգ սպառնացող հանգամանքներ) պայմանավորված՝ ունեն առաջնային կարիքների հասցեագրման անհրաժեշտություն,</li>\n<li>կազմակերպությունները և անհատները, որոնք ցանկանում են մեկտեղել ռեսուրսները հանուն հրատապ արձագանքման ենթակա իրավիճակներից տուժած ՀՀ բնակիչ հանդիսացող անձանց և ընտանիքների։</li>\n</ul>\n<p>Հրատապ արձագանքման հարթակի սոցիալական աջակցության քարտեզի միջոցով կապահովվի հասանելիություն համապատասխան մարզում տրամադրվող աջակցության ծառայություններին ծանոթանալու համար։ </p>\n<p>Հղում՝ <a href=\"http://www.hratapkariq.am\">www.hratapkariq.am</a></p>\n<p>Հարթակի ծրագրային ապահովումը մշակվել է «Նորք» տեխնոլոգիաների կենտրոնի կողմից։</p>"
+    },
+    "en": {
+      "title": "Urgent Response Platform",
+      "content": "<p>The urgent response platform <a href=\"http://www.hratapkariq.am\" target=\"_blank\" rel=\"noopener\">www.hratapkariq.am</a> was launched by the Ministry of Labor and Social Affairs to address the primary needs of people and families affected by emergency situations and to coordinate the targeted distribution of public resources.</p>"
+    }
+  }
+}
