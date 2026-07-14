@@ -306,7 +306,7 @@ function initServiceDetailModal() {
     if (detailData) return detailData;
     try {
       const apiBase = typeof window.WISEF_getApiBase === 'function' ? window.WISEF_getApiBase() : '';
-      const dataUrl = apiBase ? apiBase.replace(/\/$/, '') + '/assets/data/services-detail.json' : '../assets/data/services-detail.json';
+      const dataUrl = (apiBase ? apiBase.replace(/\/$/, '') + '/assets/data/services-detail.json' : '../assets/data/services-detail.json') + '?v=47';
       const res = await fetch(dataUrl);
       if (!res.ok) throw new Error('Failed to load service details');
       detailData = await res.json();
