@@ -86,6 +86,7 @@
     'contactprev.btn':   { hy: 'Գրել նամակ', en: 'Send Message' },
 
     /* About page */
+    'about.pagetitle':  { hy: 'Մեր մասին', en: 'About Us' },
     'about.exp_label': { hy: '25 տարվա փորձ', en: '25 Years of Experience' },
     'about.exp_title': { hy: 'Մենք երազում ենք, ստեղծում ենք, կիսվում ենք', en: 'We dream, create, and share' },
     'about.exp_p1': { hy: '«Բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն» հիմնադրամը Հայաստանում առաջատար տեխնոլոգիական կենտրոն է, որն իրականացնում է պետական և մասնավոր ոլորտի տեղեկատվական և հեռահաղորդակցության տեխնոլոգիաների ենթակառուցվածքների ներդրում և սպասարկում։', en: 'Welfare Information Systems Enterprise Foundation is a leading technological center in Armenia, carrying out implementation and maintenance of IT infrastructure for public and private sectors.' },
