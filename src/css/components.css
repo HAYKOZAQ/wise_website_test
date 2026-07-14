@@ -668,6 +668,68 @@ html[lang="en"] .nav__link {
   line-height: 1.7;
 }
 
+/* Detail cards on the Services page: left-aligned, compact mini-cube icons */
+.service-detail {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  height: 100%;
+}
+
+.service-detail .service-card__icon {
+  width: 52px;
+  height: 52px;
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.service-detail .service-card__title {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.service-detail .service-card__text {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.service-detail__list {
+  margin: 12px 0 0 0;
+  padding-left: 20px;
+  color: var(--color-text-light);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.service-detail__list li {
+  margin-bottom: 6px;
+}
+
+.service-detail__list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure detail cards in grid-2 stretch to equal height */
+.grid-2 > .service-detail {
+  min-height: 100%;
+}
+
+@media (max-width: 768px) {
+  .service-detail {
+    padding: 24px 20px;
+  }
+
+  .service-detail .service-card__icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.35rem;
+  }
+}
+
 /* ===== PARTNERS (Partners page) ===== */
 .partner-card {
   display: flex;
