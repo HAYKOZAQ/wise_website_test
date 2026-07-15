@@ -47,12 +47,13 @@ load_env()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma2")
+USE_LOCAL_EMBEDDER = os.environ.get("USE_LOCAL_EMBEDDER", "1").strip().lower() not in ("0", "false", "no")
 # Prefer stable Gemini models first; Gemma experimental last
 GEMINI_GENERATE_MODELS = [
     m.strip()
     for m in os.environ.get(
         "GEMINI_GENERATE_MODELS",
-        "gemini-2.5-flash,gemini-flash-latest,gemini-2.5-flash-lite,gemma-4-26b-a4b-it,gemma-4-31b-it",
+        "gemma-4-26b-a4b-it,gemma-4-31b-it",
     ).split(",")
     if m.strip()
 ]
@@ -213,6 +214,19 @@ class RAGEngine:
         self.embed_skip_reason = ""
         print(f"Local TF–IDF vector search enabled ({len(self.chunks)} docs).")
 
+    def _embed_with_local_backend(self):
+        """Embed all chunks using the local sentence-transformer backend."""
+        try:
+            from local_embedder import get_local_embedder
+        except ImportError:
+            from backend.local_embedder import get_local_embedder  # type: ignore
+        embedder = get_local_embedder()
+        texts = [(c.get("text") or "")[:8000] for c in self.chunks]
+        vectors = embedder.embed(texts)
+        if len(vectors) != len(self.chunks):
+            return []
+        return [(c["chunk_id"], v) for c, v in zip(self.chunks, vectors)]
+
     def _load_or_build_embeddings(self):
         self.embeddings = []
         self.vector_enabled = False
@@ -246,6 +260,21 @@ class RAGEngine:
         force_embed = os.environ.get("FORCE_EMBED", "").strip() in ("1", "true", "yes")
         max_auto = int(os.environ.get("AUTO_EMBED_MAX_CHUNKS", "400"))
         prefer_local = os.environ.get("USE_LOCAL_TFIDF", "1").strip().lower() not in ("0", "false", "no")
+
+        # Own local dense embedding backend (no Google / no Ollama)
+        if USE_LOCAL_EMBEDDER:
+            print("Trying own local embedding backend…")
+            try:
+                local_vectors = self._embed_with_local_backend()
+                if local_vectors and len(local_vectors) == len(self.chunks):
+                    self.embeddings = local_vectors
+                    self.vector_enabled = True
+                    self.vector_backend = "local_embedder"
+                    self._save_embeddings_cache()
+                    print(f"Own local embedding search enabled ({len(self.embeddings)} embeddings).")
+                    return
+            except Exception as e:
+                print(f"Local embedder failed: {e}")
 
         # Large corpora: skip online bulk embed unless forced
         if len(self.chunks) > max_auto and not force_embed:
@@ -351,6 +380,13 @@ class RAGEngine:
             print(f"Ollama embedding error: {e}")
         return None
 
+    def get_local_embedding(self, text: str):
+        try:
+            from local_embedder import get_local_embedder
+        except ImportError:
+            from backend.local_embedder import get_local_embedder  # type: ignore
+        return get_local_embedder().embed_one(text[:8000])
+
     @staticmethod
     def cosine_similarity(vec1, vec2) -> float:
         if not vec1 or not vec2:
@@ -407,11 +443,13 @@ class RAGEngine:
         # Local TF–IDF path (offline)
         if self._tfidf is not None:
             return self._tfidf.scores(query)[:80]
-        # Dense embedding path (Gemini / Ollama / cache)
+        # Dense embedding path (local / Gemini / Ollama / cache)
         if not self.embeddings:
             return []
         q_vec = None
-        if self.use_gemini:
+        if self.vector_backend == "local_embedder":
+            q_vec = self.get_local_embedding(query)
+        elif self.use_gemini:
             q_vec = self.get_gemini_embedding(query)
         if not q_vec:
             q_vec = self.get_ollama_embedding(query)

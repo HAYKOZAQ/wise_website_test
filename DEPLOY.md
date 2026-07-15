@@ -102,7 +102,10 @@ Optional env:
 | `REINGEST_FORCE` | `1` force re-download on scheduled runs |
 | `CORS_ORIGINS` | Explicit list, or set `WISEF_CORS_OPEN=1` for `*` |
 | `USE_LOCAL_TFIDF` | Default `1` — offline TF–IDF vectors when cloud embed skipped |
-| `FORCE_EMBED=1` | Build Gemini/Ollama dense embedding cache (slow) |
+| `USE_LOCAL_EMBEDDER` | Default `1` — own local sentence-transformer embeddings (no Google/Ollama) |
+| `LOCAL_EMBED_MODEL` | Default `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
+| `LOCAL_EMBED_DEVICE` | `cpu` (default) or `cuda` if GPU available |
+| `FORCE_EMBED=1` | Build dense embedding cache (slow) — now uses local embedder first |
 
 Seed snapshot (offline-friendly) is written to `backend/seed/mlsa_programs.json` after a successful scrape.
 
