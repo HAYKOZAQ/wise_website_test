@@ -183,3 +183,13 @@ Free services **sleep** after idle time. First chat after sleep can take 30–60
 | 502 / cold start | Wait and retry; check Render logs |
 | Empty answers / 500 | `GEMINI_API_KEY` missing on host → add in Environment |
 | Status ok but no programs | First boot runs `scraper.py`; check logs for ARLIS download |
+| `Keras 3` error from `transformers` | Install `tf-keras` (only needed when TensorFlow is present) or set `TF_USE_LEGACY_KERAS=1` |
+| FAISS `_ARRAY_API not found` | `faiss-cpu` wheel mismatched with NumPy; use the versions pinned in `requirements.txt` |
+
+### CPU-only PyTorch
+
+If you want the smaller CPU wheel instead of the default CUDA wheel:
+
+```bash
+pip install torch==2.8.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+```
