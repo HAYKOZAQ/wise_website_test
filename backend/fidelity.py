@@ -14,6 +14,42 @@ from datetime import datetime, timezone
 from typing import Any
 
 
+_semantic_model = None
+
+
+def _get_semantic_model():
+    global _semantic_model
+    if _semantic_model is None:
+        try:
+            from sentence_transformers import SentenceTransformer
+            _semantic_model = SentenceTransformer(
+                "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            )
+        except Exception:
+            pass
+    return _semantic_model
+
+
+def _semantic_similarity(text1: str, text2: str) -> float:
+    """Lightweight sentence-transformer cosine similarity if available."""
+    model = _get_semantic_model()
+    if model is None:
+        return 0.0
+    try:
+        from sentence_transformers import util
+        emb1 = model.encode(text1, convert_to_tensor=True)
+        emb2 = model.encode(text2, convert_to_tensor=True)
+        return float(util.cos_sim(emb1, emb2)[0][0])
+    except Exception:
+        return 0.0
+
+
+def _split_sentences(text: str) -> list[str]:
+    """Split on Armenian/English sentence terminators."""
+    parts = re.split(r"(?<=[.!?:։])\s+", (text or "").strip())
+    return [p.strip() for p in parts if p.strip()]
+
+
 _NUM_CLAIM_RE = re.compile(
     r"(?:"
     r"\d{1,3}(?:[ \u00a0]?\d{3})+(?:\s*(?:ՀՀ\s*)?դրամ|դր\.?|AMD)?"
@@ -77,14 +113,21 @@ def claim_supported(claim: str, context: str) -> bool:
 def evaluate_grounding(answer: str, context: str) -> dict[str, Any]:
     claims = extract_numeric_claims(answer)
     if not claims:
+        # Semantic grounding: compare answer to context via sentence-transformers
+        score = _semantic_similarity(answer or "", context or "")
+        # Boost with lexical overlap as a fallback signal
         ans_tokens = set(re.findall(r"[\w\u0531-\u0587]{4,}", (answer or "").lower()))
         ctx_tokens = set(re.findall(r"[\w\u0531-\u0587]{4,}", (context or "").lower()))
-        if not ans_tokens:
-            score = 0.0
+        if ans_tokens:
+            lex_score = len(ans_tokens & ctx_tokens) / max(len(ans_tokens), 1)
         else:
-            score = len(ans_tokens & ctx_tokens) / max(len(ans_tokens), 1)
+            lex_score = 0.0
+        if score > 0:
+            score = 0.75 * score + 0.25 * lex_score
+        else:
+            score = lex_score
         score = max(0.0, min(1.0, score))
-        risk = "low" if score >= 0.45 else ("medium" if score >= 0.25 else "high")
+        risk = "low" if score >= 0.55 else ("medium" if score >= 0.35 else "high")
         return {
             "grounding_score": round(score, 3),
             "hallucination_rate": round(1.0 - score, 3),
@@ -94,7 +137,7 @@ def evaluate_grounding(answer: str, context: str) -> dict[str, Any]:
             "claims_unsupported": 0,
             "supported_claims": [],
             "unsupported_claims": [],
-            "method": "lexical_overlap",
+            "method": "semantic_similarity",
         }
 
     supported = []

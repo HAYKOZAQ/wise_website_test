@@ -16,6 +16,16 @@ from typing import Any
 
 import requests
 
+try:
+    from rag_index import RAGIndex
+except ImportError:
+    from backend.rag_index import RAGIndex  # type: ignore
+
+try:
+    from reranker import get_reranker
+except ImportError:
+    from backend.reranker import get_reranker  # type: ignore
+
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -48,6 +58,9 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma2")
 USE_LOCAL_EMBEDDER = os.environ.get("USE_LOCAL_EMBEDDER", "1").strip().lower() not in ("0", "false", "no")
+USE_RERANKER = os.environ.get("USE_RERANKER", "0").strip().lower() in ("1", "true", "yes")
+HYBRID_SEMANTIC_WEIGHT = float(os.environ.get("HYBRID_SEMANTIC_WEIGHT", "0.6"))
+QUERY_EXPANSION = os.environ.get("QUERY_EXPANSION", "0").strip().lower() in ("1", "true", "yes")
 # Prefer stable Gemini models first; Gemma experimental last
 GEMINI_GENERATE_MODELS = [
     m.strip()
@@ -81,12 +94,14 @@ class RAGEngine:
         self.chunks: list[dict[str, Any]] = []
         self.embeddings: list[tuple[int, list[float]]] = []
         self.vector_enabled = False
-        self.vector_backend = "none"  # gemini | ollama | tfidf_local | none
+        self.vector_backend = "none"  # local_embedder | gemini | ollama | tfidf_local | faiss_bm25 | none
         self.use_gemini = bool(GEMINI_API_KEY)
         self.corpus_hash = ""
         self.legal_acts = 0
         self.cache_ok = False
         self._tfidf = None  # LocalTfidfIndex | None
+        self._rag_index: Any = None
+        self._reranker: Any = None
         self.embed_skip_reason = ""
 
         self.load_data()
@@ -233,51 +248,39 @@ class RAGEngine:
         self.vector_backend = "none"
         self.cache_ok = False
         self._tfidf = None
+        self._rag_index = None
         self.embed_skip_reason = ""
-        cache_file = self._cache_path()
-
-        if os.path.exists(cache_file):
-            try:
-                with open(cache_file, "r", encoding="utf-8") as f:
-                    cached = json.load(f)
-                if (
-                    cached.get("corpus_hash") == self.corpus_hash
-                    and cached.get("chunks_count") == len(self.chunks)
-                ):
-                    self.embeddings = [
-                        (item["chunk_id"], item["vector"])
-                        for item in cached.get("embeddings", [])
-                    ]
-                    if len(self.embeddings) == len(self.chunks):
-                        self.vector_enabled = True
-                        self.cache_ok = True
-                        self.vector_backend = cached.get("backend") or "cache"
-                        print(f"Loaded {len(self.embeddings)} embeddings from cache (hash={self.corpus_hash}).")
-                        return
-            except Exception as e:
-                print(f"Error loading embeddings cache: {e}")
-
         force_embed = os.environ.get("FORCE_EMBED", "").strip() in ("1", "true", "yes")
         max_auto = int(os.environ.get("AUTO_EMBED_MAX_CHUNKS", "400"))
         prefer_local = os.environ.get("USE_LOCAL_TFIDF", "1").strip().lower() not in ("0", "false", "no")
 
-        # Own local dense embedding backend (no Google / no Ollama)
+        # Try persisted FAISS + BM25 index first
+        self._rag_index = RAGIndex(self._backend_dir())
+        if self._rag_index.load(self.corpus_hash):
+            self.embeddings = [(c["chunk_id"], []) for c in self._rag_index.chunks]
+            self.vector_enabled = True
+            self.cache_ok = True
+            self.vector_backend = "faiss_bm25"
+            print(f"Loaded persisted FAISS+BM25 index ({len(self._rag_index.chunks)} chunks).")
+            return
+
+        # Build dense embeddings, then construct FAISS + BM25 index
+        embeddings: list[tuple[int, list[float]]] = []
+        backend_name = "none"
+
+        # 1) Own local dense embedding backend (no Google / no Ollama)
         if USE_LOCAL_EMBEDDER:
             print("Trying own local embedding backend…")
             try:
                 local_vectors = self._embed_with_local_backend()
                 if local_vectors and len(local_vectors) == len(self.chunks):
-                    self.embeddings = local_vectors
-                    self.vector_enabled = True
-                    self.vector_backend = "local_embedder"
-                    self._save_embeddings_cache()
-                    print(f"Own local embedding search enabled ({len(self.embeddings)} embeddings).")
-                    return
+                    embeddings = local_vectors
+                    backend_name = "local_embedder"
             except Exception as e:
                 print(f"Local embedder failed: {e}")
 
-        # Large corpora: skip online bulk embed unless forced
-        if len(self.chunks) > max_auto and not force_embed:
+        # 2) Large corpora: skip online bulk embed unless forced
+        if not embeddings and len(self.chunks) > max_auto and not force_embed:
             self.embed_skip_reason = (
                 f"bulk cloud embed skipped for {len(self.chunks)} chunks "
                 f"(limit={max_auto}; set FORCE_EMBED=1 for Gemini/Ollama cache)"
@@ -287,7 +290,8 @@ class RAGEngine:
                 self._enable_local_tfidf()
             return
 
-        if self.use_gemini and (force_embed or len(self.chunks) <= max_auto):
+        # 3) Google Gemini embeddings
+        if not embeddings and self.use_gemini and (force_embed or len(self.chunks) <= max_auto):
             print("Using Google Gemini API for embeddings…")
             success = True
             for i, chunk in enumerate(self.chunks):
@@ -295,42 +299,49 @@ class RAGEngine:
                     print(f"  … embedded {i}/{len(self.chunks)}")
                 vector = self.get_gemini_embedding(chunk["text"])
                 if vector:
-                    self.embeddings.append((chunk["chunk_id"], vector))
+                    embeddings.append((chunk["chunk_id"], vector))
                 else:
                     success = False
                     break
-            if success and len(self.embeddings) == len(self.chunks):
-                self.vector_enabled = True
-                self.vector_backend = "gemini"
-                self._save_embeddings_cache()
-                print(f"Gemini vector search enabled ({len(self.embeddings)} embeddings).")
-                return
-            print("Gemini embeddings incomplete; trying Ollama…")
-            self.embeddings = []
-
-        print("Falling back to local Ollama for embeddings…")
-        try:
-            r = requests.get(OLLAMA_HOST, timeout=3)
-            if r.status_code == 200:
-                for i, chunk in enumerate(self.chunks):
-                    if i and i % 25 == 0:
-                        print(f"  … embedded {i}/{len(self.chunks)}")
-                    vector = self.get_ollama_embedding(chunk["text"])
-                    if vector:
-                        self.embeddings.append((chunk["chunk_id"], vector))
-                if len(self.embeddings) == len(self.chunks):
-                    self.vector_enabled = True
-                    self.vector_backend = "ollama"
-                    self._save_embeddings_cache()
-                    print(f"Ollama vector search enabled ({len(self.embeddings)} embeddings).")
-                    return
-                print("Could not generate all embeddings.")
+            if success and len(embeddings) == len(self.chunks):
+                backend_name = "gemini"
             else:
-                print("Ollama non-200.")
-        except Exception as e:
-            print(f"Ollama not available: {e}.")
+                print("Gemini embeddings incomplete; trying Ollama…")
+                embeddings = []
 
-        # Always provide a working offline vector channel
+        # 4) Local Ollama embeddings
+        if not embeddings:
+            print("Falling back to local Ollama for embeddings…")
+            try:
+                r = requests.get(OLLAMA_HOST, timeout=3)
+                if r.status_code == 200:
+                    for i, chunk in enumerate(self.chunks):
+                        if i and i % 25 == 0:
+                            print(f"  … embedded {i}/{len(self.chunks)}")
+                        vector = self.get_ollama_embedding(chunk["text"])
+                        if vector:
+                            embeddings.append((chunk["chunk_id"], vector))
+                    if len(embeddings) == len(self.chunks):
+                        backend_name = "ollama"
+                    else:
+                        print("Could not generate all embeddings.")
+                else:
+                    print("Ollama non-200.")
+            except Exception as e:
+                print(f"Ollama not available: {e}.")
+
+        # 5) Build and persist FAISS + BM25 index
+        if embeddings and len(embeddings) == len(self.chunks):
+            self.embeddings = embeddings
+            if self._rag_index.build(self.chunks, self.corpus_hash, embeddings):
+                self.vector_enabled = True
+                self.vector_backend = "faiss_bm25"
+                self.cache_ok = True
+                self.embed_skip_reason = ""
+                print(f"FAISS+BM25 index built ({len(embeddings)} embeddings, backend={backend_name}).")
+                return
+
+        # 6) Always provide a working offline vector channel
         if prefer_local:
             self._enable_local_tfidf()
         else:
@@ -407,6 +418,10 @@ class RAGEngine:
         return {w for w in words if len(w) > 2}
 
     def _keyword_scores(self, query: str) -> list[tuple[int, float]]:
+        if self._rag_index is not None and self._rag_index.is_ready():
+            return self._rag_index.search_bm25(query, k=80)
+
+        # Fallback legacy keyword scorer
         q_words = self._tokenize(query)
         if not q_words:
             return []
@@ -417,7 +432,6 @@ class RAGEngine:
             if not c_words:
                 continue
             overlap = len(q_words & c_words)
-            # Substring fallback for Armenian morphology (նպաստ / նպաստի)
             sub_hits = 0
             low = text.lower()
             for w in q_words:
@@ -425,11 +439,9 @@ class RAGEngine:
                     sub_hits += 1
             title_words = self._tokenize(chunk.get("title") or "")
             title_hit = len(q_words & title_words)
-            # Soft length normalization — avoid crushing long legal articles
             length_norm = max(2.0, min(math.log(1 + len(c_words)), 6.5))
             score = (float(overlap) + 0.65 * float(sub_hits)) / length_norm
             score += 2.2 * float(title_hit)
-            # Prefer denser matches
             if overlap >= 2:
                 score += 0.35 * (overlap - 1)
             if score > 0:
@@ -443,7 +455,15 @@ class RAGEngine:
         # Local TF–IDF path (offline)
         if self._tfidf is not None:
             return self._tfidf.scores(query)[:80]
-        # Dense embedding path (local / Gemini / Ollama / cache)
+        # FAISS + BM25 hybrid index path
+        if self._rag_index is not None and self._rag_index.is_ready():
+            q_vec = self.get_local_embedding(query)
+            if not q_vec and self.use_gemini:
+                q_vec = self.get_gemini_embedding(query)
+            if not q_vec:
+                q_vec = self.get_ollama_embedding(query)
+            return self._rag_index.search_dense(q_vec, k=80) if q_vec else []
+        # Legacy dense embedding path
         if not self.embeddings:
             return []
         q_vec = None
@@ -478,26 +498,81 @@ class RAGEngine:
         q = query.lower()
         return any(h in q for h in SUMMARY_QUERY_HINTS)
 
+    def _expand_query(self, query: str) -> list[str]:
+        """Generate query variants for better recall (optional, LLM-powered)."""
+        if not QUERY_EXPANSION:
+            return [query]
+        if len(query.split()) > 15:
+            return [query]
+        # Use the fastest available generator for a cheap rewrite
+        variants = [query]
+        rewrite_prompt = (
+            "Rewrite this question in Armenian in 1 different way to help search a database. "
+            "Return ONLY the rewritten question, no explanation.\n\nQuestion: "
+        ) + query
+        try:
+            rewritten = ""
+            if self.use_gemini:
+                rewritten = self._generate_with_gemini(rewrite_prompt)
+            if not rewritten:
+                rewritten = self._generate_with_ollama(rewrite_prompt)
+            if rewritten:
+                clean = rewritten.strip().split("\n")[0].strip()
+                if clean and clean.lower() != query.lower():
+                    variants.append(clean)
+        except Exception as e:
+            print(f"Query expansion failed: {e}")
+        return variants
+
     def _merge_rank(self, query: str, top_n: int = 8) -> list[dict[str, Any]]:
-        """Hybrid retrieval with diversification by act_id / title."""
-        vec = self._vector_scores(query)
-        kw = self._keyword_scores(query)
-
-        # Normalize scores to 0-1 within each channel
-        def normalize(pairs: list[tuple[int, float]]) -> dict[int, float]:
-            if not pairs:
-                return {}
-            mx = max(s for _, s in pairs) or 1.0
-            mn = min(s for _, s in pairs)
-            span = (mx - mn) or 1.0
-            return {cid: (s - mn) / span for cid, s in pairs}
-
-        vmap = normalize(vec[:40])
-        kmap = normalize(kw[:40])
-        all_ids = set(vmap) | set(kmap)
-
+        """Hybrid retrieval with optional re-ranking and diversification."""
         prefer_legal = self._query_prefers_legal(query)
         prefer_summary = self._query_prefers_summary(query)
+        initial_k = max(top_n * 3, 24)
+
+        # Query expansion
+        query_variants = self._expand_query(query)
+
+        # Collect candidates from FAISS+BM25 hybrid or legacy channels
+        candidate_scores: dict[int, float] = {}
+        for q in query_variants:
+            if self._rag_index is not None and self._rag_index.is_ready():
+                q_vec = self.get_local_embedding(q)
+                if not q_vec and self.use_gemini:
+                    q_vec = self.get_gemini_embedding(q)
+                if not q_vec:
+                    q_vec = self.get_ollama_embedding(q)
+                pairs = self._rag_index.search_hybrid(
+                    q, q_vec, k=initial_k, semantic_weight=HYBRID_SEMANTIC_WEIGHT
+                )
+            else:
+                vec = self._vector_scores(q)
+                kw = self._keyword_scores(q)
+
+                def normalize(pairs: list[tuple[int, float]]) -> dict[int, float]:
+                    if not pairs:
+                        return {}
+                    mx = max(s for _, s in pairs) or 1.0
+                    mn = min(s for _, s in pairs)
+                    span = (mx - mn) or 1.0
+                    return {cid: (s - mn) / span for cid, s in pairs}
+
+                vmap = normalize(vec[:40])
+                kmap = normalize(kw[:40])
+                pairs = []
+                all_ids = set(vmap) | set(kmap)
+                for cid in all_ids:
+                    if self.vector_backend == "tfidf_local":
+                        score = 0.50 * vmap.get(cid, 0.0) + 0.50 * kmap.get(cid, 0.0)
+                    else:
+                        score = 0.55 * vmap.get(cid, 0.0) + 0.45 * kmap.get(cid, 0.0)
+                    pairs.append((cid, score))
+                pairs.sort(key=lambda x: x[1], reverse=True)
+                pairs = pairs[:initial_k]
+
+            # Merge variant scores keeping the max
+            for cid, score in pairs:
+                candidate_scores[cid] = max(candidate_scores.get(cid, 0.0), score)
 
         # Precompute which canonical acts have legal HTML chunks available
         acts_with_legal: set[str] = set()
@@ -507,39 +582,41 @@ class RAGEngine:
                 if ca:
                     acts_with_legal.add(ca)
 
-        combined: list[tuple[int, float]] = []
-        for cid in all_ids:
-            # Prefer keyword a bit more when only local TF–IDF (both are lexical)
-            if self.vector_backend == "tfidf_local":
-                score = 0.50 * vmap.get(cid, 0.0) + 0.50 * kmap.get(cid, 0.0)
-            else:
-                score = 0.55 * vmap.get(cid, 0.0) + 0.45 * kmap.get(cid, 0.0)
+        # Apply type/priority boosts and build candidate list
+        candidates: list[dict[str, Any]] = []
+        for cid, score in candidate_scores.items():
             chunk = self.chunks[cid]
             dtype = chunk.get("doc_type") or "summary"
             ca = self._canonical_act_id(chunk.get("act_id"))
-            # Prefer official legal text over PDF of the same act
+            adjusted = score
             if dtype == "legal":
-                score += 0.20
+                adjusted += 0.20
             elif dtype == "pdf":
                 if ca and ca in acts_with_legal:
-                    score -= 0.28  # demote PDF when legal exists for same act
+                    adjusted -= 0.28
                 else:
-                    score += 0.06
+                    adjusted += 0.06
             if prefer_legal and dtype == "legal":
-                score += 0.18
+                adjusted += 0.18
             if prefer_legal and dtype == "pdf" and not (ca and ca in acts_with_legal):
-                score += 0.10
+                adjusted += 0.10
             if prefer_summary and dtype == "summary":
-                score += 0.18
+                adjusted += 0.18
             if dtype == "summary" and not prefer_legal:
-                score += 0.06
+                adjusted += 0.06
             if dtype == "web" and not prefer_legal:
-                score += 0.05
+                adjusted += 0.05
             pr = chunk.get("priority") or 2
-            score += max(0, (3 - pr)) * 0.02
-            combined.append((cid, score))
+            adjusted += max(0, (3 - pr)) * 0.02
+            candidates.append({**chunk, "hybrid_score": adjusted})
 
-        combined.sort(key=lambda x: x[1], reverse=True)
+        candidates.sort(key=lambda x: x["hybrid_score"], reverse=True)
+
+        # Optional cross-encoder re-ranking
+        if USE_RERANKER and candidates:
+            if self._reranker is None:
+                self._reranker = get_reranker()
+            candidates = self._reranker.rerank(query, candidates, top_k=max(top_n * 2, 16))
 
         # Diversify: limit per act/title; skip PDF if legal already picked for act
         picked: list[dict[str, Any]] = []
@@ -548,14 +625,14 @@ class RAGEngine:
         type_counts: dict[str, int] = defaultdict(int)
         legal_picked_acts: set[str] = set()
 
-        def try_pick(cid: int) -> bool:
-            chunk = self.chunks[cid]
+        def try_pick(chunk: dict[str, Any]) -> bool:
+            cid = chunk["chunk_id"]
             ca = self._canonical_act_id(chunk.get("act_id"))
             act_key = ca or str(chunk.get("act_id") or f"t:{chunk.get('title')}" or cid)
             title_key = chunk.get("title") or str(cid)
             dtype = chunk.get("doc_type") or "summary"
             if dtype == "pdf" and ca and ca in legal_picked_acts:
-                return False  # legal already represents this act
+                return False
             if dtype == "pdf" and ca and ca in acts_with_legal and act_counts[act_key] >= 1:
                 return False
             if act_counts[act_key] >= 2:
@@ -572,21 +649,20 @@ class RAGEngine:
                 legal_picked_acts.add(ca)
             return True
 
-        for cid, _ in combined:
-            try_pick(cid)
+        for c in candidates:
+            try_pick(c)
             if len(picked) >= top_n:
                 break
 
         have_legal = any(c.get("doc_type") == "legal" for c in picked)
         have_sum = any(c.get("doc_type") == "summary" for c in picked)
         if not have_legal or not have_sum:
-            for cid, _ in combined:
-                chunk = self.chunks[cid]
-                if not have_legal and chunk.get("doc_type") == "legal":
-                    if try_pick(cid):
+            for c in candidates:
+                if not have_legal and c.get("doc_type") == "legal":
+                    if try_pick(c):
                         have_legal = True
-                if not have_sum and chunk.get("doc_type") == "summary":
-                    if try_pick(cid):
+                if not have_sum and c.get("doc_type") == "summary":
+                    if try_pick(c):
                         have_sum = True
                 if have_legal and have_sum:
                     break
@@ -595,6 +671,7 @@ class RAGEngine:
 
         # Fallback pure keyword if hybrid empty
         if not picked:
+            kw = self._keyword_scores(query)
             for cid, _ in kw[:top_n]:
                 picked.append(self.chunks[cid])
 

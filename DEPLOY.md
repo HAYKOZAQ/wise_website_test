@@ -105,7 +105,10 @@ Optional env:
 | `USE_LOCAL_EMBEDDER` | Default `1` — own local sentence-transformer embeddings (no Google/Ollama) |
 | `LOCAL_EMBED_MODEL` | Default `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
 | `LOCAL_EMBED_DEVICE` | `cpu` (default) or `cuda` if GPU available |
-| `FORCE_EMBED=1` | Build dense embedding cache (slow) — now uses local embedder first |
+| `USE_RERANKER` | Default `0` — enable cross-encoder re-ranking for better precision |
+| `HYBRID_SEMANTIC_WEIGHT` | Default `0.6` — weight of dense vs. BM25 in hybrid scoring |
+| `QUERY_EXPANSION` | Default `0` — ask the LLM to rewrite the query for better recall |
+| `FORCE_EMBED=1` | Build dense embedding cache (slow) — uses local embedder first |
 
 Seed snapshot (offline-friendly) is written to `backend/seed/mlsa_programs.json` after a successful scrape.
 

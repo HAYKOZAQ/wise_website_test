@@ -147,7 +147,10 @@ class TestRetrievalEngine(unittest.TestCase):
             "engine must have chunks; prefer vector_enabled via tfidf",
         )
         if self.engine.vector_enabled:
-            self.assertIn(self.engine.vector_backend, ("tfidf_local", "gemini", "ollama", "cache"))
+            self.assertIn(
+                self.engine.vector_backend,
+                ("faiss_bm25", "local_embedder", "tfidf_local", "gemini", "ollama", "cache"),
+            )
 
     def test_retrieve_pension(self):
         hits = self.engine.retrieve("տարիքային կենսաթոշակ", top_n=4)
