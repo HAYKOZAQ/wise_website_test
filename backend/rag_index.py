@@ -166,6 +166,14 @@ class RAGIndex:
         semantic_weight: float = 0.6,
     ) -> list[tuple[int, float]]:
         """Merge BM25 and dense scores with weighted sum."""
+        if (
+            query_vector
+            and self.faiss_index is not None
+            and len(query_vector) != self.faiss_index.d
+        ):
+            # Mismatch: pre-built index was created with a different embedder
+            # than the one used for the query. Fall back to lexical search.
+            query_vector = None
         dense = self.search_dense(query_vector, k=k * 2) if query_vector else []
         lexical = self.search_bm25(query, k=k * 2)
 

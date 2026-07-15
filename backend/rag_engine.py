@@ -457,7 +457,9 @@ class RAGEngine:
             return self._tfidf.scores(query)[:80]
         # FAISS + BM25 hybrid index path
         if self._rag_index is not None and self._rag_index.is_ready():
-            q_vec = self.get_local_embedding(query)
+            q_vec = None
+            if USE_LOCAL_EMBEDDER:
+                q_vec = self.get_local_embedding(query)
             if not q_vec and self.use_gemini:
                 q_vec = self.get_gemini_embedding(query)
             if not q_vec:
@@ -537,7 +539,9 @@ class RAGEngine:
         candidate_scores: dict[int, float] = {}
         for q in query_variants:
             if self._rag_index is not None and self._rag_index.is_ready():
-                q_vec = self.get_local_embedding(q)
+                q_vec = None
+                if USE_LOCAL_EMBEDDER:
+                    q_vec = self.get_local_embedding(q)
                 if not q_vec and self.use_gemini:
                     q_vec = self.get_gemini_embedding(q)
                 if not q_vec:

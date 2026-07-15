@@ -56,6 +56,47 @@ productionApiBase: 'https://YOUR-APP.onrender.com'
 
 ---
 
+## Free tier / 512 MB deployment (Render, Railway, Fly Hobby)
+
+The default `Dockerfile` installs `torch` + `sentence-transformers` and builds embeddings at runtime. That needs **>1 GB RAM** and will crash on a 512 MB free container.
+
+Use the **slim runtime** instead:
+
+1. **Pre-build the search index locally** (one-time, needs ~600 MB RAM):
+
+   ```bat
+   cd backend
+   python -m venv .venv-build
+   .venv-build\Scripts\activate
+   pip install -r requirements.txt
+   python scraper.py --force
+   deactivate
+   ```
+
+   This writes `backend/data/index/` (FAISS + BM25 + chunks).
+
+2. **Commit the index** to git:
+
+   ```bash
+   git add backend/data/index/
+   git commit -m "chore(index): pre-build FAISS+BM25 index for slim runtime"
+   git push
+   ```
+
+3. On Render / Railway / Fly use **`Dockerfile.slim`** and set:
+
+   | Key | Value |
+   |-----|-------|
+   | `GEMINI_API_KEY` | from [Google AI Studio](https://aistudio.google.com/apikey) |
+   | `USE_LOCAL_EMBEDDER` | `0` (already the default in `Dockerfile.slim`) |
+
+   The slim image has **no torch / sentence-transformers / tensorflow** at runtime and fits in ~512 MB RAM.
+
+### Query embeddings on the free tier
+
+- **Best quality:** keep `GEMINI_API_KEY` set. Queries are embedded via the free Gemini API and matched against the pre-built index.
+- **Fully offline / zero API cost:** unset `GEMINI_API_KEY`. Retrieval falls back to BM25 keyword search only (still works, slightly lower semantic recall).
+
 ## Local development (unchanged)
 
 ```bat
