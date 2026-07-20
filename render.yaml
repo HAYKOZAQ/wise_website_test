@@ -5,6 +5,7 @@ services:
   - type: web
     name: wisef-rag-api
     runtime: docker
+    dockerfilePath: Dockerfile.slim
     plan: free
     healthCheckPath: /api/status
     envVars:
