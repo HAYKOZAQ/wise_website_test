@@ -7,8 +7,9 @@ With the latest Docker image, the **same URL** also serves the real website:
 
 | URL | What you get |
 |-----|----------------|
-| `https://YOUR-APP.onrender.com/` | Redirects to the WISE site |
-| `https://YOUR-APP.onrender.com/pages/index.html` | Full website + chat |
+| `https://YOUR-APP.onrender.com/` | Full website + chat |
+| `https://YOUR-APP.onrender.com/index.html` | Full website + chat |
+| `https://YOUR-APP.onrender.com/pages/index.html` | Legacy redirect to `/index.html` |
 | `https://YOUR-APP.onrender.com/api` | AI backend status (what you saw) |
 | `https://YOUR-APP.onrender.com/api/status` | JSON health |
 | `https://YOUR-APP.onrender.com/docs` | API docs |
@@ -27,7 +28,7 @@ Chat uses **same origin** automatically (`config.js` leaves `productionApiBase` 
    |-----|--------|
    | `GEMINI_API_KEY` | from [Google AI Studio](https://aistudio.google.com/apikey) |
 
-4. Deploy → open: `https://YOUR-APP.onrender.com/pages/index.html`  
+4. Deploy → open: `https://YOUR-APP.onrender.com/`  
 5. Use **Ask us** chat (green “ready” when API is up)
 
 **Manual deploy:** Render dashboard → **Manual Deploy → Deploy latest commit** after you push.
@@ -36,7 +37,11 @@ Chat uses **same origin** automatically (`config.js` leaves `productionApiBase` 
 
 ## Option B: GitHub Pages (site) + Render (API only)
 
-1. Site: `https://YOURUSER.github.io/REPO/`  
+The frontend is now built with **Eleventy**. Publish the generated `_site/` folder
+(GitHub Actions, `gh-pages`, or any static host). The Render Docker image builds
+`_site/` automatically.
+
+1. Site: `https://YOURUSER.github.io/REPO/` (serve the built `_site/` output)  
 2. API: Render Docker as above  
 3. In `src/js/config.js` set:
 
@@ -50,7 +55,7 @@ productionApiBase: 'https://YOUR-APP.onrender.com'
 
 ## Test
 
-1. Site: `…/pages/index.html` — full design + chat  
+1. Site: `…/` or `…/index.html` — full design + chat  
 2. API: `…/api/status` — `"status":"ready"`  
 3. Docs: `…/docs`
 

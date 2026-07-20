@@ -12,7 +12,6 @@ Each PDF is cached under data/pdf_cache/ and chunked into doc_type="pdf".
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 import re
 import sys
@@ -21,7 +20,19 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-import requests
+from ingest_common import (
+    TextCache,
+    backend_dir,
+    cache_key,
+    data_dir,
+    default_headers,
+    hard_split,
+    http_get,
+    load_json,
+    normalize_text,
+    save_json,
+    slug,
+)
 
 if sys.platform == "win32":
     try:
@@ -34,30 +45,14 @@ try:
 except ImportError:
     PdfReader = None  # type: ignore
 
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/pdf,*/*",
-    "Accept-Language": "hy,en;q=0.8",
-}
-
-
-def backend_dir() -> str:
-    return os.path.dirname(os.path.abspath(__file__))
-
-
-def data_dir() -> str:
-    path = os.path.join(backend_dir(), "data")
-    os.makedirs(path, exist_ok=True)
-    return path
-
 
 def pdf_cache_dir() -> str:
-    path = os.path.join(data_dir(), "pdf_cache")
-    os.makedirs(path, exist_ok=True)
-    return path
+    path = data_dir() / "pdf_cache"
+    path.mkdir(parents=True, exist_ok=True)
+    return str(path)
+
+
+_pdf_cache = TextCache(pdf_cache_dir(), min_chars=120)
 
 
 def local_pdf_dirs() -> list[str]:
@@ -75,23 +70,15 @@ def load_catalog(catalog_path: str | None = None) -> list[dict[str, Any]]:
         paths.append(catalog_path)
     paths.extend(
         [
-            os.path.join(backend_dir(), "mlsa_pdf_catalog.json"),
-            os.path.join(data_dir(), "mlsa_pdf_catalog.json"),
+            backend_dir() / "mlsa_pdf_catalog.json",
+            data_dir() / "mlsa_pdf_catalog.json",
         ]
     )
-    path = next((p for p in paths if os.path.exists(p)), None)
+    path = next((p for p in paths if p.exists()), None)
     if not path:
         print("[pdf] Catalog not found (backend/mlsa_pdf_catalog.json)")
         return []
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def normalize_text(text: str) -> str:
-    text = (text or "").replace("\u00a0", " ")
-    text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text.strip()
+    return load_json(path, default=[])
 
 
 def extract_pdf_bytes(content: bytes) -> str | None:
@@ -116,80 +103,23 @@ def extract_pdf_bytes(content: bytes) -> str | None:
         return None
 
 
-def hard_split(text: str, max_chars: int = 1400, overlap: int = 150) -> list[str]:
-    if len(text) <= max_chars:
-        return [text]
-    chunks: list[str] = []
-    start = 0
-    n = len(text)
-    while start < n:
-        end = min(start + max_chars, n)
-        if end < n:
-            window = text[start:end]
-            br = max(window.rfind("\n\n"), window.rfind("\n"), window.rfind(". "))
-            if br > max_chars // 3:
-                end = start + br + 1
-        chunk = text[start:end].strip()
-        if chunk:
-            chunks.append(chunk)
-        if end >= n:
-            break
-        start = max(0, end - overlap)
-    return chunks
-
-
-def _slug(s: str) -> str:
-    s = re.sub(r"[^\w\-]+", "_", s, flags=re.UNICODE)
-    return s[:80] or "doc"
-
-
-def cache_key(source: str) -> str:
-    return hashlib.sha256(source.encode("utf-8")).hexdigest()[:20]
-
-
-def load_cached_text(key: str) -> str | None:
-    path = os.path.join(pdf_cache_dir(), f"{key}.json")
-    if not os.path.exists(path):
-        return None
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        text = data.get("text") or ""
-        return text if len(text) > 120 else None
-    except Exception:
-        return None
-
-
-def save_cached_text(key: str, text: str, meta: dict[str, Any]) -> None:
-    path = os.path.join(pdf_cache_dir(), f"{key}.json")
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "meta": meta,
-                "text": text,
-                "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-                "char_count": len(text),
-            },
-            f,
-            ensure_ascii=False,
-            indent=2,
-        )
-
-
 def download_pdf(url: str, timeout: int = 90) -> bytes | None:
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
-        if r.status_code != 200:
-            print(f"[pdf] HTTP {r.status_code} for {url[:90]}")
-            return None
-        content = r.content
-        if len(content) < 500:
-            print(f"[pdf] Too small response for {url[:90]}")
-            return None
-        return content
-    except Exception as e:
-        print(f"[pdf] download error {url[:90]}: {e}")
+    r = http_get(
+        url,
+        headers=default_headers("application/pdf,*/*"),
+        timeout=timeout,
+        fix_encoding=False,
+    )
+    if r is None:
         return None
+    if r.status_code != 200:
+        print(f"[pdf] HTTP {r.status_code} for {url[:90]}")
+        return None
+    content = r.content
+    if len(content) < 500:
+        print(f"[pdf] Too small response for {url[:90]}")
+        return None
+    return content
 
 
 def text_to_docs(
@@ -203,7 +133,7 @@ def text_to_docs(
     priority: int = 2,
 ) -> list[dict[str, Any]]:
     docs: list[dict[str, Any]] = []
-    pieces = hard_split(text)
+    pieces = hard_split(text, max_chars=1400, overlap=150)
     for i, piece in enumerate(pieces):
         piece_title = title if i == 0 else f"{title} (մաս {i + 1})"
         docs.append(
@@ -224,38 +154,27 @@ def text_to_docs(
 
 def load_exclude_set() -> dict[str, str]:
     """filename(lower) -> reason"""
-    path = os.path.join(backend_dir(), "pdf_exclude.json")
+    path = backend_dir() / "pdf_exclude.json"
     out: dict[str, str] = {}
-    if not os.path.exists(path):
+    if not path.exists():
         return out
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        for item in data.get("excluded") or []:
-            name = (item.get("file") or "").strip().lower()
-            if name:
-                out[name] = item.get("reason") or "excluded"
-    except Exception as e:
-        print(f"[pdf] exclude list error: {e}")
+    data = load_json(path, default={})
+    for item in data.get("excluded") or []:
+        name = (item.get("file") or "").strip().lower()
+        if name:
+            out[name] = item.get("reason") or "excluded"
     return out
 
 
 def record_exclude(name: str, reason: str) -> None:
     """Append runtime exclude entry to data/pdf_excluded_runtime.json."""
-    path = os.path.join(data_dir(), "pdf_excluded_runtime.json")
-    rows = []
-    if os.path.exists(path):
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                rows = json.load(f) or []
-        except Exception:
-            rows = []
+    path = data_dir() / "pdf_excluded_runtime.json"
+    rows = load_json(path, default=[])
     key = name.lower()
     if any((r.get("file") or "").lower() == key for r in rows):
         return
     rows.append({"file": name, "reason": reason})
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(rows, f, ensure_ascii=False, indent=2)
+    save_json(path, rows)
 
 
 def try_ocr_pdf(path: str) -> str | None:
@@ -296,7 +215,7 @@ def ingest_local_pdfs() -> list[dict[str, Any]]:
                 continue
             path = os.path.join(folder, name)
             key = cache_key(f"local:{path}:{os.path.getmtime(path)}")
-            text = load_cached_text(key)
+            text = _pdf_cache.load(key)
             if not text:
                 try:
                     with open(path, "rb") as f:
@@ -315,7 +234,7 @@ def ingest_local_pdfs() -> list[dict[str, Any]]:
                         print(f"[pdf] No text from local {name} — excluding")
                         record_exclude(name, reason)
                         continue
-                save_cached_text(
+                _pdf_cache.save(
                     key,
                     text,
                     {"path": path, "name": name, "source": "local"},
@@ -329,7 +248,7 @@ def ingest_local_pdfs() -> list[dict[str, Any]]:
                     category="general",
                     program_keys=[],
                     source_url=f"file://{name}",
-                    doc_id=_slug(name),
+                    doc_id=slug(name),
                     priority=1,
                 )
             )
@@ -352,7 +271,7 @@ def ingest_catalog_entry(entry: dict[str, Any], force: bool = False) -> list[dic
             return []
 
     key = cache_key(url)
-    text = None if force else load_cached_text(key)
+    text = None if force else _pdf_cache.load(key)
     if not text:
         print(f"[pdf] Fetching {doc_id} …")
         raw = download_pdf(url)
@@ -372,7 +291,7 @@ def ingest_catalog_entry(entry: dict[str, Any], force: bool = False) -> list[dic
             print(f"[pdf] {reason}")
             record_exclude(f"{doc_id}.pdf", reason)
             return []
-        save_cached_text(key, text, entry)
+        _pdf_cache.save(key, text, entry)
         print(f"[pdf] Saved {doc_id} ({len(text)} chars)")
     else:
         print(f"[pdf] Cache hit {doc_id} ({len(text)} chars)")
@@ -408,7 +327,6 @@ def ingest_all(force: bool = False, catalog_path: str | None = None) -> list[dic
 if __name__ == "__main__":
     force = "--force" in sys.argv
     docs = ingest_all(force=force)
-    out = os.path.join(data_dir(), "mlsa_pdf_docs.json")
-    with open(out, "w", encoding="utf-8") as f:
-        json.dump(docs, f, ensure_ascii=False, indent=2)
+    out = data_dir() / "mlsa_pdf_docs.json"
+    save_json(out, docs)
     print(f"[pdf] Wrote {len(docs)} docs → {out}")

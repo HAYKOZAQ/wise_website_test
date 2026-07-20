@@ -1,0 +1,4 @@
+# Extra dev/test dependencies not installed in the production Docker image.
+# Install with: pip install -r requirements-dev.txt
+
+playwright

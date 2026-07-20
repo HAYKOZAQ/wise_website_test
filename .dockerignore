@@ -1,0 +1,44 @@
+# Prevent local secrets / runtime state from leaking into the image.
+# (Dockerfile does `COPY backend/ /app/` so without this, a locally-present
+#  backend/.env with a live GEMINI_API_KEY would be baked into the registry image.)
+
+# Secrets
+.env
+backend/.env
+**/.env
+
+# Python build / cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.pytest_cache/
+
+# Regeneratable caches (rebuild from pdfs/ + scraper)
+backend/data/embeddings_cache.json
+backend/data/pdf_cache/
+backend/data/web_cache/
+
+# Runtime logs / state
+backend/data/qa_eval_log.jsonl
+backend/data/contact_messages.jsonl
+backend/data/reingest_state.json
+backend/data/reingest_mode.json
+backend/data/pdf_excluded_runtime.json
+
+# Node / editor / OS junk
+node_modules/
+_site/
+.git/
+.gitignore
+**/.DS_Store
+**/Thumbs.db
+
+# Local audit / temp scratch
+_audit*.py
+_cleanup*.py
+_audit*.txt
+_cleanup*.json
+_cmp.txt
+_pdf_dups.txt
+_live*.txt
+partners_live.html

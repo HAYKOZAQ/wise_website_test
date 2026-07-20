@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default('hy') }}">
+<head>
+  <script>try{var t=localStorage.getItem('wisef_theme')||'light';document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=(t==='dark'?'dark':'light');}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title{% if title_key %} data-i18n="{{ title_key }}"{% endif %}>{{ title | default('WISE Foundation') }}</title>
+  <meta name="description" content="{{ description | default('') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Armenian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css?v=47">
+  <link rel="stylesheet" href="/css/glass.css?v=47">
+  <link rel="stylesheet" href="/css/components.css?v=47">
+  <link rel="stylesheet" href="/css/dark.css?v=47">
+  <link rel="icon" href="/assets/logos/favicon.svg" type="image/svg+xml">
+</head>
+<body lang="{{ lang | default('hy') }}">
+{% include "header.njk" %}
+{{ content | safe }}
+{% include "footer.njk" %}
+<script src="/js/main.js?v=47"></script>
+<script src="/js/vendor/purify.min.js?v=47"></script>
+<script src="/js/i18n.js?v=47"></script>
+<script src="/js/config.js?v=47"></script>
+<script src="/js/chat.js?v=47"></script>
+</body>
+</html>

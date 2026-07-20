@@ -23,6 +23,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from ingest_common import backend_dir as _backend_dir
+
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -30,12 +32,8 @@ if sys.platform == "win32":
         pass
 
 
-def backend_dir() -> Path:
-    return Path(__file__).resolve().parent
-
-
 def default_pdf_dir() -> Path:
-    return backend_dir() / "pdfs"
+    return _backend_dir() / "pdfs"
 
 
 def safe_name(path: Path, used: set[str]) -> str:

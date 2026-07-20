@@ -7,10 +7,10 @@ bulk embed is unavailable or the corpus is too large for online embed.
 
 from __future__ import annotations
 
+import heapq
 import math
 import re
 from collections import Counter
-from typing import Iterable
 
 
 _TOKEN_RE = re.compile(r"[\w\u0531-\u0587]+", re.UNICODE)
@@ -27,9 +27,9 @@ class LocalTfidfIndex:
 
     def __init__(self, documents: list[str], max_features: int = 12000):
         self.max_features = max_features
-        self.doc_tokens: list[list[str]] = [tokenize(d) for d in documents]
+        doc_tokens = [tokenize(d) for d in documents]
         self.df: Counter[str] = Counter()
-        for toks in self.doc_tokens:
+        for toks in doc_tokens:
             for t in set(toks):
                 self.df[t] += 1
         # Keep most frequent document-frequency terms (stable-ish features)
@@ -41,8 +41,11 @@ class LocalTfidfIndex:
             for t in self.vocab
         }
         self.vectors: list[dict[int, float]] = [
-            self._tfidf_vec(toks) for toks in self.doc_tokens
+            self._tfidf_vec(toks) for toks in doc_tokens
         ]
+        # doc_tokens are no longer needed once vectors are built; dropping them
+        # frees roughly half the index memory.
+        del doc_tokens
 
     def _tfidf_vec(self, tokens: list[str]) -> dict[int, float]:
         if not tokens:
@@ -73,12 +76,17 @@ class LocalTfidfIndex:
             a, b = b, a
         return sum(v * b.get(i, 0.0) for i, v in a.items())
 
-    def scores(self, query: str) -> list[tuple[int, float]]:
+    def scores(self, query: str, top_k: int = 80) -> list[tuple[int, float]]:
         q = self.embed(query)
-        out: list[tuple[int, float]] = []
+        # Min-heap keeps the best top_k scores without scanning/sorting the full corpus.
+        heap: list[tuple[float, int]] = []
         for i, vec in enumerate(self.vectors):
             s = self.cosine_sparse(q, vec)
-            if s > 0:
-                out.append((i, s))
-        out.sort(key=lambda x: x[1], reverse=True)
-        return out
+            if s <= 0:
+                continue
+            if len(heap) < top_k:
+                heapq.heappush(heap, (s, i))
+            elif s > heap[0][0]:
+                heapq.heapreplace(heap, (s, i))
+        out = sorted(heap, key=lambda x: x[0], reverse=True)
+        return [(i, s) for s, i in out]

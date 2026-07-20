@@ -111,14 +111,29 @@ _RATE_WINDOW = int(os.environ.get("CHAT_RATE_WINDOW_SEC", "60"))  # seconds
 _rate_buckets: dict[str, deque] = defaultdict(deque)
 _rate_lock = Lock()
 
+# Only trust X-Forwarded-For when we are explicitly behind a proxy / load balancer.
+# Unset → use the socket peer (safe default; XFF is client-supplied and spoofable).
+_TRUST_PROXY = (os.environ.get("TRUST_PROXY_HOPS") or "").strip()
+_TRUST_PROXY_HOPS = int(_TRUST_PROXY) if _TRUST_PROXY.isdigit() else (1 if _TRUST_PROXY.lower() in ("1", "true", "yes") else 0)
+
 
 def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for") or ""
-    if forwarded:
-        return forwarded.split(",")[0].strip()
+    if _TRUST_PROXY_HOPS > 0:
+        forwarded = request.headers.get("x-forwarded-for") or ""
+        if forwarded:
+            # Take the hop at position (count - TRUST_PROXY_HOPS) from the left,
+            # i.e. the address our immediate trusted proxy saw as the client.
+            parts = [p.strip() for p in forwarded.split(",") if p.strip()]
+            if parts:
+                idx = max(0, len(parts) - _TRUST_PROXY_HOPS)
+                return parts[idx]
     if request.client:
         return request.client.host or "unknown"
     return "unknown"
+
+
+def _is_loopback_ip(ip: str) -> bool:
+    return ip in ("127.0.0.1", "::1", "localhost") or ip.startswith("::ffff:127.0.0.1")
 
 
 def _rate_limit_ok(ip: str, limit: int = _RATE_LIMIT, window: int = _RATE_WINDOW) -> bool:
@@ -184,25 +199,72 @@ def _admin_or_local(request: Request, authorization: Optional[str], x_admin_toke
     if _ADMIN_TOKEN:
         _require_admin(authorization, x_admin_token)
         return
-    ip = _client_ip(request)
-    if ip not in ("127.0.0.1", "::1", "localhost"):
+    # No admin token configured: only allow calls from the actual socket peer at
+    # loopback. Never trust X-Forwarded-For here — it is client-supplied and an
+    # attacker behind a reverse proxy could spoof "127.0.0.1" to bypass admin.
+    peer = (request.client.host if request.client else "") or ""
+    if not _is_loopback_ip(peer):
         raise HTTPException(
             status_code=401,
             detail="Set ADMIN_TOKEN env to allow remote re-ingest, or call from localhost",
         )
 
 
-# Frontend paths (Docker: /app/frontend ; local: ../src next to backend/)
+# Frontend paths (Docker: /app/frontend ; local: ../_site next to backend/)
 _BACKEND_DIR = Path(__file__).resolve().parent
 _FRONTEND_CANDIDATES = [
     _BACKEND_DIR / "frontend",
-    _BACKEND_DIR.parent / "src",
+    _BACKEND_DIR.parent / "_site",
 ]
 FRONTEND_ROOT = next((p for p in _FRONTEND_CANDIDATES if p.is_dir()), None)
 if FRONTEND_ROOT:
     print(f"Frontend static files: {FRONTEND_ROOT}")
 else:
     print("Frontend static folder not found — / will show API-only page")
+
+
+# Allowlist of roots admin endpoints may import PDFs from.
+# Comma-separated absolute paths via env; always permits the bundled backend/pdfs.
+def _import_roots() -> list[Path]:
+    raw = (os.environ.get("WISEF_IMPORT_ROOTS") or "").strip()
+    roots = [Path(p.strip()).resolve() for p in raw.split(",") if p.strip()]
+    roots.append((_BACKEND_DIR / "pdfs").resolve())
+    return roots
+
+
+def _validate_import_path(source: Optional[str]) -> Optional[str]:
+    """Return a safe path string, or None to mean 'use the bundled pdfs library'.
+
+    Rejects paths that escape the configured WISEF_IMPORT_ROOTS allowlist, so an
+    admin-token-bearing attacker cannot exfiltrate or ingest arbitrary files.
+    """
+    if not source:
+        return None
+    try:
+        # If relative, resolve against the backend dir so behavior is independent
+        # of the process's current working directory.
+        p = Path(source)
+        if not p.is_absolute():
+            p = _BACKEND_DIR / p
+        resolved = p.resolve()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid source path")
+    # Always allow the bundled library.
+    lib = (_BACKEND_DIR / "pdfs").resolve()
+    if resolved == lib:
+        return None
+    for root in _import_roots():
+        try:
+            # Both Path.is_relative_to and os.path.commonpath work on Windows/Unix.
+            if resolved.is_relative_to(root):
+                return str(resolved)
+        except Exception:
+            continue
+    raise HTTPException(
+        status_code=403,
+        detail="Source path is outside WISEF_IMPORT_ROOTS allowlist",
+    )
+
 
 def _reingest_mode_file() -> Path:
     return _BACKEND_DIR / "data" / "reingest_mode.json"
@@ -378,7 +440,7 @@ def _api_only_html() -> str:
     <ul>
       <li>GitHub Pages (your static site), with <code>productionApiBase</code> pointing here, or</li>
       <li>Redeploy this service with the latest Docker image that includes the frontend
-          (then open <code>/pages/index.html</code>).</li>
+          (then open <code>/index.html</code>).</li>
     </ul>
   </div>
   <div class="card">
@@ -551,9 +613,10 @@ def admin_reingest(
 ):
     """Trigger full corpus rebuild (async) and hot-reload RAG when done."""
     _admin_or_local(request, authorization, x_admin_token)
+    safe_import_path = _validate_import_path(payload.import_path)
     out = run_reingest_async(
         force=bool(payload.force),
-        import_pdfs_from=payload.import_path,
+        import_pdfs_from=safe_import_path,
         reload_callback=reload_rag_engine,
     )
     if not out.get("ok") and not out.get("started"):
@@ -575,6 +638,7 @@ def admin_import_pdfs(
     _admin_or_local(request, authorization, x_admin_token)
 
     source = (payload.source or "").strip() or str(_BACKEND_DIR / "pdfs")
+    source = _validate_import_path(source) or str(_BACKEND_DIR / "pdfs")
     lib = str((_BACKEND_DIR / "pdfs").resolve())
     try:
         src_resolved = str(Path(source).resolve())
@@ -750,7 +814,6 @@ if FRONTEND_ROOT:
     _css = FRONTEND_ROOT / "css"
     _js = FRONTEND_ROOT / "js"
     _assets = FRONTEND_ROOT / "assets"
-    _pages = FRONTEND_ROOT / "pages"
 
     if _css.is_dir():
         app.mount("/css", StaticFiles(directory=str(_css)), name="css")
@@ -758,17 +821,24 @@ if FRONTEND_ROOT:
         app.mount("/js", StaticFiles(directory=str(_js)), name="js")
     if _assets.is_dir():
         app.mount("/assets", StaticFiles(directory=str(_assets)), name="assets")
-    if _pages.is_dir():
-        app.mount("/pages", StaticFiles(directory=str(_pages), html=True), name="pages")
 
-    @app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
-    def site_home():
-        # Explicit 302 Location works for both GET and HEAD probes on Render
-        return RedirectResponse(url="/pages/index.html", status_code=302)
+    @app.api_route("/pages", methods=["GET", "HEAD"], include_in_schema=False)
+    @app.api_route("/pages/", methods=["GET", "HEAD"], include_in_schema=False)
+    def pages_root_compat():
+        return RedirectResponse(url="/index.html", status_code=301)
+
+    @app.api_route("/pages/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
+    def pages_compat(path: str):
+        target = (path or "index.html").lstrip("/")
+        return RedirectResponse(url=f"/{target}", status_code=301)
 
     @app.api_route("/healthz", methods=["GET", "HEAD"], include_in_schema=False)
     def healthz():
         return {"ok": True, "status": "ready"}
+
+    # Eleventy builds the site into FRONTEND_ROOT; serve it from / after all
+    # API routes so /api/* keeps working. html=True serves /index.html for /.
+    app.mount("/", StaticFiles(directory=str(FRONTEND_ROOT), html=True), name="site")
 
 else:
 

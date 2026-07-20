@@ -4,6 +4,14 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
+from ingest_common import (
+    atomic_save_json,
+    backend_dir,
+    load_json,
+    safe_canonical_act_id,
+    save_json,
+)
+
 # Fix Windows terminal encoding for Armenian Unicode
 if sys.platform == "win32":
     try:
@@ -438,30 +446,38 @@ def summaries_as_docs() -> list:
     return docs
 
 
-def _load_json_list(path: str) -> list:
-    if not os.path.exists(path):
-        return []
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return data if isinstance(data, list) else []
-    except Exception as e:
-        print(f"[scraper] Failed reading {path}: {e}")
-        return []
-
-
 def _dedupe_docs(docs: list) -> list:
-    """Drop content duplicates; keep first (higher-priority sources first)."""
-    seen = set()
+    """Drop content duplicates; keep first (higher-priority sources first).
+
+    PDFs/web use source_url + content hash so cover-page boilerplate does not
+    collapse distinct documents. ARLIS acts ingested as both legal (HTML) and
+    pdf (download) are cross-type deduped by canonical act id, keeping legal.
+    """
+    seen: set[tuple] = set()
+    legal_acts: set[str] = set()
+
+    # First pass: collect canonical act ids for legal acts.
+    for d in docs:
+        if (d.get("doc_type") or "") == "legal":
+            ca = safe_canonical_act_id(d.get("act_id"))
+            if ca:
+                legal_acts.add(ca)
+
     out = []
     for d in docs:
+        dtype = d.get("doc_type") or ""
         content_h = hashlib_sha((d.get("content") or "")[:800])
-        # PDFs/web often reappear via catalog + local drop — dedupe by body text
-        if (d.get("doc_type") or "") in ("pdf", "web"):
-            key = ((d.get("doc_type") or ""), content_h)
+        ca = safe_canonical_act_id(d.get("act_id"))
+
+        # Drop PDF mirror of an act we already have as legal HTML.
+        if dtype == "pdf" and ca and ca in legal_acts:
+            continue
+
+        if dtype in ("pdf", "web"):
+            key = (dtype, d.get("source_url") or "", content_h)
         else:
             key = (
-                (d.get("doc_type") or ""),
+                dtype,
                 (d.get("act_id") or ""),
                 (d.get("title") or "")[:120],
                 content_h,
@@ -494,8 +510,7 @@ def export_seed(docs: list, backend: str) -> None:
             break
     if len(seed_docs) < 50:
         seed_docs = docs[: min(len(docs), 800)]
-    with open(seed_path, "w", encoding="utf-8") as f:
-        json.dump(seed_docs, f, ensure_ascii=False)
+    save_json(seed_path, seed_docs, indent=None)
     meta = {
         "documents": len(seed_docs),
         "full_corpus_hint": len(docs),
@@ -504,8 +519,7 @@ def export_seed(docs: list, backend: str) -> None:
     for d in seed_docs:
         t = d.get("doc_type") or "?"
         meta["by_type"][t] = meta["by_type"].get(t, 0) + 1
-    with open(os.path.join(seed_dir, "manifest.json"), "w", encoding="utf-8") as f:
-        json.dump(meta, f, ensure_ascii=False, indent=2)
+    save_json(os.path.join(seed_dir, "manifest.json"), meta)
     print(f"[scraper] Seed snapshot: {len(seed_docs)} docs → {seed_path}")
 
 
@@ -527,14 +541,13 @@ def run_scraper(force_arlis: bool = False, force_all: bool = False):
         legal_docs = ingest_all(force=force)
     except Exception as e:
         print(f"[scraper] ARLIS ingest warning: {e}")
-        legal_docs = _load_json_list(os.path.join(out_dir, "arlis_legal_docs.json"))
+        legal_docs = load_json(os.path.join(out_dir, "arlis_legal_docs.json"), default=[])
         if legal_docs:
             print(f"[scraper] Loaded {len(legal_docs)} cached legal docs")
 
     if legal_docs:
         data.extend(legal_docs)
-        with open(os.path.join(out_dir, "arlis_legal_docs.json"), "w", encoding="utf-8") as f:
-            json.dump(legal_docs, f, ensure_ascii=False, indent=2)
+        save_json(os.path.join(out_dir, "arlis_legal_docs.json"), legal_docs)
         print(f"[scraper] ARLIS legal docs: {len(legal_docs)}")
     else:
         print("[scraper] No ARLIS legal docs available")
@@ -546,12 +559,11 @@ def run_scraper(force_arlis: bool = False, force_all: bool = False):
         pdf_docs = ingest_pdfs(force=force)
     except Exception as e:
         print(f"[scraper] PDF ingest warning: {e}")
-        pdf_docs = _load_json_list(os.path.join(out_dir, "mlsa_pdf_docs.json"))
+        pdf_docs = load_json(os.path.join(out_dir, "mlsa_pdf_docs.json"), default=[])
 
     if pdf_docs:
         data.extend(pdf_docs)
-        with open(os.path.join(out_dir, "mlsa_pdf_docs.json"), "w", encoding="utf-8") as f:
-            json.dump(pdf_docs, f, ensure_ascii=False, indent=2)
+        save_json(os.path.join(out_dir, "mlsa_pdf_docs.json"), pdf_docs)
         print(f"[scraper] PDF docs: {len(pdf_docs)}")
     else:
         print("[scraper] No PDF docs available (drop files into backend/pdfs/)")
@@ -563,12 +575,11 @@ def run_scraper(force_arlis: bool = False, force_all: bool = False):
         web_docs = ingest_web(force=force)
     except Exception as e:
         print(f"[scraper] Web ingest warning: {e}")
-        web_docs = _load_json_list(os.path.join(out_dir, "mlsa_web_docs.json"))
+        web_docs = load_json(os.path.join(out_dir, "mlsa_web_docs.json"), default=[])
 
     if web_docs:
         data.extend(web_docs)
-        with open(os.path.join(out_dir, "mlsa_web_docs.json"), "w", encoding="utf-8") as f:
-            json.dump(web_docs, f, ensure_ascii=False, indent=2)
+        save_json(os.path.join(out_dir, "mlsa_web_docs.json"), web_docs)
         print(f"[scraper] Web docs: {len(web_docs)}")
     else:
         print("[scraper] No web docs available")
@@ -576,15 +587,13 @@ def run_scraper(force_arlis: bool = False, force_all: bool = False):
     # If live ingest failed almost entirely, fall back to seed
     if len(data) < 40:
         seed_path = os.path.join(backend, "seed", "mlsa_programs.json")
-        seed = _load_json_list(seed_path)
+        seed = load_json(seed_path, default=[])
         if seed:
             print(f"[scraper] Merging seed corpus ({len(seed)} docs)")
             data.extend(seed)
 
     data = _dedupe_docs(data)
-
-    with open(out_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    atomic_save_json(out_file, data)
 
     try:
         export_seed(data, backend)

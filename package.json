@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "description": "WISE Foundation website redesign — Liquid Glass Minimalism",
   "scripts": {
-    "dev": "npx serve src/pages",
-    "start": "npx serve src/pages"
+    "dev": "eleventy --serve",
+    "start": "eleventy --serve",
+    "build": "eleventy"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.6"
   }
 }

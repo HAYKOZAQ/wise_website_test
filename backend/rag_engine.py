@@ -12,9 +12,11 @@ import os
 import re
 import sys
 from collections import defaultdict
+from functools import lru_cache
 from typing import Any
 
 import requests
+import threading
 
 try:
     from rag_index import RAGIndex
@@ -129,13 +131,15 @@ class RAGEngine:
             run_scraper()
             data_file = next((p for p in self._candidate_data_files() if os.path.exists(p)), None)
 
-        try:
-            if not data_file:
-                raise FileNotFoundError("No mlsa_programs.json or seed found")
-            with open(data_file, "r", encoding="utf-8") as f:
-                self.documents = json.load(f)
-            # Normalize legacy plain summaries
-            for doc in self.documents:
+        def _load_file(path: str) -> list[dict[str, Any]]:
+            with open(path, "r", encoding="utf-8") as f:
+                docs = json.load(f)
+            if not isinstance(docs, list):
+                raise TypeError(f"{path}: expected list, got {type(docs).__name__}")
+            return docs
+
+        def _normalize(docs: list[dict[str, Any]]) -> None:
+            for doc in docs:
                 doc.setdefault("doc_type", "summary")
                 doc.setdefault("act_id", None)
                 doc.setdefault("article", None)
@@ -143,24 +147,40 @@ class RAGEngine:
                 doc.setdefault("program_keys", [])
                 doc.setdefault("source_url", None)
                 doc.setdefault("priority", 2)
-            self.legal_acts = len(
-                {
-                    d.get("act_id")
-                    for d in self.documents
-                    if d.get("act_id") and not str(d.get("act_id")).startswith(("pdf:", "web:"))
-                }
-            )
-            by_type: dict[str, int] = {}
-            for d in self.documents:
-                t = d.get("doc_type") or "?"
-                by_type[t] = by_type.get(t, 0) + 1
-            print(
-                f"Loaded {len(self.documents)} documents from {data_file} "
-                f"(legal acts≈{self.legal_acts}, by_type={by_type})."
-            )
-        except Exception as e:
-            print(f"Error loading social programs JSON: {e}")
-            self.documents = []
+
+        candidates = self._candidate_data_files()
+        last_error = None
+        for candidate in candidates:
+            if not os.path.exists(candidate):
+                continue
+            try:
+                self.documents = _load_file(candidate)
+                _normalize(self.documents)
+                self.legal_acts = len(
+                    {
+                        d.get("act_id")
+                        for d in self.documents
+                        if d.get("act_id") and not str(d.get("act_id")).startswith(("pdf:", "web:"))
+                    }
+                )
+                by_type: dict[str, int] = {}
+                for d in self.documents:
+                    t = d.get("doc_type") or "?"
+                    by_type[t] = by_type.get(t, 0) + 1
+                print(
+                    f"Loaded {len(self.documents)} documents from {candidate} "
+                    f"(legal acts≈{self.legal_acts}, by_type={by_type})."
+                )
+                return
+            except Exception as e:
+                print(f"Warning: failed to load {candidate}: {e}")
+                last_error = e
+
+        if not candidates:
+            print("Error: no mlsa_programs.json or seed found")
+        else:
+            print(f"Error loading social programs JSON: {last_error}")
+        self.documents = []
 
     def build_index(self):
         self.chunks = []
@@ -204,7 +224,7 @@ class RAGEngine:
         print(f"Created {len(self.chunks)} semantic chunks.")
         self.corpus_hash = hashlib.sha256(
             json.dumps(
-                [{"t": c["title"], "x": c["text"][:200]} for c in self.chunks],
+                [{"t": c["title"], "x": c["text"]} for c in self.chunks],
                 ensure_ascii=False,
                 sort_keys=True,
             ).encode("utf-8")
@@ -402,11 +422,15 @@ class RAGEngine:
     def cosine_similarity(vec1, vec2) -> float:
         if not vec1 or not vec2:
             return 0.0
-        n = min(len(vec1), len(vec2))
-        v1, v2 = vec1[:n], vec2[:n]
-        dot = sum(a * b for a, b in zip(v1, v2))
-        na = math.sqrt(sum(a * a for a in v1))
-        nb = math.sqrt(sum(b * b for b in v2))
+        if len(vec1) != len(vec2):
+            print(
+                f"cosine_similarity dimension mismatch: {len(vec1)} vs {len(vec2)}; "
+                "returning 0.0 (different embedders or corrupt vector)"
+            )
+            return 0.0
+        dot = sum(a * b for a, b in zip(vec1, vec2))
+        na = math.sqrt(sum(a * a for a in vec1))
+        nb = math.sqrt(sum(b * b for b in vec2))
         if na == 0.0 or nb == 0.0:
             return 0.0
         return dot / (na * nb)
@@ -449,6 +473,42 @@ class RAGEngine:
         scores.sort(key=lambda x: x[1], reverse=True)
         return scores
 
+    @lru_cache(maxsize=256)
+    def _embed_query(self, query: str) -> list[float] | None:
+        """Centralized query embedding with fallback chain and LRU cache."""
+        return self._embed_queries_batch([query])[0]
+
+    def _embed_queries_batch(self, queries: list[str]) -> list[list[float] | None]:
+        """Embed a batch of query strings, preferring local backend then Gemini then Ollama."""
+        if not queries:
+            return []
+
+        # 1) Local sentence-transformer backend (fast, no network, batched).
+        if USE_LOCAL_EMBEDDER:
+            try:
+                from local_embedder import get_local_embedder
+
+                embedder = get_local_embedder()
+                vectors = embedder.embed(queries)
+                if len(vectors) == len(queries):
+                    return vectors
+            except Exception as e:
+                print(f"Local query embedder failed: {e}")
+
+        # 2) Gemini embeddings.
+        if self.use_gemini:
+            out: list[list[float] | None] = []
+            for q in queries:
+                out.append(self.get_gemini_embedding(q))
+            if all(v is not None for v in out):
+                return out
+
+        # 3) Ollama embeddings.
+        out = []
+        for q in queries:
+            out.append(self.get_ollama_embedding(q))
+        return out
+
     def _vector_scores(self, query: str) -> list[tuple[int, float]]:
         if not self.vector_enabled:
             return []
@@ -457,24 +517,12 @@ class RAGEngine:
             return self._tfidf.scores(query)[:80]
         # FAISS + BM25 hybrid index path
         if self._rag_index is not None and self._rag_index.is_ready():
-            q_vec = None
-            if USE_LOCAL_EMBEDDER:
-                q_vec = self.get_local_embedding(query)
-            if not q_vec and self.use_gemini:
-                q_vec = self.get_gemini_embedding(query)
-            if not q_vec:
-                q_vec = self.get_ollama_embedding(query)
+            q_vec = self._embed_query(query)
             return self._rag_index.search_dense(q_vec, k=80) if q_vec else []
         # Legacy dense embedding path
         if not self.embeddings:
             return []
-        q_vec = None
-        if self.vector_backend == "local_embedder":
-            q_vec = self.get_local_embedding(query)
-        elif self.use_gemini:
-            q_vec = self.get_gemini_embedding(query)
-        if not q_vec:
-            q_vec = self.get_ollama_embedding(query)
+        q_vec = self._embed_query(query)
         if not q_vec:
             return []
         scores = []
@@ -535,17 +583,17 @@ class RAGEngine:
         # Query expansion
         query_variants = self._expand_query(query)
 
-        # Collect candidates from FAISS+BM25 hybrid or legacy channels
+        # Collect candidates from FAISS+BM25 hybrid or legacy channels.
+        # Pre-compute query embeddings in one batch to avoid N sequential API calls.
         candidate_scores: dict[int, float] = {}
-        for q in query_variants:
-            if self._rag_index is not None and self._rag_index.is_ready():
-                q_vec = None
-                if USE_LOCAL_EMBEDDER:
-                    q_vec = self.get_local_embedding(q)
-                if not q_vec and self.use_gemini:
-                    q_vec = self.get_gemini_embedding(q)
-                if not q_vec:
-                    q_vec = self.get_ollama_embedding(q)
+        use_hybrid = self._rag_index is not None and self._rag_index.is_ready()
+        variant_vectors: list[list[float] | None] = []
+        if use_hybrid:
+            variant_vectors = self._embed_queries_batch(query_variants)
+
+        for i, q in enumerate(query_variants):
+            if use_hybrid:
+                q_vec = variant_vectors[i] if i < len(variant_vectors) else None
                 pairs = self._rag_index.search_hybrid(
                     q, q_vec, k=initial_k, semantic_weight=HYBRID_SEMANTIC_WEIGHT
                 )
@@ -1056,20 +1104,26 @@ Write a complete answer in clear English:"""
                 mode = mode + "+extractive"
 
         fidelity = evaluate_grounding(answer, context_str)
-        try:
-            log_qa_event({
-                "query": query,
-                "lang": user_lang,
-                "mode": mode,
-                "answer_preview": answer[:400],
-                "answer_len": len(answer),
-                "sources": [s.get("title") for s in sources[:6]],
-                "chunks_used": len(relevant),
-                "vector_search": self.vector_enabled,
-                **fidelity,
-            })
-        except Exception as e:
-            print(f"QA log error: {e}")
+
+        def _log_event():
+            try:
+                log_qa_event({
+                    "query": query,
+                    "lang": user_lang,
+                    "mode": mode,
+                    "answer_preview": answer[:400],
+                    "answer_len": len(answer),
+                    "sources": [s.get("title") for s in sources[:6]],
+                    "chunks_used": len(relevant),
+                    "vector_search": self.vector_enabled,
+                    **fidelity,
+                })
+            except Exception as e:
+                print(f"QA log error: {e}")
+
+        # Logging (and the optional semantic grounding branch inside it) should not
+        # block returning the answer to the user.
+        threading.Thread(target=_log_event, daemon=True).start()
 
         return {
             "answer": answer,

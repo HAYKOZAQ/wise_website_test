@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import math
 import os
+import threading
 from typing import Any
 
 LOCAL_EMBED_MODEL = os.environ.get(
@@ -23,12 +24,15 @@ class LocalSentenceEmbedder:
     """Lightweight wrapper around sentence-transformers."""
 
     _instance: "LocalSentenceEmbedder | None" = None
+    _lock = threading.Lock()
 
     def __new__(cls, *args: Any, **kwargs: Any) -> "LocalSentenceEmbedder":
         # Singleton so the model is loaded only once per process.
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialized = False
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
         return cls._instance
 
     def __init__(self, model_name: str | None = None, device: str | None = None):
@@ -38,23 +42,27 @@ class LocalSentenceEmbedder:
         self.device = device or LOCAL_EMBED_DEVICE
         self._model: Any = None
         self._dim: int | None = None
+        self._load_lock = threading.Lock()
         self._initialized = True
 
     def _load(self):
         if self._model is not None:
             return
-        try:
-            from sentence_transformers import SentenceTransformer
-        except ImportError as e:
-            raise ImportError(
-                "sentence-transformers is required for local embeddings. "
-                "Install it with: pip install sentence-transformers"
-            ) from e
+        with self._load_lock:
+            if self._model is not None:
+                return
+            try:
+                from sentence_transformers import SentenceTransformer
+            except ImportError as e:
+                raise ImportError(
+                    "sentence-transformers is required for local embeddings. "
+                    "Install it with: pip install sentence-transformers"
+                ) from e
 
-        print(f"Loading local embedding model {self.model_name} on {self.device}…")
-        self._model = SentenceTransformer(self.model_name, device=self.device)
-        self._dim = self._model.get_sentence_embedding_dimension()
-        print(f"Local embedder ready. Dimension={self._dim}")
+            print(f"Loading local embedding model {self.model_name} on {self.device}…")
+            self._model = SentenceTransformer(self.model_name, device=self.device)
+            self._dim = self._model.get_sentence_embedding_dimension()
+            print(f"Local embedder ready. Dimension={self._dim}")
 
     @property
     def dim(self) -> int:

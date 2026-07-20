@@ -22,13 +22,15 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 
+from ingest_common import backend_dir, load_json, save_json, slug
+
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
 
-BACKEND = Path(__file__).resolve().parent
+BACKEND = backend_dir()
 PDFS = BACKEND / "pdfs"
 PDFS.mkdir(exist_ok=True)
 
@@ -94,18 +96,6 @@ CRAWL_PAGES = [
 ]
 
 
-def slug(s: str) -> str:
-    s = re.sub(r"[^\w\-]+", "_", s, flags=re.UNICODE)
-    return (s[:90] or "doc").strip("_")
-
-
-def load_json(path: Path) -> Any:
-    if not path.exists():
-        return None
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
 def collect_targets() -> list[dict[str, str]]:
     """Return list of {id, url, title} unique by url."""
     by_url: dict[str, dict[str, str]] = {}
@@ -149,6 +139,8 @@ def collect_targets() -> list[dict[str, str]]:
             if r.status_code != 200:
                 print(f"  HTTP {r.status_code}")
                 continue
+            # Armenian gov pages sometimes lack charset; requests defaults to ISO-8859-1.
+            r.encoding = r.apparent_encoding or "utf-8"
             soup = BeautifulSoup(r.text, "lxml")
             for a in soup.find_all("a", href=True):
                 href = a["href"].strip()
@@ -228,8 +220,7 @@ def harvest() -> dict[str, Any]:
         "stats": stats,
         "files": sorted(p.name for p in PDFS.glob("*.pdf")),
     }
-    with open(PDFS / "_harvest_manifest.json", "w", encoding="utf-8") as f:
-        json.dump(manifest, f, ensure_ascii=False, indent=2)
+    save_json(PDFS / "_harvest_manifest.json", manifest)
     return stats
 
 
@@ -258,8 +249,7 @@ def sync_arlis_catalog_from_extra() -> None:
         have.add(aid)
         added += 1
     if added:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(catalog, f, ensure_ascii=False, indent=2)
+        save_json(path, catalog)
         print(f"[harvest] Added {added} acts to arlis_catalog.json (now {len(catalog)})")
     else:
         print(f"[harvest] arlis_catalog already complete ({len(catalog)} acts)")
@@ -292,8 +282,7 @@ def expand_pdf_catalog_from_arlis() -> None:
         have_urls.add(url)
         added += 1
     if added:
-        with open(pdf_path, "w", encoding="utf-8") as f:
-            json.dump(pdf_cat, f, ensure_ascii=False, indent=2)
+        save_json(pdf_path, pdf_cat)
         print(f"[harvest] Expanded mlsa_pdf_catalog +{added} (now {len(pdf_cat)})")
 
 

@@ -1,3 +1,23 @@
+/**
+ * Sanitize untrusted HTML (from scraped JSON) before injecting into the DOM.
+ * Requires DOMPurify (vendored at /js/vendor/purify.min.js). Falls back to
+ * a strict tag/attribute allowlist if DOMPurify is unavailable, so we never
+ * inject raw scraped HTML.
+ */
+function safeHtml(html) {
+  if (html == null) return '';
+  var str = String(html);
+  if (typeof window.DOMPurify !== 'undefined' && window.DOMPurify.sanitize) {
+    return window.DOMPurify.sanitize(str, {
+      ALLOWED_TAGS: ['p','br','strong','em','b','i','u','s','ul','ol','li','h1','h2','h3','h4','h5','h6','a','img','figure','figcaption','blockquote','pre','code','span','div','table','thead','tbody','tr','td','th','hr','sup','sub','mark','time'],
+      ALLOWED_ATTR: ['href','src','alt','title','width','height','colspan','rowspan','target','rel','datetime','class'],
+      ALLOW_DATA_ATTR: false,
+    });
+  }
+  // Fallback escape if DOMPurify failed to load — never inject raw HTML.
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function initMobileMenu() {
   const toggle = document.querySelector('.mobile-toggle');
   const nav = document.querySelector('.nav');
@@ -199,7 +219,7 @@ function initBlogModal() {
 <body>
 <h1>${safeTitle}</h1>
 <p class="meta">${safeDate ? safeDate + ' • ' : ''}Source: <a href="${safeSource}">${safeSource}</a></p>
-${content || '<p>Content not available offline.</p>'}
+${safeHtml(content || '<p>Content not available offline.</p>')}
 <p><a class="source" href="${safeSource}" target="_blank" rel="noopener">View original →</a></p>
 </body>
 </html>`;
@@ -279,7 +299,7 @@ ${content || '<p>Content not available offline.</p>'}
              <a class="blog-download-banner__view" href="${url}" target="_blank" rel="noopener">Բացել բնօրինակ էջը →</a>
            </div>
          </div>
-         <div class="blog-download-body">${entry.content || '<p>Content not available.</p>'}</div>`;
+         <div class="blog-download-body">${safeHtml(entry.content || '<p>Content not available.</p>')}</div>`;
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
 
@@ -340,7 +360,7 @@ function initServiceDetailModal() {
     bodyEl.innerHTML = `
       <div class="service-detail-modal__icon">${icon}</div>
       <h2 class="service-detail-modal__title">${loc.title || ''}</h2>
-      <div class="service-detail-modal__content">${loc.content || ''}</div>
+      <div class="service-detail-modal__content">${safeHtml(loc.content || '')}</div>
       <div class="service-detail-modal__footer">
         <a href="contact.html?service=${currentKey}" class="glass-btn">${t('svc.contact_about', 'Contact us about this project')}</a>
       </div>
@@ -444,31 +464,23 @@ function initContactForm() {
 
   // Pre-fill subject if provided in URL parameter
   const urlParams = new URLSearchParams(window.location.search);
-  const serviceKey = urlParams.get('service');
+      const serviceKey = urlParams.get('service');
   if (serviceKey) {
     const subjectInput = form.querySelector('input[name="subject"]');
     if (subjectInput) {
-      const serviceNames = {
-        s1: { hy: 'ՏՀ նախագծում և սպասարկում', en: 'IS Design & Maintenance' },
-        s2: { hy: 'Տեղեկատվական համակարգերի բովանդակային սպասարկում', en: 'IS Content Maintenance' },
-        s3: { hy: 'Տվյալների մշակում և վերլուծում', en: 'Data Processing & Analysis' },
-        s4: { hy: 'Կրթական ծրագրերի նախագծում, իրականացում', en: 'Educational Programs Design & Implementation' },
-        s5: { hy: 'Կիբեռանվտանգություն և ցանցային ապահովում', en: 'Cybersecurity & Network Security' },
-        s6: { hy: 'Տեխնիկական սպասարկում', en: 'Technical Support' },
-        p1: { hy: 'Ընտանիքի անապահովության գնահատման համակարգ', en: 'Family Vulnerability Assessment System' },
-        p2: { hy: 'Սոցիալական արագ արձագանքման ՏՀ', en: 'Social Rapid Response IS' },
-        p3: { hy: 'Տվյալների փոխանակման ՏՀ', en: 'Data Exchange IS' },
-        p4: { hy: '«Գործ» զբաղվածության ՏՀ', en: '"Gorts" Employment IS' },
-        p5: { hy: 'Պրոթեզաօրթոպեդիկ պարագաների ՏՀ', en: 'Prosthetic-Orthopedic Devices IS' },
-        p6: { hy: '«Մանուկ» երեխաների հաշվառման ՏՀ', en: '"Manuk" Child Registration IS' }
-      };
-      
-      const service = serviceNames[serviceKey];
-      if (service) {
-        const isArmenian = document.documentElement.lang !== 'en';
-        subjectInput.value = isArmenian ? service.hy : service.en;
-      }
+      subjectInput.value = _serviceName(serviceKey);
     }
+  }
+
+  function _serviceName(key) {
+    if (!window.wisefI18n || !window.wisefI18n.t) return '';
+    const match = String(key || '').match(/^(s|p)(\d+)$/);
+    if (!match) return '';
+    const [, kind, num] = match;
+    const i18nKey = kind === 's'
+      ? 'svc.' + key + '_full_title'
+      : 'svc.p' + num + '_title';
+    return window.wisefI18n.t(i18nKey) || '';
   }
 
   function showStatus(message, isSuccess) {
@@ -496,7 +508,6 @@ function initContactForm() {
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
-    console.log('[ContactForm] Form submitted');
 
     const texts = getTexts();
     const submitBtn = form.querySelector('button[type="submit"]');
@@ -508,20 +519,8 @@ function initContactForm() {
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
-    console.log('[ContactForm] Sending data:', JSON.stringify(data));
 
-    function getContactApiBase() {
-      if (typeof window.WISEF_getApiBase === 'function') {
-        return window.WISEF_getApiBase();
-      }
-      var host = (location && location.hostname) || '';
-      if (host === 'localhost' || host === '127.0.0.1') {
-        return 'http://127.0.0.1:8000';
-      }
-      return (typeof location !== 'undefined' && location.origin) || '';
-    }
-
-    const apiBase = getContactApiBase();
+    const apiBase = typeof window.WISEF_getApiBase === 'function' ? window.WISEF_getApiBase() : '';
     const primaryUrl = apiBase ? (apiBase.replace(/\/$/, '') + '/api/contact') : '';
     // Optional secondary path only if site owner configures window.WISEF_CONTACT_FALLBACK_URL
     const fallbackUrl = (window.WISEF_CONFIG && window.WISEF_CONFIG.contactFallbackUrl) || '';
@@ -535,7 +534,6 @@ function initContactForm() {
         },
         body: JSON.stringify(data)
       }).then(async (response) => {
-        console.log('[ContactForm] Response status:', response.status, url);
         let result = {};
         try {
           result = await response.json();
@@ -563,14 +561,13 @@ function initContactForm() {
 
     tryPrimary
       .then((result) => {
-        console.log('[ContactForm] Result:', JSON.stringify(result));
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
         showStatus(texts.success, true);
         form.reset();
       })
       .catch((error) => {
-        console.error('[ContactForm] Error:', error);
+        console.warn('[ContactForm] submission failed:', error.message || error);
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
         showStatus(texts.error, false);

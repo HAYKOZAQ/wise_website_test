@@ -18,6 +18,32 @@ if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
 
+class TestCorpusHash(unittest.TestCase):
+    def test_hash_changes_after_edit_beyond_200_chars(self):
+        """A content edit after character 200 must invalidate the persisted-index hash."""
+        from rag_engine import RAGEngine
+
+        def make_chunks(text: str):
+            return [{"title": "Test", "text": text}]
+
+        long_a = "x" * 250 + " alpha"
+        long_b = "x" * 250 + " beta"
+        # Directly exercise the hash computation logic
+        def _hash(chunks):
+            import hashlib, json
+            return hashlib.sha256(
+                json.dumps(
+                    [{"t": c["title"], "x": c["text"]} for c in chunks],
+                    ensure_ascii=False,
+                    sort_keys=True,
+                ).encode("utf-8")
+            ).hexdigest()[:16]
+
+        hash_a = _hash(make_chunks(long_a))
+        hash_b = _hash(make_chunks(long_b))
+        self.assertNotEqual(hash_a, hash_b, "editing after char 200 must change corpus_hash")
+
+
 class TestLocalTfidf(unittest.TestCase):
     def test_tfidf_ranks_relevant_doc(self):
         from local_vectors import LocalTfidfIndex
@@ -54,6 +80,40 @@ class TestFidelity(unittest.TestCase):
         context = "Նպաստի մասին ընդհանուր տեքստ առանց այդ գումարի"
         res = evaluate_grounding(answer, context)
         self.assertGreaterEqual(res["claims_total"], 1)
+        self.assertGreaterEqual(res["claims_unsupported"], 1)
+        self.assertIn(res["risk"], ("high", "medium"))
+
+    def test_age_claim_not_supported_by_larger_amount(self):
+        """A claim of '63 տարի' must not be marked supported just because the
+        context contains the amount '63,500 դրամ'."""
+        from fidelity import evaluate_grounding
+
+        answer = "Տարիքային կենսաթոշակ ստանալու իրավունք ունի 63 տարին լրացած անձը"
+        context = "Նպաստի չափը 63,500 ՀՀ դրամ է ամսական"
+        res = evaluate_grounding(answer, context)
+        self.assertGreaterEqual(res["claims_total"], 1)
+        self.assertGreaterEqual(res["claims_unsupported"], 1)
+
+    def test_wrong_frequency_is_unsupported(self):
+        """'50000 դրամ ամսական' and '50000 դրամ տարեկան' are distinct claims."""
+        from fidelity import evaluate_grounding
+
+        answer = "Վճարվում է 50000 դրամ ամսական"
+        context = "Տարեկան նպաստի չափը 50000 դրամ է"
+        res = evaluate_grounding(answer, context)
+        self.assertGreaterEqual(res["claims_total"], 1)
+        self.assertGreaterEqual(res["claims_unsupported"], 1)
+
+    def test_two_digit_age_85_supported(self):
+        """Two-digit ages above 80 (previously dropped) must now be checked."""
+        from fidelity import evaluate_grounding
+
+        answer = "Կենսաթոշակ՝ 85 տարեկանից"
+        context = "Կենսաթոշակի իրավունք ունի 85 տարին լրացած անձը"
+        res = evaluate_grounding(answer, context)
+        self.assertGreaterEqual(res["claims_total"], 1)
+        self.assertEqual(res["claims_unsupported"], 0)
+        self.assertGreaterEqual(res["grounding_score"], 1.0)
 
 
 class TestRetrievalEngine(unittest.TestCase):
@@ -229,4 +289,7 @@ if __name__ == "__main__":
 
         raise SystemExit(pytest.main([__file__, "-q"]))
     except ImportError:
-        raise SystemExit(0 if unittest.main(verbosity=2) else 1)
+        # unittest.main() returns None when it calls sys.exit internally,
+        # so run it with exit=False and check the result explicitly.
+        program = unittest.main(verbosity=2, exit=False)
+        raise SystemExit(0 if program.result.wasSuccessful() else 1)

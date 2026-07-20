@@ -7,30 +7,27 @@ Falls back gracefully when a page is JS-heavy or offline.
 
 from __future__ import annotations
 
-import hashlib
-import json
-import os
-import re
 import sys
 from typing import Any
 from urllib.parse import urljoin, urlparse
 
-import requests
 from bs4 import BeautifulSoup
+
+from ingest_common import (
+    TextCache,
+    backend_dir,
+    data_dir,
+    default_headers,
+    hard_split,
+    http_get,
+    normalize_text,
+)
 
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "hy,en;q=0.8",
-}
 
 # Curated official program / service pages (MLSA + USS + hartak for displaced)
 PROGRAM_PAGES: list[dict[str, Any]] = [
@@ -157,81 +154,7 @@ PROGRAM_PAGES: list[dict[str, Any]] = [
 ]
 
 
-def backend_dir() -> str:
-    return os.path.dirname(os.path.abspath(__file__))
-
-
-def data_dir() -> str:
-    path = os.path.join(backend_dir(), "data")
-    os.makedirs(path, exist_ok=True)
-    return path
-
-
-def cache_dir() -> str:
-    path = os.path.join(data_dir(), "web_cache")
-    os.makedirs(path, exist_ok=True)
-    return path
-
-
-def normalize_text(text: str) -> str:
-    text = (text or "").replace("\u00a0", " ")
-    text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text.strip()
-
-
-def hard_split(text: str, max_chars: int = 1600, overlap: int = 120) -> list[str]:
-    if len(text) <= max_chars:
-        return [text]
-    chunks: list[str] = []
-    start = 0
-    n = len(text)
-    while start < n:
-        end = min(start + max_chars, n)
-        if end < n:
-            window = text[start:end]
-            br = max(window.rfind("\n\n"), window.rfind("\n"), window.rfind(". "))
-            if br > max_chars // 3:
-                end = start + br + 1
-        chunk = text[start:end].strip()
-        if chunk:
-            chunks.append(chunk)
-        if end >= n:
-            break
-        start = max(0, end - overlap)
-    return chunks
-
-
-def cache_path(page_id: str) -> str:
-    return os.path.join(cache_dir(), f"{page_id}.json")
-
-
-def load_cache(page_id: str) -> str | None:
-    path = cache_path(page_id)
-    if not os.path.exists(path):
-        return None
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        text = data.get("text") or ""
-        return text if len(text) > 80 else None
-    except Exception:
-        return None
-
-
-def save_cache(page_id: str, text: str, meta: dict[str, Any]) -> None:
-    with open(cache_path(page_id), "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "meta": meta,
-                "text": text,
-                "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-                "char_count": len(text),
-            },
-            f,
-            ensure_ascii=False,
-            indent=2,
-        )
+_text_cache = TextCache(data_dir() / "web_cache", min_chars=80)
 
 
 def extract_page_text(html: str, base_url: str) -> str:
@@ -276,22 +199,19 @@ def extract_page_text(html: str, base_url: str) -> str:
 
 
 def fetch_page(url: str, timeout: int = 40) -> str | None:
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
-        if r.status_code != 200:
-            print(f"[web] HTTP {r.status_code} {url[:90]}")
-            return None
-        r.encoding = r.apparent_encoding or r.encoding or "utf-8"
-        return r.text
-    except Exception as e:
-        print(f"[web] fetch error {url[:90]}: {e}")
+    r = http_get(url, timeout=timeout)
+    if r is None:
         return None
+    if r.status_code != 200:
+        print(f"[web] HTTP {r.status_code} {url[:90]}")
+        return None
+    return r.text
 
 
 def page_to_docs(entry: dict[str, Any], text: str) -> list[dict[str, Any]]:
     docs: list[dict[str, Any]] = []
     title = entry.get("title_hy") or entry.get("id")
-    pieces = hard_split(text)
+    pieces = hard_split(text, max_chars=1600, overlap=120)
     for i, piece in enumerate(pieces):
         piece_title = title if i == 0 else f"{title} (մաս {i + 1})"
         docs.append(
@@ -312,7 +232,7 @@ def page_to_docs(entry: dict[str, Any], text: str) -> list[dict[str, Any]]:
 
 def ingest_page(entry: dict[str, Any], force: bool = False) -> list[dict[str, Any]]:
     page_id = str(entry.get("id") or urlparse(entry.get("url", "")).path or "page")
-    text = None if force else load_cache(page_id)
+    text = None if force else _text_cache.load(page_id)
     if not text:
         html = fetch_page(entry["url"])
         if not html:
@@ -322,7 +242,7 @@ def ingest_page(entry: dict[str, Any], force: bool = False) -> list[dict[str, An
         if len(text) < 100:
             print(f"[web] Thin page {page_id} ({len(text)} chars) — skip")
             return []
-        save_cache(page_id, text, entry)
+        _text_cache.save(page_id, text, entry)
         print(f"[web] Saved {page_id} ({len(text)} chars)")
     else:
         print(f"[web] Cache hit {page_id} ({len(text)} chars)")
@@ -343,7 +263,7 @@ def ingest_all(force: bool = False) -> list[dict[str, Any]]:
 if __name__ == "__main__":
     force = "--force" in sys.argv
     docs = ingest_all(force=force)
-    out = os.path.join(data_dir(), "mlsa_web_docs.json")
-    with open(out, "w", encoding="utf-8") as f:
-        json.dump(docs, f, ensure_ascii=False, indent=2)
+    out = data_dir() / "mlsa_web_docs.json"
+    from ingest_common import save_json
+    save_json(out, docs)
     print(f"[web] Wrote {len(docs)} docs → {out}")

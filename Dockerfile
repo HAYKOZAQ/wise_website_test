@@ -1,4 +1,15 @@
 # WISE website + RAG API — one service for Render / Railway / Fly
+FROM node:20-alpine AS frontend
+WORKDIR /web
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY .eleventy.js ./
+COPY src/ ./src/
+RUN npm run build
+
+
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -18,11 +29,10 @@ ARG BUILD_TIME=unknown
 # Backend code (includes data/ corpus, seed/, start.sh)
 COPY backend/ /app/
 
-# Frontend static site (HTML/CSS/JS) served by FastAPI
-# This COPY layer will be invalidated when CACHEBUST changes
-COPY src/ /app/frontend/
+# Built frontend static site (Eleventy output) served by FastAPI
+COPY --from=frontend /web/_site/ /app/frontend/
 
-# Verify frontend assets were copied correctly
+# Verify frontend assets were built/copied correctly
 RUN test -f /app/frontend/css/base.css \
     && test -f /app/frontend/css/glass.css \
     && test -f /app/frontend/css/components.css \
@@ -31,18 +41,18 @@ RUN test -f /app/frontend/css/base.css \
     && test -f /app/frontend/js/i18n.js \
     && test -f /app/frontend/js/chat.js \
     && test -f /app/frontend/js/config.js \
-    && test -f /app/frontend/pages/index.html \
-    && test -f /app/frontend/pages/about.html \
-    && test -f /app/frontend/pages/services.html \
-    && test -f /app/frontend/pages/partners.html \
-    && test -f /app/frontend/pages/contact.html \
-    && test -f /app/frontend/pages/blog.html \
-    && test -f /app/frontend/pages/en/index.html \
-    && test -f /app/frontend/pages/en/about.html \
-    && test -f /app/frontend/pages/en/services.html \
-    && test -f /app/frontend/pages/en/partners.html \
-    && test -f /app/frontend/pages/en/contact.html \
-    && test -f /app/frontend/pages/en/blog.html \
+    && test -f /app/frontend/index.html \
+    && test -f /app/frontend/about.html \
+    && test -f /app/frontend/services.html \
+    && test -f /app/frontend/partners.html \
+    && test -f /app/frontend/contact.html \
+    && test -f /app/frontend/blog.html \
+    && test -f /app/frontend/en/index.html \
+    && test -f /app/frontend/en/about.html \
+    && test -f /app/frontend/en/services.html \
+    && test -f /app/frontend/en/partners.html \
+    && test -f /app/frontend/en/contact.html \
+    && test -f /app/frontend/en/blog.html \
     && test -f /app/frontend/assets/data/blog-posts.json \
     && test -f /app/frontend/assets/images/partners/HH_Gerb.svg \
     && test -f /app/frontend/assets/images/partners/usaid.svg \

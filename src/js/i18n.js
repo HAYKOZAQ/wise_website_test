@@ -459,7 +459,6 @@
       document.documentElement.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
       localStorage.setItem('wisef_theme', theme);
       applyHeaderLogo(theme);
-      applyThemeContrast(theme);
     });
     return btn;
   }
@@ -476,16 +475,6 @@
     });
   }
 
-  function applyThemeContrast(theme) {
-    const dark = theme === 'dark';
-    document.querySelectorAll('.header').forEach((el) => {
-      el.style.setProperty('background', dark ? 'rgba(11,18,32,0.92)' : 'rgba(255,255,255,0.94)', 'important');
-    });
-    document.querySelectorAll('.footer').forEach((el) => {
-      el.style.setProperty('background', dark ? '#020617' : '#0f2740', 'important');
-    });
-  }
-
   /* ══════════════════════════════════════════════════════
      INIT
   ══════════════════════════════════════════════════════ */
@@ -493,7 +482,6 @@
     cacheOriginals();
     const initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
     applyHeaderLogo(initialTheme);
-    applyThemeContrast(initialTheme);
 
     // Build header controls as a sibling of .nav (centered nav, controls on right)
     document.querySelectorAll('.header__inner').forEach((inner) => {

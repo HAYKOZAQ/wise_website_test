@@ -1,0 +1,22 @@
+<header class="header" id="header">
+  <div class="header__inner">
+    <a href="index.html" class="header__logo">
+      <img src="/assets/logos/wisef-logo.svg" alt="WISE Foundation">
+    </a>
+
+    <nav class="nav" role="navigation" aria-label="Հիմնական նավիգացիա">
+      <a href="index.html" class="nav__link{% if active == 'home' %} nav__link--active{% endif %}" data-i18n="nav.home">Գլխավոր</a>
+      <a href="about.html" class="nav__link{% if active == 'about' %} nav__link--active{% endif %}" data-i18n="nav.about">Մեր մասին</a>
+      <a href="services.html" class="nav__link{% if active == 'services' %} nav__link--active{% endif %}" data-i18n="nav.services">Ծառայություններ</a>
+      <a href="partners.html" class="nav__link{% if active == 'partners' %} nav__link--active{% endif %}" data-i18n="nav.partners">Գործընկերներ</a>
+      <a href="contact.html" class="nav__link{% if active == 'contact' %} nav__link--active{% endif %}" data-i18n="nav.contact">Հետադարձ կապ</a>
+      <a href="blog.html" class="nav__link{% if active == 'blog' %} nav__link--active{% endif %}" data-i18n="nav.blog">Բլոգ</a>
+    </nav>
+
+    <button class="mobile-toggle" aria-label="Բացել մենյուն">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>

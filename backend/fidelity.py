@@ -7,24 +7,37 @@ Logs every evaluation so you can audit quality in the backend.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
+import threading
 from datetime import datetime, timezone
 from typing import Any
 
 
 _semantic_model = None
+_semantic_lock = threading.Lock()
 
 
 def _get_semantic_model():
+    """Return the shared local sentence-transformer model (loads once per process).
+
+    Reuses the LocalSentenceEmbedder singleton so the same MiniLM instance serves
+    both retrieval embeddings and grounding checks, cutting RAM ~in half.
+    """
     global _semantic_model
-    if _semantic_model is None:
+    if _semantic_model is not None:
+        return _semantic_model
+    with _semantic_lock:
+        if _semantic_model is not None:
+            return _semantic_model
         try:
-            from sentence_transformers import SentenceTransformer
-            _semantic_model = SentenceTransformer(
-                "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-            )
+            from local_embedder import get_local_embedder
+
+            embedder = get_local_embedder()
+            embedder._load()
+            _semantic_model = embedder._model
         except Exception:
             pass
     return _semantic_model
@@ -37,9 +50,9 @@ def _semantic_similarity(text1: str, text2: str) -> float:
         return 0.0
     try:
         from sentence_transformers import util
-        emb1 = model.encode(text1, convert_to_tensor=True)
-        emb2 = model.encode(text2, convert_to_tensor=True)
-        return float(util.cos_sim(emb1, emb2)[0][0])
+        # Batch the two encodes to avoid two separate forward passes.
+        embs = model.encode([text1, text2], convert_to_tensor=True)
+        return float(util.cos_sim(embs[0], embs[1]))
     except Exception:
         return 0.0
 
@@ -50,10 +63,17 @@ def _split_sentences(text: str) -> list[str]:
     return [p.strip() for p in parts if p.strip()]
 
 
+_UNIT_SUFFIX = (
+    r"(?:դրամ|դր\.?|AMD|ՀՀ\s*դրամ|"
+    r"տարի|տարեկան|ամիս|ամսական|օր|օրյա|միանվագ|"
+    r"տոկոս|%|ամենամսյա|ամենամյա|ամսամեկ|ամսվա)"
+)
+_UNIT_PHRASE = _UNIT_SUFFIX + r"(?:\s+" + _UNIT_SUFFIX + r")*"
+
 _NUM_CLAIM_RE = re.compile(
     r"(?:"
-    r"\d{1,3}(?:[ \u00a0]?\d{3})+(?:\s*(?:ՀՀ\s*)?դրամ|դր\.?|AMD)?"
-    r"|\d+(?:[.,]\d+)?\s*(?:%|տոկոս|տարի|ամիս|օր|դրամ|դր\.?)"
+    r"\d{1,3}(?:[ \u00a0]?\d{3})+(?:[.,]\d+)?(?:\s*" + _UNIT_PHRASE + r")?"
+    r"|\d+(?:[.,]\d+)?(?:\s*" + _UNIT_PHRASE + r")"
     r"|\d{2,6}"
     r")",
     re.IGNORECASE,
@@ -66,6 +86,80 @@ def _backend_data_dir() -> str:
     return d
 
 
+_QA_LOG_MAX_BYTES = 64 * 1024 * 1024  # 64 MB cap per log file
+
+
+
+def _redact_event(event: dict[str, Any]) -> dict[str, Any]:
+    """Strip or hash fields that can contain personal / welfare information."""
+    event = dict(event)
+    query = event.get("query") or ""
+    # Never store any textual preview of the raw query: social-welfare questions
+    # routinely contain names, IDs, ages, addresses, family composition, etc.
+    if query:
+        event["query_hash"] = hashlib.sha256(query.encode("utf-8")).hexdigest()
+        event["query_len"] = len(query)
+    event.pop("query_preview", None)
+    event.pop("query", None)
+
+    # Never store the answer text content: it may contain names, family details,
+    # IDs, or other welfare-related PII. Keep length and a structural flag only.
+    if "answer_preview" in event:
+        event.pop("answer_preview")
+    if "answer" in event:
+        event["answer_len"] = len(str(event.pop("answer")))
+
+    # Remove any direct PII that may have slipped in.
+    event.pop("ip", None)
+    event.pop("name", None)
+    event.pop("email", None)
+    event.pop("message", None)
+    return event
+
+
+# Frequency-related unit tokens take priority over currency so that
+# "50000 դրամ ամսական" and "50000 դրամ տարեկան" are treated as distinct claims.
+_FREQUENCY_UNITS = ("ամսական", "ամենամսյա", "ամսամեկ", "ամսվա", "ամիս",
+                    "տարեկան", "ամենամյա", "տարի",
+                    "օրյա", "օր", "միանվագ")
+_CURRENCY_UNITS = ("դրամ", "դր.", "տոկոս", "%")
+_UNIT_TOKENS = _FREQUENCY_UNITS + _CURRENCY_UNITS
+
+# Morphological variants that should be treated as the same unit concept.
+_UNIT_EQUIVALENTS: dict[str, tuple[str, ...]] = {
+    "ամսական": ("ամսական", "ամենամսյա", "ամսամեկ", "ամսվա", "ամիս", "ամսում"),
+    "ամիս": ("ամսական", "ամենամսյա", "ամսամեկ", "ամսվա", "ամիս", "ամսում"),
+    "տարեկան": ("տարեկան", "ամենամյա", "տարի", "տարին", "տարեկանից", "տարեկանների"),
+    "տարի": ("տարեկան", "ամենամյա", "տարի", "տարին", "տարեկանից", "տարեկանների"),
+    "օրյա": ("օրյա", "օր", "օրում", "օրական"),
+    "օր": ("օրյա", "օր", "օրում", "օրական"),
+    "դրամ": ("դրամ", "դր.", "amd", "հհ դրամ"),
+    "դր.": ("դրամ", "դր.", "amd", "հհ դրամ"),
+    "տոկոս": ("տոկոս", "%"),
+    "%": ("տոկոս", "%"),
+}
+
+
+def _claim_unit(raw: str) -> str:
+    """Return the most specific unit token found in the raw claim, or ''."""
+    low = raw.lower()
+    for unit in _UNIT_TOKENS:
+        if unit in low:
+            return unit
+    return ""
+
+
+def _unit_matches(unit: str, context: str) -> bool:
+    """Check whether the context contains the unit or an equivalent variant."""
+    if not unit:
+        return True
+    ctx_l = context.lower()
+    for equiv in _UNIT_EQUIVALENTS.get(unit, (unit,)):
+        if equiv in ctx_l:
+            return True
+    return False
+
+
 def extract_numeric_claims(text: str) -> list[str]:
     if not text:
         return []
@@ -76,10 +170,9 @@ def extract_numeric_claims(text: str) -> list[str]:
         digits = re.sub(r"\D", "", raw)
         if len(digits) < 2:
             continue
-        if len(digits) == 2 and int(digits) > 80:
-            if "տարի" not in raw and "ամիս" not in raw:
-                continue
-        key = re.sub(r"\D", "", raw)
+        # Don't drop 81-99 claims; let the context check decide support.
+        unit = _claim_unit(raw)
+        key = (digits, unit)
         if key in seen:
             continue
         seen.add(key)
@@ -98,14 +191,31 @@ def claim_supported(claim: str, context: str) -> bool:
     if claim_l in _SAFE_CLAIMS or re.sub(r"\D", "", claim) == "114":
         return True
     ctx_l = context.lower()
-    if claim_l in ctx_l:
+    # Exact substring match is safe for claims that contain words/context,
+    # but a bare digit like "63" must not be considered supported by "63,500".
+    if claim_l in ctx_l and not re.fullmatch(r"\d+", claim_l):
         return True
     digits = re.sub(r"\D", "", claim)
     if not digits:
         return False
-    if digits in re.sub(r"\D", "", context):
-        return True
-    if len(digits) <= 3 and re.search(rf"(?<!\d){re.escape(digits)}(?!\d)", context):
+
+    unit = _claim_unit(claim)
+    ctx_digits = re.sub(r"\D", "", context)
+
+    # If the claim has a unit (currency/frequency), require that unit (or an
+    # equivalent variant) to appear in the context too. This catches
+    # "50000 դրամ ամսական" vs "50000 դրամ տարեկան" while allowing "տարեկան" vs "տարին".
+    if unit and not _unit_matches(unit, context):
+        return False
+
+    # Short digit runs (<=3 digits, e.g. ages 63, 85) must match as a standalone
+    # number in the context so "63" is not considered supported by "63,500".
+    if len(digits) <= 3:
+        return bool(re.search(rf"(?<![\d.,]){re.escape(digits)}(?![\d.,])", context))
+
+    # Longer digit runs (>=4 digits, e.g. amounts 37500) may match as a substring
+    # after stripping punctuation/whitespace, so "37,500" still supports "37500".
+    if digits in ctx_digits:
         return True
     return False
 
@@ -194,9 +304,22 @@ def is_answer_incomplete(answer: str) -> bool:
 
 
 def log_qa_event(event: dict[str, Any]) -> str:
+    """Append a redacted event to the QA audit log with a size cap."""
     path = os.path.join(_backend_data_dir(), "qa_eval_log.jsonl")
-    event = dict(event)
+    event = _redact_event(event)
     event.setdefault("ts", datetime.now(timezone.utc).isoformat())
+
+    # Simple size-capped rotation: if current log exceeds cap, keep one backup.
+    try:
+        if os.path.exists(path) and os.path.getsize(path) >= _QA_LOG_MAX_BYTES:
+            backup = path + ".1"
+            if os.path.exists(backup):
+                os.remove(backup)
+            os.replace(path, backup)
+    except Exception:
+        # Rotation failures are non-fatal; still try to append the event.
+        pass
+
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(event, ensure_ascii=False) + "\n")
     return path
@@ -240,12 +363,13 @@ def load_eval_stats(limit: int = 500) -> dict[str, Any]:
     for r in recent[-30:]:
         preview.append({
             "ts": r.get("ts"),
-            "query": (r.get("query") or "")[:120],
+            "query_hash": r.get("query_hash"),
+            "query_len": r.get("query_len"),
             "grounding_score": r.get("grounding_score"),
             "hallucination_rate": r.get("hallucination_rate"),
             "risk": r.get("risk"),
             "claims_unsupported": r.get("claims_unsupported"),
-            "answer_preview": (r.get("answer_preview") or "")[:160],
+            "answer_len": r.get("answer_len"),
             "mode": r.get("mode"),
         })
 

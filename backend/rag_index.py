@@ -15,6 +15,8 @@ from typing import Any
 
 import numpy as np
 
+from filelock import FileLock
+
 
 def _tokenize_bm25(text: str) -> list[str]:
     """Whitespace-ish tokenization that keeps Armenian letters."""
@@ -34,6 +36,10 @@ class RAGIndex:
         self.corpus_hash = ""
         self._faiss_available = False
         self._bm25_available = False
+        self._lock = FileLock(os.path.join(self.index_dir, ".index.lock"))
+
+    def _lock_path(self) -> str:
+        return os.path.join(self.index_dir, ".index.lock")
 
     def _load_deps(self) -> bool:
         """Lazy-load optional deps; return True if both available."""
@@ -64,13 +70,27 @@ class RAGIndex:
     def _save(self):
         os.makedirs(self.index_dir, exist_ok=True)
         paths = self._paths()
-        with open(paths["chunks"], "wb") as f:
-            pickle.dump(self.chunks, f)
-        with open(paths["bm25"], "wb") as f:
-            pickle.dump(self.bm25, f)
-        self._faiss.write_index(self.faiss_index, paths["faiss"])
-        with open(paths["hash"], "w", encoding="utf-8") as f:
-            f.write(self.corpus_hash)
+        # Write to temp files, then atomically replace the live files so a crash
+        # or concurrent reader never sees a half-written index.
+        tmp = {k: p + ".tmp" for k, p in paths.items()}
+        try:
+            with open(tmp["chunks"], "wb") as f:
+                pickle.dump(self.chunks, f)
+            with open(tmp["bm25"], "wb") as f:
+                pickle.dump(self.bm25, f)
+            self._faiss.write_index(self.faiss_index, tmp["faiss"])
+            with open(tmp["hash"], "w", encoding="utf-8") as f:
+                f.write(self.corpus_hash)
+            for k in paths:
+                os.replace(tmp[k], paths[k])
+        except Exception:
+            for p in tmp.values():
+                try:
+                    if os.path.exists(p):
+                        os.remove(p)
+                except Exception:
+                    pass
+            raise
 
     def load(self, corpus_hash: str) -> bool:
         """Load persisted index if corpus hash matches."""
@@ -106,25 +126,29 @@ class RAGIndex:
             return False
         if not chunks or not embeddings or len(embeddings) != len(chunks):
             return False
+        if len(embeddings[0][1]) == 0:
+            return False
 
-        self.chunks = chunks
-        self.corpus_hash = corpus_hash
+        # Serialize concurrent build()/save() calls across threads and processes.
+        with self._lock:
+            self.chunks = chunks
+            self.corpus_hash = corpus_hash
 
-        # BM25
-        tokenized = [_tokenize_bm25(c.get("text", "")) for c in chunks]
-        self.bm25 = self._BM25Okapi(tokenized)
+            # BM25
+            tokenized = [_tokenize_bm25(c.get("text", "")) for c in chunks]
+            self.bm25 = self._BM25Okapi(tokenized)
 
-        # FAISS
-        dim = len(embeddings[0][1])
-        vectors = np.array([vec for _, vec in embeddings]).astype("float32")
-        # Normalize for cosine similarity via inner product
-        norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-        norms[norms == 0] = 1.0
-        vectors = vectors / norms
-        self.faiss_index = self._faiss.IndexFlatIP(dim)
-        self.faiss_index.add(vectors)
+            # FAISS
+            dim = len(embeddings[0][1])
+            vectors = np.array([vec for _, vec in embeddings]).astype("float32")
+            # Normalize for cosine similarity via inner product
+            norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+            norms[norms == 0] = 1.0
+            vectors = vectors / norms
+            self.faiss_index = self._faiss.IndexFlatIP(dim)
+            self.faiss_index.add(vectors)
 
-        self._save()
+            self._save()
         return True
 
     def is_ready(self) -> bool:

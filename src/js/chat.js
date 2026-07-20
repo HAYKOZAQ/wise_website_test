@@ -8,21 +8,14 @@
 
   var STORAGE_KEY = 'wisef_chat_v1';
   var SIZE_KEY = 'wisef_chat_size_v1';
-
-  function getApiBase() {
-    if (typeof window.WISEF_getApiBase === 'function') {
-      return window.WISEF_getApiBase();
-    }
-    var host = (location && location.hostname) || '';
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://127.0.0.1:8000';
-    }
-    return '';
-  }
+  var API_BASE = (typeof window.WISEF_getApiBase === 'function') ? window.WISEF_getApiBase() : '';
 
   var backendOnline = false;
   var chatOpen = false;
   var chatInitialized = false;
+  var pollTimer = null;
+  var POLL_INTERVAL_OPEN = 12000;
+  var POLL_INTERVAL_CLOSED = 60000;
   var hasConversation = false;
   var conversationHistory = [];
   /** @type {{id:string,title:string,history:Array,messages:Array,updated:number}|null} */
@@ -279,9 +272,36 @@
     initResize();
     ensureSession();
     restoreMessagesFromSession();
-    pollStatus();
-    setInterval(pollStatus, 12000);
+    schedulePoll(true);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibilityChange);
+    }
     chatInitialized = true;
+  }
+
+  function schedulePoll(immediate) {
+    if (pollTimer) {
+      clearTimeout(pollTimer);
+      pollTimer = null;
+    }
+    if (immediate) {
+      pollStatus();
+    }
+    // Don't schedule another tick if the tab is hidden (saves bandwidth/battery).
+    if (typeof document !== 'undefined' && document.hidden) return;
+    var interval = chatOpen ? POLL_INTERVAL_OPEN : POLL_INTERVAL_CLOSED;
+    pollTimer = setTimeout(function () {
+      schedulePoll(true);
+    }, interval);
+  }
+
+  function onVisibilityChange() {
+    if (document.hidden) {
+      if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+    } else {
+      // Tab became visible again: poll immediately, then resume schedule.
+      schedulePoll(true);
+    }
   }
 
   function buildUI() {
@@ -429,6 +449,7 @@
     if (chatOpen || animating) return;
     animating = true;
     chatOpen = true;
+    schedulePoll(false);  // switch to faster polling while open
     panel.hidden = false;
     panel.classList.remove('wise-help__panel--closing');
     fab.setAttribute('aria-expanded', 'true');
@@ -450,6 +471,7 @@
     if (!chatOpen || animating) return;
     animating = true;
     chatOpen = false;
+    schedulePoll(false);  // switch to slower polling while closed
     persistActive();
     saveSize();
     fab.setAttribute('aria-expanded', 'false');
@@ -476,14 +498,18 @@
   }
 
   async function pollStatus() {
-    var API_BASE = getApiBase();
     if (!API_BASE) {
       backendOnline = false;
       updateStatusUI();
       return;
     }
     try {
-      var r = await fetch(API_BASE + '/api/status', { signal: AbortSignal.timeout(5000) });
+      var signal = null;
+      if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+        signal = AbortSignal.timeout(5000);
+      }
+      var opts = signal ? { signal: signal } : {};
+      var r = await fetch(API_BASE + '/api/status', opts);
       backendOnline = r.ok && (await r.json()).status === 'ready';
     } catch (e) {
       backendOnline = false;
@@ -649,7 +675,6 @@
     persistActive();
 
     var typing = addTyping();
-    var API_BASE = getApiBase();
     if (!API_BASE) {
       typing.remove();
       addBotBubble(

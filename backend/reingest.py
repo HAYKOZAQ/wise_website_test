@@ -25,6 +25,8 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+from filelock import FileLock
+
 _lock = threading.Lock()
 _state: dict[str, Any] = {
     "running": False,
@@ -51,6 +53,15 @@ def state_path() -> Path:
     d = backend_dir() / "data"
     d.mkdir(parents=True, exist_ok=True)
     return d / "reingest_state.json"
+
+
+def _lock_path() -> Path:
+    return backend_dir() / "data" / ".reingest.lock"
+
+
+# Cross-process lock so the API process and a Windows Task Scheduler / CLI
+# process cannot both rewrite the corpus and index at the same time.
+_reingest_lock = FileLock(str(_lock_path()))
 
 
 def get_state() -> dict[str, Any]:
@@ -92,91 +103,98 @@ def run_reingest(
 ) -> dict[str, Any]:
     """
     Full pipeline: optional bulk PDF import → scraper → optional RAG reload callback.
-    Thread-safe: only one run at a time.
+    Thread-safe within process and across processes via a file lock.
     """
-    with _lock:
-        if _state["running"]:
-            return {"ok": False, "error": "Re-ingest already running", "state": get_state()}
-        _state["running"] = True
-        _state["last_started"] = datetime.now(timezone.utc).isoformat()
-        _state["last_error"] = None
-        _persist()
-
-    result: dict[str, Any] = {
-        "ok": False,
-        "force": force,
-        "import": None,
-        "scraper": None,
-        "reload": None,
-        "started": _state["last_started"],
-    }
+    acquired = _reingest_lock.acquire(blocking=False)
+    if not acquired:
+        return {"ok": False, "error": "Re-ingest already running", "state": get_state()}
 
     try:
-        if import_pdfs_from:
-            from bulk_import_pdfs import import_folder
+        with _lock:
+            if _state["running"]:
+                return {"ok": False, "error": "Re-ingest already running", "state": get_state()}
+            _state["running"] = True
+            _state["last_started"] = datetime.now(timezone.utc).isoformat()
+            _state["last_error"] = None
+            _persist()
 
-            print(f"[reingest] Bulk import from {import_pdfs_from}")
-            # import_folder already rebuilds; we still rebuild below if needed
-            result["import"] = import_folder(
-                import_pdfs_from,
-                copy=True,
-                rebuild=False,
-                force=False,
-            )
-
-        from scraper import run_scraper
-
-        print(f"[reingest] Running scraper force={force}")
-        docs = run_scraper(force_arlis=force, force_all=force)
-        by_type: dict[str, int] = {}
-        for d in docs or []:
-            t = d.get("doc_type") or "?"
-            by_type[t] = by_type.get(t, 0) + 1
-        result["scraper"] = {
-            "documents": len(docs or []),
-            "by_type": by_type,
+        result: dict[str, Any] = {
+            "ok": False,
+            "force": force,
+            "import": None,
+            "scraper": None,
+            "reload": None,
+            "started": _state["last_started"],
         }
 
-        if reload_callback:
-            print("[reingest] Reloading RAG engine…")
-            reload_info = reload_callback()
-            result["reload"] = reload_info if reload_info is not None else {"ok": True}
+        try:
+            if import_pdfs_from:
+                from bulk_import_pdfs import import_folder
 
-        result["ok"] = True
-        result["finished"] = datetime.now(timezone.utc).isoformat()
+                print(f"[reingest] Bulk import from {import_pdfs_from}")
+                # import_folder already rebuilds; we still rebuild below if needed
+                result["import"] = import_folder(
+                    import_pdfs_from,
+                    copy=True,
+                    rebuild=False,
+                    force=False,
+                )
 
-        with _lock:
-            _state["last_ok"] = True
-            _state["last_error"] = None
-            _state["last_result"] = {
-                "documents": result["scraper"]["documents"],
+            from scraper import run_scraper
+
+            print(f"[reingest] Running scraper force={force}")
+            docs = run_scraper(force_arlis=force, force_all=force)
+            by_type: dict[str, int] = {}
+            for d in docs or []:
+                t = d.get("doc_type") or "?"
+                by_type[t] = by_type.get(t, 0) + 1
+            result["scraper"] = {
+                "documents": len(docs or []),
                 "by_type": by_type,
-                "finished": result["finished"],
             }
-            _state["runs"] = int(_state.get("runs") or 0) + 1
-            _state["last_finished"] = result["finished"]
-            _persist()
 
-        print(f"[reingest] OK — {result['scraper']['documents']} docs")
-        return result
+            if reload_callback:
+                print("[reingest] Reloading RAG engine…")
+                reload_info = reload_callback()
+                result["reload"] = reload_info if reload_info is not None else {"ok": True}
 
-    except Exception as e:
-        err = f"{e}\n{traceback.format_exc()}"
-        print(f"[reingest] FAILED: {e}")
-        result["ok"] = False
-        result["error"] = str(e)
-        result["finished"] = datetime.now(timezone.utc).isoformat()
-        with _lock:
-            _state["last_ok"] = False
-            _state["last_error"] = str(e)
-            _state["last_finished"] = result["finished"]
-            _state["last_result"] = {"error": str(e)}
-            _persist()
-        return result
+            result["ok"] = True
+            result["finished"] = datetime.now(timezone.utc).isoformat()
+
+            with _lock:
+                _state["last_ok"] = True
+                _state["last_error"] = None
+                _state["last_result"] = {
+                    "documents": result["scraper"]["documents"],
+                    "by_type": by_type,
+                    "finished": result["finished"],
+                }
+                _state["runs"] = int(_state.get("runs") or 0) + 1
+                _state["last_finished"] = result["finished"]
+                _persist()
+
+            print(f"[reingest] OK — {result['scraper']['documents']} docs")
+            return result
+
+        except Exception as e:
+            err = f"{e}\n{traceback.format_exc()}"
+            print(f"[reingest] FAILED: {e}")
+            result["ok"] = False
+            result["error"] = str(e)
+            result["finished"] = datetime.now(timezone.utc).isoformat()
+            with _lock:
+                _state["last_ok"] = False
+                _state["last_error"] = str(e)
+                _state["last_finished"] = result["finished"]
+                _state["last_result"] = {"error": str(e)}
+                _persist()
+            return result
+        finally:
+            with _lock:
+                _state["running"] = False
+                _persist()
     finally:
-        with _lock:
-            _state["running"] = False
-            _persist()
+        _reingest_lock.release()
 
 
 def run_reingest_async(
@@ -233,17 +251,20 @@ def start_scheduler(
     interval_sec = max(300.0, float(interval_hours) * 3600.0)  # min 5 minutes
 
     def _loop():
+        with _lock:
+            _state["scheduler"] = {
+                "enabled": True,
+                "interval_hours": interval_hours,
+                "next_run": datetime.now(timezone.utc).isoformat() if run_immediately else None,
+                "thread_alive": True,
+            }
+            _persist()
         if run_immediately:
             run_reingest(force=force, reload_callback=reload_callback)
         while not _scheduler_stop.is_set():
             next_ts = time.time() + interval_sec
             with _lock:
-                _state["scheduler"] = {
-                    "enabled": True,
-                    "interval_hours": interval_hours,
-                    "next_run": datetime.fromtimestamp(next_ts, tz=timezone.utc).isoformat(),
-                    "thread_alive": True,
-                }
+                _state["scheduler"]["next_run"] = datetime.fromtimestamp(next_ts, tz=timezone.utc).isoformat()
                 _persist()
             # Sleep in small chunks so stop is responsive
             while time.time() < next_ts:
