@@ -1,241 +1,179 @@
-# Deploy WISE site + AI (GitHub Pages + cloud backend)
+# WISE Deployment
 
-## Recommended: one Render URL = website + AI
+The application has two deployable parts:
 
-If you only open the Render URL and see **“WISE Social Programs RAG API”**, that is the **backend status page**, not a bug.  
-With the latest Docker image, the **same URL** also serves the real website:
+- Static Eleventy website: `_site/`
+- FastAPI RAG service: `backend/`
 
-| URL | What you get |
-|-----|----------------|
-| `https://YOUR-APP.onrender.com/` | Full website + chat |
-| `https://YOUR-APP.onrender.com/index.html` | Full website + chat |
-| `https://YOUR-APP.onrender.com/pages/index.html` | Legacy redirect to `/index.html` |
-| `https://YOUR-APP.onrender.com/api` | AI backend status (what you saw) |
-| `https://YOUR-APP.onrender.com/api/status` | JSON health |
-| `https://YOUR-APP.onrender.com/docs` | API docs |
+## Recommended: Cloudflare Pages + Hugging Face
 
-Chat uses **same origin** automatically (`config.js` leaves `productionApiBase` empty).
+This avoids Render's 15-minute sleep and gives the API substantially more
+memory than a 512 MB container.
 
----
+### 1. Build the API index
 
-## Deploy on Render (Docker)
+The compact BM25 index is used by Render. The existing FAISS file is preserved
+for the full Hugging Face image, where local sentence-transformer queries can
+use dense retrieval.
 
-1. [render.com](https://render.com) → **New → Web Service** → this GitHub repo  
-2. **Runtime:** Docker · **Dockerfile:** repo root  
-3. **Environment** (dashboard only — never commit secrets):
-
-   | Key | Value |
-   |-----|--------|
-   | `GEMINI_API_KEY` | from [Google AI Studio](https://aistudio.google.com/apikey) |
-
-4. Deploy → open: `https://YOUR-APP.onrender.com/`  
-5. Use **Ask us** chat (green “ready” when API is up)
-
-**Manual deploy:** Render dashboard → **Manual Deploy → Deploy latest commit** after you push.
-
----
-
-## Option B: GitHub Pages (site) + Render (API only)
-
-The frontend is now built with **Eleventy**. Publish the generated `_site/` folder
-(GitHub Actions, `gh-pages`, or any static host). The Render Docker image builds
-`_site/` automatically.
-
-1. Site: `https://YOURUSER.github.io/REPO/` (serve the built `_site/` output)  
-2. API: Render Docker as above  
-3. In `src/js/config.js` set:
-
-```js
-productionApiBase: 'https://YOUR-APP.onrender.com'
+```bat
+python backend\build_index.py --sparse-only
 ```
 
-4. Push so GitHub Pages rebuilds. **Never put the API key in config.js.**
+For a complete refresh from ARLIS, PDFs, and official web pages:
 
----
+```bat
+python backend\build_index.py --force
+```
 
-## Test
+The generated files under `backend/data/index/` are deployment artifacts:
 
-1. Site: `…/` or `…/index.html` — full design + chat  
-2. API: `…/api/status` — `"status":"ready"`  
-3. Docs: `…/docs`
+- `chunks.json`
+- `bm25.npz`
+- `bm25_vocab.json`
+- `corpus_hash.txt`
+- `faiss.index` when dense indexing was available
 
----
+### 2. Deploy the API to Hugging Face Spaces
 
-## Free tier / 512 MB deployment (Render, Railway, Fly Hobby)
-
-The default `Dockerfile` installs `torch` + `sentence-transformers` and builds embeddings at runtime. That needs **>1 GB RAM** and will crash on a 512 MB free container.
-
-Use the **slim runtime** instead:
-
-1. **Pre-build the search index locally** (one-time, needs ~600 MB RAM):
-
-   ```bat
-   cd backend
-   python -m venv .venv-build
-   .venv-build\Scripts\activate
-   pip install -r requirements.txt
-   python scraper.py --force
-   deactivate
-   ```
-
-   This writes `backend/data/index/` (FAISS + BM25 + chunks).
-
-2. **Commit the index** to git:
-
-   ```bash
-   git add backend/data/index/
-   git commit -m "chore(index): pre-build FAISS+BM25 index for slim runtime"
-   git push
-   ```
-
-3. On Render / Railway / Fly use **`Dockerfile.slim`** and set:
+1. Create a new Space with **Docker** as the SDK.
+2. Push this repository to the Space. The root `README.md` contains the Space
+   metadata and the root `Dockerfile` is the full runtime image.
+3. Configure these Space secrets:
 
    | Key | Value |
    |-----|-------|
-   | `GEMINI_API_KEY` | from [Google AI Studio](https://aistudio.google.com/apikey) |
-   | `USE_LOCAL_EMBEDDER` | `0` (already the default in `Dockerfile.slim`) |
+   | `GEMINI_API_KEY` | Google AI Studio key for answer generation |
+   | `CORS_ORIGINS` | Exact Cloudflare Pages origin |
+   | `ADMIN_TOKEN` | Optional token for remote admin endpoints |
 
-   The slim image has **no torch / sentence-transformers / tensorflow** at runtime and fits in ~512 MB RAM.
+4. Configure these variables:
 
-### Query embeddings on the free tier
+   | Key | Value |
+   |-----|-------|
+   | `USE_LOCAL_EMBEDDER` | `1` |
+   | `REINGEST_MODE` | `off` |
+   | `FORCE_SCRAPE_ON_BOOT` | `0` |
 
-- **Best quality:** keep `GEMINI_API_KEY` set. Queries are embedded via the free Gemini API and matched against the pre-built index.
-- **Fully offline / zero API cost:** unset `GEMINI_API_KEY`. Retrieval falls back to BM25 keyword search only (still works, slightly lower semantic recall).
+The API will be available at `https://YOUR-SPACE.hf.space`. Verify it with
+`/api/status` and `/docs`.
 
-## Local development (unchanged)
+### 3. Deploy the website to Cloudflare Pages
+
+Create a Pages project from the same repository with:
+
+| Setting | Value |
+|---------|-------|
+| Build command | `npm run build` |
+| Output directory | `_site` |
+| Build variable | `WISEF_API_BASE=https://YOUR-SPACE.hf.space` |
+
+`npm run build` replaces the API marker in the generated `config.js`. The
+source file never contains a secret. `wrangler.toml` is included for CLI or
+Direct Upload workflows:
+
+```bash
+npx wrangler pages deploy _site --project-name wisef-website
+```
+
+Set `CORS_ORIGINS` on the Space to the exact Pages origin, for example
+`https://wisef-website.pages.dev`. A custom domain can be used instead.
+
+## Render fallback: 512 MB slim service
+
+`render.yaml` uses `Dockerfile.slim`. It is deliberately lexical-only:
+
+- no torch, sentence-transformers, FAISS, or rank_bm25
+- compact NumPy BM25 postings instead of the large Python BM25 object
+- no source PDFs, seed snapshots, per-document corpus cache, or ingestion data
+- one Uvicorn process and a prebuilt corpus/index
+
+The slim image still supports grounded answer generation through
+`GEMINI_API_KEY`, and answers use BM25 retrieval. Dense retrieval is available
+in the full Hugging Face image with `USE_LOCAL_EMBEDDER=1`.
+
+To deploy manually on Render:
+
+1. Create a Docker Web Service from this repository.
+2. Use `Dockerfile.slim`.
+3. Set `GEMINI_API_KEY` in the dashboard only.
+4. Set `ADMIN_TOKEN` only if remote admin endpoints are required.
+5. Use `/api/status` as the health check.
+
+The same Render URL serves both the static website and API. Leave
+`WISEF_API_BASE` empty in that setup so the browser uses same-origin requests.
+The service sleeps when idle; that cold start is expected on the free plan.
+
+## Local development
 
 ```bat
 start_backend.bat
 start.bat
 ```
 
-- Frontend: `localhost` → uses `http://127.0.0.1:8000`  
-- Secret: `backend/.env` (gitignored) with `GEMINI_API_KEY=...`
+- Website: `http://localhost:3000`
+- API: `http://127.0.0.1:8000`
+- Local browser requests use `localApiBase` from `src/js/config.js`.
+- Put `GEMINI_API_KEY` in `backend/.env`, never in frontend JavaScript.
 
----
-
-## MLSA programs in the AI (PDFs + laws + web)
-
-The RAG corpus is built by `backend/scraper.py` from **four layers**:
-
-| Layer | Source | How to expand |
-|-------|--------|----------------|
-| Citizen summaries | Built-in program guides | Edit `backend/scraper.py` `FALLBACK_PROGRAMS` |
-| ARLIS legal acts | `backend/arlis_catalog.json` | Add `act_id` + URLs |
-| Ministry PDFs | `backend/mlsa_pdf_catalog.json` + `backend/pdfs/*.pdf` | Drop PDFs or add catalog URLs |
-| Official web pages | `backend/mlsa_web_ingest.py` | Add pages to `PROGRAM_PAGES` |
-
-Rebuild index:
+## Rebuild and re-ingest
 
 ```bat
-cd backend
-python scraper.py
-python scraper.py --force
-```
-
-Optional env:
-
-| Key | Meaning |
-|-----|---------|
-| `FORCE_EMBED=1` | Build full vector embeddings (slow, better search) |
-| `CHAT_RATE_LIMIT` | Max chat requests per IP per window (default 20) |
-| `CORS_ORIGINS` | Comma-separated origins, or `*` |
-| `CONTACT_WEBHOOK_URL` | Optional webhook for contact form |
-| `ADMIN_TOKEN` | Secret for `/api/admin/*` (required when set, even on localhost) |
-| `REINGEST_MODE` | `inprocess` (default) \| `windows` \| `off` — only one schedule path |
-| `REINGEST_INTERVAL_HOURS` | e.g. `24` — in-process schedule (ignored if mode=windows) |
-| `REINGEST_ON_START` | `1` to re-ingest once when API starts (with scheduler) |
-| `REINGEST_FORCE` | `1` force re-download on scheduled runs |
-| `CORS_ORIGINS` | Explicit list, or set `WISEF_CORS_OPEN=1` for `*` |
-| `USE_LOCAL_TFIDF` | Default `1` — offline TF–IDF vectors when cloud embed skipped |
-| `USE_LOCAL_EMBEDDER` | Default `1` — own local sentence-transformer embeddings (no Google/Ollama) |
-| `LOCAL_EMBED_MODEL` | Default `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
-| `LOCAL_EMBED_DEVICE` | `cpu` (default) or `cuda` if GPU available |
-| `USE_RERANKER` | Default `0` — enable cross-encoder re-ranking for better precision |
-| `HYBRID_SEMANTIC_WEIGHT` | Default `0.6` — weight of dense vs. BM25 in hybrid scoring |
-| `QUERY_EXPANSION` | Default `0` — ask the LLM to rewrite the query for better recall |
-| `FORCE_EMBED=1` | Build dense embedding cache (slow) — uses local embedder first |
-
-Seed snapshot (offline-friendly) is written to `backend/seed/mlsa_programs.json` after a successful scrape.
-
----
-
-## Bulk PDF import + scheduled re-ingest
-
-### Import a folder of ministry PDFs
-
-```bat
-import_pdfs.bat "D:\MLSA_PDFs"
-```
-
-Or:
-
-```bat
-python backend\bulk_import_pdfs.py "D:\MLSA_PDFs"
-python backend\reingest.py
-```
-
-### Manual full re-ingest
-
-```bat
+python backend\build_index.py
+python backend\build_index.py --force
 reingest.bat
 reingest.bat --force
 ```
 
-### While the server is running (hot reload)
+The API skips scraping at startup when `backend/data/mlsa_programs.json` is
+already present. Ingestion and scheduled re-ingest are intended for a full
+runtime or local machine, not the 512 MB slim image.
 
-```bat
-curl -X POST http://127.0.0.1:8000/api/admin/reingest -H "Content-Type: application/json" -d "{\"force\":false}"
-curl http://127.0.0.1:8000/api/admin/ingest-status
-curl -X POST http://127.0.0.1:8000/api/admin/reload
-```
+## API and security variables
 
-### Windows daily schedule
+| Key | Meaning |
+|-----|---------|
+| `GEMINI_API_KEY` | Answer generation key; server-side only |
+| `ADMIN_TOKEN` | Protects `/api/admin/*` remotely |
+| `CORS_ORIGINS` | Comma-separated exact allowed origins; takes precedence |
+| `WISEF_PAGES_ORIGIN` | One separate Pages origin when `CORS_ORIGINS` is unset |
+| `WISEF_CORS_OPEN` | Explicitly allow `*`; avoid for production |
+| `CHAT_RATE_LIMIT` | Chat requests per window, default `20` |
+| `USE_LOCAL_EMBEDDER` | Local sentence-transformer dense queries, default `1` |
+| `USE_LOCAL_TFIDF` | In-memory fallback when no persisted index, default `1` |
+| `LOCAL_EMBED_MODEL` | Default multilingual MiniLM model |
+| `LOCAL_EMBED_DEVICE` | `cpu` or `cuda` |
+| `USE_RERANKER` | Optional cross-encoder, default `0` |
+| `HYBRID_SEMANTIC_WEIGHT` | Dense versus BM25 rank weight, default `0.6` |
+| `REINGEST_MODE` | `inprocess`, `windows`, or `off` |
+| `REINGEST_INTERVAL_HOURS` | Background interval; use `0` on free services |
+| `WISEF_IMPORT_ROOTS` | Allowlisted PDF import directories |
+| `CONTACT_WEBHOOK_URL` | Optional contact notification webhook |
 
-```powershell
-.\install_scheduled_reingest.ps1
-.\install_scheduled_reingest.ps1 -Hour 3 -Minute 15
-.\install_scheduled_reingest.ps1 -Uninstall
-```
+## Corpus sources
 
-### In-process schedule (Render / Docker)
+`backend/scraper.py` combines four layers:
 
-Set `REINGEST_INTERVAL_HOURS=24` and `ADMIN_TOKEN=...` in the host environment.
+| Layer | Source |
+|-------|--------|
+| Citizen summaries | Built-in fallback program guides |
+| ARLIS legal acts | `backend/arlis_catalog.json` |
+| Ministry PDFs | `backend/mlsa_pdf_catalog.json` and `backend/pdfs/` |
+| Official web pages | `backend/mlsa_web_ingest.py` |
 
----
+After changing a source, run `python backend\build_index.py --force` and
+redeploy the generated index artifacts.
 
-## Security checklist
-
-| Do | Don’t |
-|----|--------|
-| Set `GEMINI_API_KEY` only on Render/Railway | Commit `.env` or keys to GitHub |
-| Put only the **public API URL** in `config.js` | Put API keys in frontend JS |
-| Keep `.env` in `.gitignore` | Upload `.env` to GitHub Pages |
-
----
-
-## Free-tier note (Render)
-
-Free services **sleep** after idle time. First chat after sleep can take 30–60s while the server wakes up. That is normal.
-
----
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---------|-----|
-| “Server offline” on live site | `productionApiBase` empty or wrong; set it and push |
-| CORS error in browser console | Confirm API URL is https and service is up |
-| 502 / cold start | Wait and retry; check Render logs |
-| Empty answers / 500 | `GEMINI_API_KEY` missing on host → add in Environment |
-| Status ok but no programs | First boot runs `scraper.py`; check logs for ARLIS download |
-| `Keras 3` error from `transformers` | Install `tf-keras` (only needed when TensorFlow is present) or set `TF_USE_LEGACY_KERAS=1` |
-| FAISS `_ARRAY_API not found` | `faiss-cpu` wheel mismatched with NumPy; use the versions pinned in `requirements.txt` |
-
-### CPU-only PyTorch
-
-If you want the smaller CPU wheel instead of the default CUDA wheel:
+## Verification
 
 ```bash
-pip install torch==2.8.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+python -m pytest backend/tests -q
+npm.cmd run build
 ```
+
+Check these endpoints after deployment:
+
+- `GET /api/status`
+- `GET /api/version`
+- `GET /docs`
+- `POST /api/chat`

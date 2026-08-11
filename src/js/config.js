@@ -1,18 +1,18 @@
 /* ====================================================
    WISE site config (safe to commit — NO secrets here)
    ====================================================
-   Put GEMINI_API_KEY only on Render/Railway (server env).
+   Put GEMINI_API_KEY only on the API host (server environment).
    Never put the key in this file.
 */
 window.WISEF_CONFIG = {
   /**
    * Optional: public API URL if backend is on a DIFFERENT domain.
-   * Example: 'https://wisef-rag-api.onrender.com'
+   * Example: 'https://your-space.hf.space'
    *
-   * Leave empty when the website is served FROM the same Render
-   * service as the API (recommended) — chat will use this domain.
+   * Cloudflare Pages builds replace the marker from WISEF_API_BASE. Leave
+   * the build variable empty when the website and API share one origin.
    */
-  productionApiBase: '',
+  productionApiBase: '__WISEF_API_BASE__',
 
   /** Local backend while developing on your PC */
   localApiBase: 'http://127.0.0.1:8000',
@@ -39,6 +39,8 @@ window.WISEF_getApiBase = function () {
   }
 
   var prod = (cfg.productionApiBase || '').trim().replace(/\/$/, '');
+  // Keep local Eleventy/dev output safe before the optional build injection.
+  if (prod === '__WISEF_API_BASE__') prod = '';
   if (prod) return prod;
 
   // Same host as the page (Docker/Render serves site + API together)

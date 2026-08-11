@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "eleventy --serve",
     "start": "eleventy --serve",
-    "build": "eleventy"
+    "build": "eleventy && node scripts/inject-api-base.cjs"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.6"
+    "@11ty/eleventy": "3.1.6"
   }
 }

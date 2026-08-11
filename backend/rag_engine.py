@@ -93,6 +93,8 @@ def _strip_image_refs(text: str) -> str:
 class RAGEngine:
     def __init__(self):
         self.documents: list[dict[str, Any]] = []
+        self.document_count = 0
+        self.doc_type_counts: dict[str, int] = {}
         self.chunks: list[dict[str, Any]] = []
         self.embeddings: list[tuple[int, list[float]]] = []
         self.vector_enabled = False
@@ -156,6 +158,7 @@ class RAGEngine:
             try:
                 self.documents = _load_file(candidate)
                 _normalize(self.documents)
+                self.document_count = len(self.documents)
                 self.legal_acts = len(
                     {
                         d.get("act_id")
@@ -167,6 +170,7 @@ class RAGEngine:
                 for d in self.documents:
                     t = d.get("doc_type") or "?"
                     by_type[t] = by_type.get(t, 0) + 1
+                self.doc_type_counts = by_type
                 print(
                     f"Loaded {len(self.documents)} documents from {candidate} "
                     f"(legal acts≈{self.legal_acts}, by_type={by_type})."
@@ -181,6 +185,8 @@ class RAGEngine:
         else:
             print(f"Error loading social programs JSON: {last_error}")
         self.documents = []
+        self.document_count = 0
+        self.doc_type_counts = {}
 
     def build_index(self):
         self.chunks = []
@@ -232,6 +238,11 @@ class RAGEngine:
 
         self._load_or_build_embeddings()
 
+        # The chunk list is the only corpus representation needed after the
+        # index is ready. Keep counts above for status endpoints, but release
+        # the full JSON document objects to avoid a second resident corpus.
+        self.documents = []
+
     def _cache_path(self) -> str:
         return os.path.join(self._backend_dir(), "data", "embeddings_cache.json")
 
@@ -277,11 +288,17 @@ class RAGEngine:
         # Try persisted FAISS + BM25 index first
         self._rag_index = RAGIndex(self._backend_dir())
         if self._rag_index.load(self.corpus_hash):
-            self.embeddings = [(c["chunk_id"], []) for c in self._rag_index.chunks]
-            self.vector_enabled = True
+            # Reuse the persisted chunk list instead of retaining the chunks
+            # built from the corpus plus a second unpickled copy.
+            self.chunks = self._rag_index.chunks
+            self.embeddings = []
+            self.vector_enabled = self._rag_index.faiss_index is not None
             self.cache_ok = True
-            self.vector_backend = "faiss_bm25"
-            print(f"Loaded persisted FAISS+BM25 index ({len(self._rag_index.chunks)} chunks).")
+            self.vector_backend = "faiss_bm25" if self.vector_enabled else "bm25"
+            print(
+                f"Loaded persisted index ({len(self._rag_index.chunks)} chunks, "
+                f"dense={'on' if self.vector_enabled else 'off'})."
+            )
             return
 
         # Build dense embeddings, then construct FAISS + BM25 index
@@ -305,10 +322,10 @@ class RAGEngine:
                 f"bulk cloud embed skipped for {len(self.chunks)} chunks "
                 f"(limit={max_auto}; set FORCE_EMBED=1 for Gemini/Ollama cache)"
             )
-            print(self.embed_skip_reason + ". Enabling local TF–IDF vectors.")
-            if prefer_local:
-                self._enable_local_tfidf()
-            return
+            # Continue to the persisted compact BM25 path below. The old
+            # early return built a second in-memory TF-IDF index and left the
+            # deployable sparse cache stale or missing.
+            print(self.embed_skip_reason + ". Building compact BM25 index.")
 
         # 3) Google Gemini embeddings
         if not embeddings and self.use_gemini and (force_embed or len(self.chunks) <= max_auto):
@@ -354,14 +371,32 @@ class RAGEngine:
         if embeddings and len(embeddings) == len(self.chunks):
             self.embeddings = embeddings
             if self._rag_index.build(self.chunks, self.corpus_hash, embeddings):
-                self.vector_enabled = True
-                self.vector_backend = "faiss_bm25"
+                # FAISS owns the dense vectors after persistence. Keeping the
+                # Python list here only duplicates several megabytes of data.
+                self.embeddings = []
+                self.vector_enabled = self._rag_index.faiss_index is not None
+                self.vector_backend = "faiss_bm25" if self.vector_enabled else "bm25"
                 self.cache_ok = True
                 self.embed_skip_reason = ""
-                print(f"FAISS+BM25 index built ({len(embeddings)} embeddings, backend={backend_name}).")
+                print(
+                    f"Persisted hybrid index ({len(embeddings)} embeddings, "
+                    f"backend={backend_name}, dense={'on' if self.vector_enabled else 'off'})."
+                )
                 return
 
-        # 6) Always provide a working offline vector channel
+        # 6) Persist lexical retrieval even when no dense backend is present.
+        # This also migrates an existing FAISS file when one is available.
+        try:
+            if self._rag_index.build_sparse(self.chunks, self.corpus_hash):
+                self.vector_enabled = self._rag_index.faiss_index is not None
+                self.vector_backend = "faiss_bm25" if self.vector_enabled else "bm25"
+                self.cache_ok = True
+                print(f"Compact BM25 index built ({len(self.chunks)} chunks).")
+                return
+        except Exception as e:
+            print(f"Compact BM25 index build failed: {e}")
+
+        # 7) Always provide a working offline vector channel
         if prefer_local:
             self._enable_local_tfidf()
         else:
@@ -587,13 +622,14 @@ class RAGEngine:
         # Pre-compute query embeddings in one batch to avoid N sequential API calls.
         candidate_scores: dict[int, float] = {}
         use_hybrid = self._rag_index is not None and self._rag_index.is_ready()
+        dense_available = use_hybrid and self._rag_index.faiss_index is not None
         variant_vectors: list[list[float] | None] = []
-        if use_hybrid:
+        if dense_available:
             variant_vectors = self._embed_queries_batch(query_variants)
 
         for i, q in enumerate(query_variants):
             if use_hybrid:
-                q_vec = variant_vectors[i] if i < len(variant_vectors) else None
+                q_vec = variant_vectors[i] if dense_available and i < len(variant_vectors) else None
                 pairs = self._rag_index.search_hybrid(
                     q, q_vec, k=initial_k, semantic_weight=HYBRID_SEMANTIC_WEIGHT
                 )

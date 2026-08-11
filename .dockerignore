@@ -18,6 +18,16 @@ backend/data/embeddings_cache.json
 backend/data/pdf_cache/
 backend/data/web_cache/
 
+# Deployment images use the committed corpus and index. These ingestion-only
+# files are not needed at runtime and can add tens of megabytes to the build
+# context/image. Keep them available in the repository for local re-ingest.
+backend/pdfs/
+backend/seed/
+backend/data/corpus/
+backend/data/arlis_legal_docs.json
+backend/data/mlsa_pdf_docs.json
+backend/data/mlsa_web_docs.json
+
 # Runtime logs / state
 backend/data/qa_eval_log.jsonl
 backend/data/contact_messages.jsonl

@@ -300,7 +300,7 @@
     'chat.topics_label':   { hy: 'Ընտրեք թեմա կամ գրեք հարց', en: 'Pick a topic or type a question' },
     'chat.disclaimer':     { hy: 'Տեղեկատվական է · Պաշտոնական որոշման համար՝ 114', en: 'For information only · Official decisions: call 114' },
     'chat.err_offline':    { hy: 'Հիմա չեմ կարող պատասխանել։ Ստուգեք, որ սերվերն աշխատում է (start_backend.bat կամ cloud API)։', en: 'I cannot answer right now. Please start the server (local or cloud API).' },
-    'chat.err_no_api':     { hy: 'Արտադրական կայքում AI-ն աշխատելու համար տեղադրեք backend-ը (Render/Railway) և լրացրեք productionApiBase-ը config.js-ում։ Տե՛ս DEPLOY.md։', en: 'To use AI on the live site, deploy the backend (Render/Railway) and set productionApiBase in config.js. See DEPLOY.md.' },
+    'chat.err_no_api':     { hy: 'Արտադրական կայքում AI-ն աշխատելու համար տեղադրեք backend-ը (Hugging Face կամ Render) և լրացրեք API հասցեն build-ի WISEF_API_BASE փոփոխականով։ Տե՛ս DEPLOY.md։', en: 'To use AI on the live site, deploy the backend (Hugging Face or Render) and set WISEF_API_BASE during the frontend build. See DEPLOY.md.' },
     'chat.status_ready':   { hy: 'Պատրաստ է օգնել', en: 'Ready to help' },
     'chat.status_offline': { hy: 'Սերվերը անջատված է', en: 'Server is offline' },
     'chat.thinking':       { hy: 'Մտածում եմ…', en: 'Thinking…' },

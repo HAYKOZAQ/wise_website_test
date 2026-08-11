@@ -85,8 +85,10 @@ def _resolve_cors_origins() -> list[str]:
     # Explicit opt-in to wide open
     if (os.environ.get("WISEF_CORS_OPEN") or "").strip().lower() in ("1", "true", "yes"):
         return ["*"]
-    # Default: allow same-origin style hosts + common local dev + live Render URL
-    return [
+    # Default: allow same-origin style hosts + common local dev + live Render URL.
+    # A separately hosted Cloudflare Pages site should be added with
+    # CORS_ORIGINS (or WISEF_PAGES_ORIGIN) on the API service.
+    origins = [
         "http://127.0.0.1:8000",
         "http://localhost:8000",
         "http://127.0.0.1:3000",
@@ -94,6 +96,10 @@ def _resolve_cors_origins() -> list[str]:
         "https://wise-website-test.onrender.com",
         "http://wise-website-test.onrender.com",
     ]
+    pages_origin = (os.environ.get("WISEF_PAGES_ORIGIN") or "").strip().rstrip("/")
+    if pages_origin and pages_origin not in origins:
+        origins.append(pages_origin)
+    return origins
 
 
 _cors_origins = _resolve_cors_origins()
@@ -167,7 +173,7 @@ def reload_rag_engine() -> dict[str, Any]:
         rag_engine = new_engine
     return {
         "ok": True,
-        "documents": len(new_engine.documents),
+        "documents": new_engine.document_count,
         "chunks": len(new_engine.chunks),
         "vector_search": new_engine.vector_enabled,
         "corpus_hash": new_engine.corpus_hash,
@@ -347,11 +353,7 @@ class ContactRequest(BaseModel):
 def _doc_type_counts() -> dict[str, int]:
     if not rag_engine:
         return {}
-    counts: dict[str, int] = {}
-    for d in getattr(rag_engine, "documents", []) or []:
-        t = d.get("doc_type") or "?"
-        counts[t] = counts.get(t, 0) + 1
-    return counts
+    return dict(getattr(rag_engine, "doc_type_counts", {}) or {})
 
 
 def _status_payload() -> dict:
@@ -381,7 +383,7 @@ def _status_payload() -> dict:
         "ollama_connected": ollama_ok,
         "ollama_host": OLLAMA_HOST,
         "model": OLLAMA_MODEL,
-        "documents_indexed": len(rag_engine.documents) if rag_engine else 0,
+        "documents_indexed": rag_engine.document_count if rag_engine else 0,
         "chunks_indexed": len(rag_engine.chunks) if rag_engine else 0,
         "doc_types": _doc_type_counts(),
         "legal_acts": legal_acts,
@@ -438,7 +440,7 @@ def _api_only_html() -> str:
     <strong>This is not the full WISE marketing website.</strong><br>
     This page is the <em>AI server</em> status. The public site is either:
     <ul>
-      <li>GitHub Pages (your static site), with <code>productionApiBase</code> pointing here, or</li>
+      <li>Cloudflare Pages (your static site), built with <code>WISEF_API_BASE</code> pointing here, or</li>
       <li>Redeploy this service with the latest Docker image that includes the frontend
           (then open <code>/index.html</code>).</li>
     </ul>
@@ -598,7 +600,7 @@ def ingest_status(
         "reingest": st,
         "library_pdfs": pdfs,
         "library_count": len(pdfs),
-        "documents_indexed": len(rag_engine.documents) if rag_engine else 0,
+        "documents_indexed": rag_engine.document_count if rag_engine else 0,
         "doc_types": _doc_type_counts(),
         "corpus_hash": getattr(rag_engine, "corpus_hash", None) if rag_engine else None,
     }

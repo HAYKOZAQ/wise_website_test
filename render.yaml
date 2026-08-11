@@ -22,3 +22,6 @@ services:
         value: "off"
       - key: ADMIN_TOKEN
         sync: false
+      # Only needed if this API is paired with a separately hosted site.
+      - key: WISEF_PAGES_ORIGIN
+        sync: false

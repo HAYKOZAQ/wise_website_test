@@ -7,6 +7,7 @@ RUN npm ci
 
 COPY .eleventy.js ./
 COPY src/ ./src/
+COPY scripts/ ./scripts/
 RUN npm run build
 
 
@@ -26,7 +27,8 @@ ARG CACHEBUST=47
 ARG BUILD_SHA=dev
 ARG BUILD_TIME=unknown
 
-# Backend code (includes data/ corpus, seed/, start.sh)
+# Backend code and the pre-built corpus/index. Ingestion-only PDFs and caches
+# are excluded by .dockerignore; rebuild them locally before deploying.
 COPY backend/ /app/
 
 # Built frontend static site (Eleventy output) served by FastAPI

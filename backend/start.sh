@@ -1,6 +1,6 @@
 #!/bin/sh
 # Fast boot for Render: do NOT block on full ARLIS/PDF scrape.
-# Corpus is already baked into the image under /app/data and /app/seed.
+# Corpus and compact index are already baked into the image under /app/data.
 set -e
 cd /app
 
@@ -16,5 +16,6 @@ fi
 
 export PORT="${PORT:-8000}"
 export HOST="${HOST:-0.0.0.0}"
+export PYTHONDONTWRITEBYTECODE=1
 echo "[start] Serving on ${HOST}:${PORT}"
 exec python -m uvicorn main:app --host "${HOST}" --port "${PORT}"

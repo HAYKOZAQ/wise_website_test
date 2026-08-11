@@ -105,3 +105,17 @@ def test_build_zero_dimensional_vectors_rejected(tmp_path):
     embeddings = [(i, []) for i in range(2)]
     assert idx.build(chunks, "hash", embeddings) is False
     assert not idx.is_ready()
+
+
+def test_sparse_index_persists_without_faiss(tmp_path):
+    idx = RAGIndex(str(tmp_path))
+    chunks = _make_chunks(3)
+    assert idx.build_sparse(chunks, "sparse-hash", preserve_faiss=False) is True
+    assert idx.is_ready()
+    assert idx.faiss_index is None
+
+    reloaded = RAGIndex(str(tmp_path))
+    assert reloaded.load("sparse-hash") is True
+    results = reloaded.search_bm25("unique2", k=3)
+    assert results
+    assert results[0][0] == 2
