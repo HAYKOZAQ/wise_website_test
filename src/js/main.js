@@ -251,8 +251,8 @@ ${safeHtml(content || '<p>Content not available offline.</p>')}
       e.stopPropagation();
 
       const url = btn.getAttribute('data-url');
-      const card = btn.closest('.blog-card, .project-card');
-      const articleTitle = card?.querySelector('h3')?.textContent ?? 'Article';
+      const card = btn.closest('.blog-card, .project-card, .wise-news-feature');
+      const articleTitle = card?.querySelector('h3, h2')?.textContent ?? 'Article';
 
       // Always allow the original URL to be opened from the modal/view-original link
       const openOriginal = () => window.open(url, '_blank', 'noopener');

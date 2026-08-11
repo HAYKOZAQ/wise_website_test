@@ -1,0 +1,1355 @@
+/* WISE presentation system: quiet white space, navy type, and one yellow signal. */
+:root {
+  --wise-navy: #15375f;
+  --wise-navy-deep: #0d2b4e;
+  --wise-blue: #234c78;
+  --wise-yellow: #f5ba35;
+  --wise-yellow-soft: #fff5d9;
+  --wise-ink: #183960;
+  --wise-muted: #64748b;
+  --wise-line: #dfe5ec;
+  --wise-surface: #f6f8fb;
+  --wise-container: 1180px;
+  --wise-radius: 20px;
+  --wise-shadow: 0 16px 40px rgba(21, 55, 95, 0.08);
+}
+
+html,
+body {
+  background: #fff !important;
+  color: var(--wise-ink) !important;
+  font-family: 'Manrope', 'Noto Sans Armenian', sans-serif !important;
+}
+
+body {
+  line-height: 1.65;
+}
+
+html[lang="hy"] body,
+body[lang="hy"],
+:lang(hy) body {
+  font-family: 'Noto Sans Armenian', 'Manrope', sans-serif !important;
+}
+
+.container,
+.header__inner,
+.footer__inner {
+  max-width: var(--wise-container);
+}
+
+.wise-container {
+  width: min(var(--wise-container), calc(100% - 48px));
+  margin: 0 auto;
+}
+
+/* Header */
+.site-header.header,
+.site-header.header.scrolled {
+  position: sticky;
+  top: 0;
+  padding: 0;
+  min-height: 78px;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid rgba(21, 55, 95, 0.09) !important;
+  box-shadow: 0 4px 18px rgba(21, 55, 95, 0.04);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.site-header .header__inner {
+  height: 78px;
+  gap: 28px;
+}
+
+.site-header .header__logo {
+  width: 116px;
+}
+
+.site-header .header__logo img {
+  width: 116px;
+  height: auto;
+}
+
+.site-header .nav {
+  gap: 26px;
+  overflow: visible;
+}
+
+.site-header .nav__link {
+  padding: 8px 0;
+  border-radius: 0;
+  color: var(--wise-ink);
+  font-size: 0.86rem;
+  font-weight: 600;
+  position: relative;
+}
+
+.site-header .nav__link:hover,
+.site-header .nav__link--active {
+  color: var(--wise-navy) !important;
+  background: transparent;
+}
+
+.site-header .nav__link--active::after {
+  left: 0;
+  bottom: -10px;
+  width: 100%;
+  height: 3px;
+  transform: none;
+  border-radius: 0;
+  background: var(--wise-yellow);
+}
+
+.site-header .nav__link--contact {
+  padding: 11px 20px;
+  border: 1px solid var(--wise-navy);
+  border-radius: 7px;
+  margin-left: 4px;
+}
+
+.site-header .nav__link--contact::after {
+  display: none;
+}
+
+.site-header .nav__link--contact:hover,
+.site-header .nav__link--contact.nav__link--active {
+  color: #fff !important;
+  background: var(--wise-navy);
+}
+
+.site-header .header-controls {
+  gap: 8px;
+}
+
+.site-header .theme-toggle {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: var(--wise-navy);
+  box-shadow: none;
+}
+
+.site-header .lang-toggle {
+  transform: scale(0.9);
+}
+
+/* Shared page composition */
+.wise-page {
+  background: #fff;
+}
+
+.wise-page-intro {
+  padding: 92px 0 64px;
+  max-width: 780px;
+}
+
+.wise-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--wise-ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 22px;
+}
+
+.wise-eyebrow::before {
+  content: '';
+  width: 36px;
+  height: 4px;
+  background: var(--wise-yellow);
+  border-radius: 999px;
+}
+
+.wise-title {
+  color: var(--wise-navy) !important;
+  font-size: clamp(2.45rem, 5vw, 4.4rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+  margin: 0 0 24px;
+}
+
+.wise-title em {
+  color: var(--wise-yellow);
+  font-style: normal;
+}
+
+.wise-lede {
+  max-width: 780px;
+  color: var(--wise-muted);
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  line-height: 1.85;
+}
+
+.wise-section {
+  padding: 104px 0;
+}
+
+.wise-section--soft {
+  background: var(--wise-surface);
+}
+
+.wise-section--navy {
+  background: var(--wise-navy-deep);
+  color: #fff;
+}
+
+.wise-section-heading {
+  max-width: 760px;
+  margin-bottom: 48px;
+}
+
+.wise-section-heading .wise-title {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+}
+
+.wise-section--navy .wise-eyebrow,
+.wise-section--navy .wise-title,
+.wise-section--navy .wise-lede {
+  color: #fff !important;
+}
+
+.wise-section--navy .wise-eyebrow::before {
+  background: var(--wise-yellow);
+}
+
+.wise-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 13px 24px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.2;
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.wise-btn:hover {
+  transform: translateY(-2px);
+}
+
+.wise-btn--gold {
+  color: var(--wise-navy);
+  background: var(--wise-yellow);
+}
+
+.wise-btn--gold:hover {
+  background: #ffd15d;
+}
+
+.wise-btn--outline {
+  color: var(--wise-navy);
+  border-color: var(--wise-navy);
+  background: transparent;
+}
+
+.wise-btn--outline:hover {
+  color: #fff;
+  background: var(--wise-navy);
+}
+
+.wise-btn--light {
+  color: var(--wise-navy);
+  background: #fff;
+}
+
+.wise-btn--light:hover {
+  background: var(--wise-yellow);
+}
+
+.wise-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--wise-navy);
+  font-weight: 800;
+}
+
+.wise-inline-link::after {
+  content: '→';
+  color: var(--wise-yellow);
+  font-size: 1.25rem;
+  transition: transform 180ms ease;
+}
+
+.wise-inline-link:hover::after {
+  transform: translateX(4px);
+}
+
+/* Home */
+.wise-home-hero {
+  position: relative;
+  min-height: min(720px, calc(100vh - 78px));
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+  background:
+    linear-gradient(90deg, rgba(8, 35, 65, 0.96) 0%, rgba(8, 35, 65, 0.85) 42%, rgba(8, 35, 65, 0.32) 100%),
+    url('/assets/images/team-meeting.jpg') center / cover;
+}
+
+.wise-home-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  background-image: radial-gradient(rgba(245, 186, 53, 0.45) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(90deg, transparent 35%, #000 100%);
+}
+
+.wise-home-hero .wise-container {
+  position: relative;
+  z-index: 1;
+}
+
+.wise-hero-copy {
+  max-width: 720px;
+  padding: 84px 0;
+}
+
+.wise-home-hero .wise-eyebrow,
+.wise-home-hero .wise-title,
+.wise-home-hero .wise-lede {
+  color: #fff !important;
+}
+
+.wise-home-hero .wise-title {
+  font-size: clamp(2.8rem, 6vw, 5.4rem);
+  margin-bottom: 28px;
+}
+
+.wise-home-hero .wise-lede {
+  max-width: 620px;
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+.wise-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.wise-home-hero .wise-btn--outline {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.72);
+}
+
+.wise-home-hero .wise-btn--outline:hover {
+  color: var(--wise-navy);
+  border-color: #fff;
+  background: #fff;
+}
+
+.wise-three-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.wise-feature-card,
+.wise-service-card,
+.wise-news-card,
+.wise-faq-item {
+  background: var(--wise-surface);
+  border: 1px solid var(--wise-line);
+  border-radius: var(--wise-radius);
+}
+
+.wise-feature-card {
+  min-height: 260px;
+  padding: 30px;
+}
+
+.wise-feature-card__icon,
+.wise-service-card__icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 42px;
+  color: var(--wise-navy);
+  background: #fff;
+  border: 1px solid var(--wise-line);
+  border-radius: 12px;
+}
+
+.wise-feature-card__icon svg,
+.wise-service-card__icon svg {
+  width: 27px;
+  height: 27px;
+  stroke: var(--wise-navy);
+  stroke-width: 1.65;
+  fill: none;
+}
+
+.wise-feature-card h3,
+.wise-service-card h3 {
+  color: var(--wise-navy);
+  font-size: 1.2rem;
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+.wise-feature-card p,
+.wise-service-card p {
+  color: var(--wise-muted);
+  font-size: 0.94rem;
+  line-height: 1.75;
+}
+
+.wise-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 38px;
+  border-radius: 18px;
+  color: #fff;
+  background: var(--wise-navy-deep);
+}
+
+.wise-ribbon h2 {
+  color: #fff;
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.wise-ribbon p {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.93rem;
+}
+
+/* About */
+.wise-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--wise-line);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.wise-stat {
+  min-height: 170px;
+  padding: 28px 26px;
+  border-right: 1px solid var(--wise-line);
+}
+
+.wise-stat:last-child {
+  border-right: 0;
+}
+
+.wise-stat strong {
+  display: block;
+  color: var(--wise-navy);
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  letter-spacing: -0.06em;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.wise-stat:nth-child(even) strong {
+  color: var(--wise-yellow);
+}
+
+.wise-stat span {
+  display: block;
+  color: var(--wise-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.wise-story {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 84px;
+  align-items: start;
+}
+
+.wise-story__copy p {
+  color: var(--wise-muted);
+  font-size: 1.05rem;
+  line-height: 1.9;
+  margin-bottom: 20px;
+}
+
+.wise-story__copy strong {
+  color: var(--wise-navy);
+}
+
+.wise-rule {
+  width: 4px;
+  height: 100%;
+  min-height: 180px;
+  background: var(--wise-yellow);
+  border-radius: 99px;
+}
+
+.wise-story__aside {
+  display: flex;
+  gap: 22px;
+  align-items: stretch;
+}
+
+/* Services */
+.wise-service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.wise-service-card {
+  position: relative;
+  min-height: 290px;
+  padding: 30px;
+}
+
+.wise-service-card:nth-child(4),
+.wise-service-card:nth-child(5) {
+  grid-column: span 1;
+}
+
+.wise-service-card__number {
+  position: absolute;
+  top: 28px;
+  right: 30px;
+  color: var(--wise-yellow);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.wise-service-card__icon {
+  margin-bottom: 52px;
+}
+
+.wise-project-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 40px;
+}
+
+.wise-project-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--wise-line);
+  color: var(--wise-ink);
+  font-weight: 700;
+}
+
+.wise-project-row__icon {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  color: var(--wise-navy);
+  border: 1px solid var(--wise-line);
+  border-radius: 10px;
+  background: var(--wise-surface);
+  font-size: 0.8rem;
+}
+
+/* Partners */
+.wise-partner-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 38px;
+}
+
+.wise-partner-column h2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid var(--wise-navy);
+  color: var(--wise-navy);
+  font-size: 1.05rem;
+}
+
+.wise-partner-column h2 span {
+  color: var(--wise-yellow);
+}
+
+.wise-partner-list {
+  margin-top: 6px;
+}
+
+.wise-partner-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 68px;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf0f4;
+  color: var(--wise-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.wise-partner-list img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border: 1px solid var(--wise-line);
+  border-radius: 10px;
+  padding: 7px;
+  background: #fff;
+}
+
+/* Blog/news */
+.wise-news-feature {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  min-height: 390px;
+  overflow: hidden;
+  border: 1px solid var(--wise-line);
+  border-radius: var(--wise-radius);
+  background: var(--wise-surface);
+}
+
+.wise-news-feature__image {
+  min-height: 320px;
+  background: linear-gradient(135deg, rgba(21,55,95,0.45), rgba(21,55,95,0.08)), url('/assets/images/team-meeting.jpg') center / cover;
+}
+
+.wise-news-feature__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px;
+}
+
+.wise-news-date {
+  color: var(--wise-yellow);
+  font-size: 0.84rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.wise-news-feature h2 {
+  color: var(--wise-navy);
+  font-size: clamp(1.5rem, 3vw, 2.45rem);
+  line-height: 1.2;
+  margin-bottom: 18px;
+}
+
+.wise-news-feature p,
+.wise-news-card p {
+  color: var(--wise-muted);
+  line-height: 1.75;
+}
+
+.wise-news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 26px;
+}
+
+.wise-news-card {
+  padding: 26px;
+  min-height: 210px;
+}
+
+.wise-news-card h3 {
+  color: var(--wise-navy);
+  font-size: 1.1rem;
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+/* FAQ */
+.wise-faq-list {
+  display: grid;
+  gap: 14px;
+  max-width: 960px;
+}
+
+.wise-faq-item {
+  overflow: hidden;
+  background: #fff;
+}
+
+.wise-faq-item[open] {
+  border-color: var(--wise-navy);
+  box-shadow: var(--wise-shadow);
+}
+
+.wise-faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 24px 28px;
+  color: var(--wise-navy);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 800;
+  list-style: none;
+}
+
+.wise-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.wise-faq-item summary::after {
+  content: '+';
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: var(--wise-navy);
+  border: 1px solid var(--wise-navy);
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.wise-faq-item[open] summary::after {
+  content: '−';
+  color: var(--wise-navy);
+  border-color: var(--wise-yellow);
+  background: var(--wise-yellow);
+}
+
+.wise-faq-item__answer {
+  padding: 0 28px 26px;
+  color: var(--wise-muted);
+  line-height: 1.8;
+}
+
+/* Contact */
+.wise-contact-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.wise-contact-panel {
+  padding: 42px;
+  border-radius: var(--wise-radius);
+  color: #fff;
+  background: var(--wise-navy-deep);
+}
+
+.wise-contact-panel h2 {
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.wise-contact-panel p {
+  color: rgba(255,255,255,0.72);
+  line-height: 1.8;
+  margin-bottom: 38px;
+}
+
+.wise-contact-detail {
+  display: grid;
+  gap: 22px;
+}
+
+.wise-contact-detail a,
+.wise-contact-detail div {
+  color: #fff;
+  font-weight: 700;
+}
+
+.wise-contact-detail small {
+  display: block;
+  color: var(--wise-yellow);
+  font-size: 0.78rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.wise-contact-form {
+  padding: 42px;
+  border: 1px solid var(--wise-line);
+  border-radius: var(--wise-radius);
+  background: var(--wise-surface);
+}
+
+.wise-contact-form h2 {
+  color: var(--wise-navy);
+  font-size: 1.6rem;
+  margin-bottom: 24px;
+}
+
+.wise-contact-form form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.wise-contact-form .wise-field--wide,
+.wise-contact-form button,
+.wise-contact-form #formStatus {
+  grid-column: 1 / -1;
+}
+
+.wise-contact-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--wise-ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.wise-contact-form input,
+.wise-contact-form textarea {
+  width: 100%;
+  padding: 15px 16px;
+  border: 1px solid var(--wise-line);
+  border-radius: 10px;
+  color: var(--wise-ink);
+  background: #fff;
+  outline: none;
+}
+
+.wise-contact-form textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.wise-contact-form input:focus,
+.wise-contact-form textarea:focus {
+  border-color: var(--wise-yellow);
+  box-shadow: 0 0 0 3px rgba(245,186,53,0.18);
+}
+
+/* Careers */
+.wise-career-banner {
+  position: relative;
+  overflow: hidden;
+  padding: 76px;
+  border-radius: 22px;
+  color: #fff;
+  background: var(--wise-navy-deep);
+}
+
+.wise-career-banner::after {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  right: -80px;
+  bottom: -140px;
+  border: 1px solid rgba(245,186,53,0.35);
+  border-radius: 50%;
+  box-shadow: 0 0 0 36px rgba(245,186,53,0.08), 0 0 0 72px rgba(245,186,53,0.04);
+}
+
+.wise-career-banner > * {
+  position: relative;
+  z-index: 1;
+}
+
+.wise-career-banner .wise-title {
+  max-width: 720px;
+  color: #fff !important;
+}
+
+.wise-career-banner p {
+  max-width: 620px;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 28px;
+}
+
+/* Footer */
+.presentation-footer.footer {
+  padding: 72px 24px 28px;
+  background: var(--wise-navy-deep) !important;
+  border-top: 0 !important;
+}
+
+.presentation-footer .footer__inner {
+  gap: 54px;
+}
+
+.presentation-footer .footer__brand p,
+.presentation-footer .footer__links a,
+.presentation-footer .footer__bottom {
+  color: rgba(255,255,255,0.7) !important;
+}
+
+.presentation-footer .footer__heading {
+  color: var(--wise-yellow) !important;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Existing interactive controls, restyled to the presentation. */
+.wise-page .service-detail-btn,
+.wise-page .blog-read-more {
+  color: var(--wise-navy);
+  border-color: var(--wise-navy);
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .wise-page {
+  background: #0c1d31 !important;
+}
+
+html[data-theme="dark"] .site-header.header,
+html[data-theme="dark"] .site-header.header.scrolled {
+  background: rgba(12, 29, 49, 0.96) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+
+html[data-theme="dark"] .site-header .nav__link,
+html[data-theme="dark"] .site-header .theme-toggle {
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .wise-title,
+html[data-theme="dark"] .wise-section-heading .wise-title,
+html[data-theme="dark"] .wise-stat strong,
+html[data-theme="dark"] .wise-feature-card h3,
+html[data-theme="dark"] .wise-service-card h3,
+html[data-theme="dark"] .wise-news-feature h2,
+html[data-theme="dark"] .wise-news-card h3,
+html[data-theme="dark"] .wise-partner-column h2,
+html[data-theme="dark"] .wise-project-row,
+html[data-theme="dark"] .wise-faq-item summary,
+html[data-theme="dark"] .wise-contact-form h2,
+html[data-theme="dark"] .wise-contact-form label {
+  color: #f8fbff !important;
+}
+
+html[data-theme="dark"] .wise-feature-card,
+html[data-theme="dark"] .wise-service-card,
+html[data-theme="dark"] .wise-news-card,
+html[data-theme="dark"] .wise-faq-item,
+html[data-theme="dark"] .wise-news-feature,
+html[data-theme="dark"] .wise-stat-strip,
+html[data-theme="dark"] .wise-contact-form {
+  background: #122943;
+  border-color: rgba(255,255,255,0.14);
+}
+
+html[data-theme="dark"] .wise-stat,
+html[data-theme="dark"] .wise-partner-list li,
+html[data-theme="dark"] .wise-project-row {
+  border-color: rgba(255,255,255,0.12);
+}
+
+html[data-theme="dark"] .wise-feature-card p,
+html[data-theme="dark"] .wise-service-card p,
+html[data-theme="dark"] .wise-news-feature p,
+html[data-theme="dark"] .wise-news-card p,
+html[data-theme="dark"] .wise-faq-item__answer,
+html[data-theme="dark"] .wise-lede,
+html[data-theme="dark"] .wise-story__copy p {
+  color: #b6c4d4 !important;
+}
+
+html[data-theme="dark"] .wise-section--soft {
+  background: #10253c;
+}
+
+html[data-theme="dark"] .wise-partner-list img,
+html[data-theme="dark"] .wise-feature-card__icon,
+html[data-theme="dark"] .wise-service-card__icon {
+  background: #183552;
+  border-color: rgba(255,255,255,0.14);
+}
+
+html[data-theme="dark"] .wise-contact-form input,
+html[data-theme="dark"] .wise-contact-form textarea {
+  color: #fff;
+  border-color: rgba(255,255,255,0.16);
+  background: #0c1d31;
+}
+
+@media (max-width: 1050px) {
+  .site-header .nav {
+    gap: 16px;
+  }
+
+  .site-header .nav__link {
+    font-size: 0.78rem;
+  }
+
+  .wise-partner-columns,
+  .wise-service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .wise-container {
+    width: min(var(--wise-container), calc(100% - 32px));
+  }
+
+  .site-header .nav {
+    top: 78px;
+    padding: 22px 24px 28px;
+    background: #fff;
+    border-bottom: 1px solid var(--wise-line);
+  }
+
+  .site-header .nav__link {
+    justify-content: flex-start;
+    padding: 13px 0;
+    font-size: 1rem;
+  }
+
+  .site-header .nav__link--active::after {
+    bottom: 4px;
+    width: 42px;
+  }
+
+  .site-header .nav__link--contact {
+    padding: 13px 16px;
+    margin: 8px 0 0;
+  }
+
+  .wise-section {
+    padding: 76px 0;
+  }
+
+  .wise-page-intro {
+    padding: 72px 0 48px;
+  }
+
+  .wise-three-grid,
+  .wise-service-grid,
+  .wise-partner-columns,
+  .wise-news-grid,
+  .wise-story,
+  .wise-contact-grid,
+  .wise-news-feature {
+    grid-template-columns: 1fr;
+  }
+
+  .wise-stat-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wise-stat:nth-child(2) {
+    border-right: 0;
+  }
+
+  .wise-stat:nth-child(-n+2) {
+    border-bottom: 1px solid var(--wise-line);
+  }
+
+  .wise-story {
+    gap: 28px;
+  }
+
+  .wise-ribbon {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 28px;
+  }
+
+  .wise-news-feature__image {
+    min-height: 240px;
+  }
+
+  .wise-news-feature__copy,
+  .wise-contact-panel,
+  .wise-contact-form {
+    padding: 30px 24px;
+  }
+
+  .wise-career-banner {
+    padding: 44px 28px;
+  }
+
+  .wise-contact-form form {
+    grid-template-columns: 1fr;
+  }
+
+  .wise-contact-form .wise-field--wide,
+  .wise-contact-form button,
+  .wise-contact-form #formStatus {
+    grid-column: auto;
+  }
+
+  .wise-project-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .wise-home-hero {
+    min-height: 670px;
+  }
+
+  .wise-hero-copy {
+    padding: 62px 0;
+  }
+
+  .wise-home-hero .wise-title {
+    font-size: 2.65rem;
+  }
+
+  .wise-hero-actions .wise-btn {
+    width: 100%;
+  }
+
+  .wise-stat {
+    min-height: 140px;
+    padding: 22px 16px;
+  }
+
+  .wise-stat strong {
+    font-size: 1.8rem;
+  }
+}
+
+/* Blog: search bar */
+.wise-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 34px;
+}
+
+.wise-search-bar__icon {
+  position: absolute;
+  left: 18px;
+  width: 20px;
+  height: 20px;
+  color: var(--wise-muted);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.wise-search-bar__input {
+  width: 100%;
+  padding: 17px 22px 17px 52px;
+  border: 1px solid var(--wise-line);
+  border-radius: 14px;
+  color: var(--wise-ink);
+  background: var(--wise-surface);
+  font: inherit;
+  outline: none;
+}
+
+.wise-search-bar__input:focus {
+  border-color: var(--wise-yellow);
+  box-shadow: 0 0 0 3px rgba(245,186,53,0.18);
+}
+
+/* Blog: news cards date */
+.wise-news-card__date {
+  color: var(--wise-yellow);
+  font-size: 0.78rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+/* Blog: pagination */
+.wise-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 48px;
+}
+
+.wise-pagination .wise-btn {
+  min-width: 46px;
+  padding: 10px 14px;
+  justify-content: center;
+}
+
+.wise-pagination .pagination__btn--active {
+  color: var(--wise-navy);
+  border-color: var(--wise-yellow);
+  background: var(--wise-yellow);
+}
+
+/* Contact: detail rows + social */
+.wise-contact-detail__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.wise-contact-detail__row svg {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  color: var(--wise-yellow);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.wise-contact-detail__row a {
+  text-decoration: none;
+}
+
+.wise-contact-panel__social {
+  display: flex;
+  gap: 12px;
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.14);
+}
+
+.wise-contact-panel__social a {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 10px;
+  color: #fff;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.wise-contact-panel__social a:hover {
+  border-color: var(--wise-yellow);
+  background: rgba(245,186,53,0.14);
+}
+
+.wise-contact-panel__social svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Careers: banner layout with image */
+.wise-career-banner__inner {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.wise-career-banner__image {
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.wise-career-banner__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+}
+
+.wise-career-banner .wise-lede {
+  color: rgba(255,255,255,0.72);
+}
+
+/* Careers: job list */
+.wise-job-list {
+  display: grid;
+  gap: 16px;
+}
+
+.wise-job-card {
+  display: grid;
+  gap: 14px;
+  padding: 28px;
+  border: 1px solid var(--wise-line);
+  border-radius: var(--wise-radius);
+  background: var(--wise-surface);
+}
+
+.wise-job-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.wise-job-card__head h3 {
+  color: var(--wise-navy);
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.wise-job-card__head p {
+  color: var(--wise-yellow);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.wise-job-card__text {
+  color: var(--wise-muted);
+  line-height: 1.75;
+}
+
+/* Careers: CV callout */
+.wise-cv-callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding: 34px 38px;
+  border: 1px solid var(--wise-line);
+  border-radius: var(--wise-radius);
+  background: var(--wise-surface);
+}
+
+.wise-cv-callout h2 {
+  color: var(--wise-navy);
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.wise-cv-callout p {
+  color: var(--wise-muted);
+  line-height: 1.7;
+}
+
+html[data-theme="dark"] .wise-search-bar__input,
+html[data-theme="dark"] .wise-job-card,
+html[data-theme="dark"] .wise-cv-callout {
+  background: #122943;
+  border-color: rgba(255,255,255,0.14);
+}
+
+html[data-theme="dark"] .wise-search-bar__input {
+  color: #fff;
+}
+
+html[data-theme="dark"] .wise-job-card__head h3,
+html[data-theme="dark"] .wise-cv-callout h2 {
+  color: #f8fbff !important;
+}
+
+html[data-theme="dark"] .wise-job-card__text,
+html[data-theme="dark"] .wise-cv-callout p {
+  color: #b6c4d4 !important;
+}
+
+@media (max-width: 768px) {
+  .wise-career-banner__inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .wise-career-banner__image img {
+    min-height: 220px;
+  }
+}
