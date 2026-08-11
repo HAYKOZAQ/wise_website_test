@@ -304,6 +304,7 @@ ${safeHtml(content || '<p>Content not available offline.</p>')}
       document.body.style.overflow = 'hidden';
 
       body.querySelectorAll('a').forEach(a => {
+        if (a.hasAttribute('download')) return;
         a.setAttribute('target', '_blank');
         a.setAttribute('rel', 'noopener');
       });
