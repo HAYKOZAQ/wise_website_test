@@ -1,6 +1,6 @@
 /* ====================================================
    WISE Foundation — Language Switcher (i18n)
-   Supports: Armenian (hy) ↔ English (en)
+   Supports: Armenian (hy) ↔ English (en) ↔ Russian (ru)
    ─ Language preference saved in localStorage
    ─ Elements with [data-i18n="key"] are auto-translated
    ─ Elements with [data-i18n-attr="attr"] translate an attribute
@@ -386,7 +386,7 @@
     'faq.q2':          { hy: 'Ինչպե՞ս կարող եմ դառնալ ձեր գործընկերը', en: 'How can I become your partner?' },
     'faq.a2':          { hy: 'Գրեք մեզ հետադարձ կապի էջի միջոցով՝ նշելով Ձեր կազմակերպությունը և համագործակցության առաջարկը։ Մեր թիմը կապվելու է Ձեզ հետ երկու աշխատանքային օրվա ընթացքում։', en: 'Write to us via the contact page with your organization and proposal. Our team will get back to you within two working days.' },
     'faq.q3':          { hy: 'Ինչպե՞ս կարող եմ միանալ ձեր թիմին', en: 'How can I join your team?' },
-    'faq.a3':          { hy: 'Կարիերա էջում հրապարակում ենք բաց թափուր տեղերը։ Կարող եք նաև ուղարկել Ձեր ինքնակենսագրությունը՝ նշելով հետաքրքրող մասնագիտությունը, և մենք կքննարկենք այն առկա հնարավորությունների հետ։', en: 'Open positions are published on the Careers page. You can also send your CV with your area of interest and we will consider it for current opportunities.' },
+    'faq.a3':          { hy: 'Կարիերա էջում հրապարակում ենք թափուր հաստիքները։ Կարող եք նաև ուղարկել Ձեր ինքնակենսագրությունը՝ նշելով հետաքրքրող մասնագիտությունը, և մենք կքննարկենք այն առկա հնարավորությունների հետ։', en: 'Open positions are published on the Careers page. You can also send your CV with your area of interest and we will consider it for current opportunities.' },
     'faq.q4':          { hy: 'Ո՞ւմ են սպասարկում ձեր տեղեկատվական համակարգերը', en: 'Who uses your information systems?' },
     'faq.a4':          { hy: 'Մեր համակարգերը սպասարկում են ՀՀ քաղաքացիներին՝ սոցիալական ծառայությունների, զբաղվածության և այլ ոլորտների գործընթացները դարձնելով հասանելի և թափանցիկ։', en: 'Our systems serve citizens of Armenia, making social services, employment, and other processes accessible and transparent.' },
     'faq.q5':          { hy: 'Ինչպե՞ս եք ապահովում տվյալների անվտանգությունը', en: 'How do you ensure data security?' },
@@ -399,9 +399,9 @@
     'careers.eyebrow':     { hy: 'Կարիերա', en: 'Careers' },
     'careers.title':       { hy: 'Աշխատանք, որը փոխում է կյանքեր', en: 'Work that changes lives' },
     'careers.lede':        { hy: 'Յուրաքանչյուր համակարգ, որը մենք կառուցում ենք, օգնում է հազարավոր մարդկանց հասանելիություն ստանալ ծառայություններին։', en: 'Every system we build helps thousands of people gain access to services.' },
-    'careers.openings_link': { hy: 'Տեսնել բաց թափուր տեղերը', en: 'See open positions' },
-    'careers.openings_label': { hy: 'Բաց թափուր տեղեր', en: 'Open Positions' },
-    'careers.openings_title': { hy: 'Ներկայումս բաց դիրքերը', en: 'Current openings' },
+    'careers.openings_link': { hy: 'Տեսնել թափուր տեղերը', en: 'See open positions' },
+    'careers.openings_label': { hy: 'Թափուր հաստիքներով', en: 'Open Positions' },
+    'careers.openings_title': { hy: 'Մենք փնտրում ենք', en: 'Current openings' },
     'careers.job1_title':  { hy: 'Full Stack Developer', en: 'Full Stack Developer' },
     'careers.job1_meta':   { hy: 'Երևան · Լրիվ դրույք', en: 'Yerevan · Full-time' },
     'careers.job1_text':   { hy: 'Մենք փնտրում ենք փորձառու Full Stack մշակող՝ մեր սոցիալական ծառայությունների նախագծերի համար։', en: 'We are looking for an experienced Full Stack developer for our social services projects.' },
@@ -412,7 +412,7 @@
     'careers.job3_meta':   { hy: 'Երևան · Լրիվ դրույք', en: 'Yerevan · Full-time' },
     'careers.job3_text':   { hy: 'Մեր համակարգերի որակի և հուսալիության պատասխանատու՝ ավտոմատացված և մեխանիկական թեստավորում։', en: 'Responsible for the quality and reliability of our systems through automated and manual testing.' },
     'careers.apply':       { hy: 'Դիմել', en: 'Apply' },
-    'careers.cv_title':    { hy: 'Չեք գտե՞լ Ձեզ հարմար պաշտոն', en: 'No position that fits?' },
+    'careers.cv_title':    { hy: 'Չեք գտե՞լ Ձեզ հարմար հաստիք', en: 'No position that fits?' },
     'careers.cv_text':     { hy: 'Ուղարկեք Ձեր ինքնակենսագրությունը, և կապվելու ենք առկա հնարավորությունների շրջանակում։', en: 'Send your CV and we will reach out within current opportunities.' },
     'careers.cv_button':   { hy: 'Ուղարկել ինքնակենսագրություն', en: 'Send your CV' },
 
@@ -434,7 +434,7 @@
     'site.desc.contact':  { hy: 'Կապվեք WISE Foundation-ի հետ: Էլ. փոստ, հեռախոս, կոնտակտային ձև:', en: 'Contact WISE Foundation. Email, phone, contact form.' },
     'site.desc.blog':     { hy: 'WISE Foundation-ի բլոգ՝ նորություններ, հոդվածներ և հայտարարություններ տեղեկատվական տեխնոլոգիաների ոլորտում:', en: 'WISE Foundation blog — news, articles and announcements in information technology.' },
     'site.desc.faq':      { hy: 'Պատասխաններ WISE Foundation-ի ծառայությունների, կարիերայի և համագործակցության վերաբերյալ հաճախ տրվող հարցերին։', en: 'Answers to frequently asked questions about WISE Foundation services, careers, and cooperation.' },
-    'site.desc.careers':  { hy: 'Աշխատեք WISE Foundation-ում. բաց թափուր տեղեր, թիմ, մշակույթ և ինքնակենսագրություն ուղարկելու հնարավորություն։', en: 'Work at WISE Foundation. Open positions, team, culture, and the ability to submit your CV.' }
+    'site.desc.careers':  { hy: 'Աշխատեք WISE Foundation-ում. թափուր հաստիքներ, թիմ, մշակույթ և ինքնակենսագրություն ուղարկելու հնարավորություն։', en: 'Work at WISE Foundation. Open positions, team, culture, and the ability to submit your CV.' }
   };
 
   /* ══════════════════════════════════════════════════════
