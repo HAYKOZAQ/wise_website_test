@@ -397,8 +397,8 @@
 
     /* Careers page */
     'careers.eyebrow':     { hy: 'Կարիերա', en: 'Careers' },
-    'careers.title':       { hy: 'Թվային լուծումներ՝ հանուն մարդու բարեկեցության', en: 'Digital solutions for human well-being' },
-    'careers.lede':        { hy: 'Մենք միշտ փնտրում ենք մարդկանց, ովքեր ցանկանում են փոխել հանրային ծառայությունների մատուցումը դեպի լավը։', en: 'We are always looking for people who want to change public service delivery for the better.' },
+    'careers.title':       { hy: 'Աշխատանք, որը փոխում է կյանքեր', en: 'Work that changes lives' },
+    'careers.lede':        { hy: 'Յուրաքանչյուր համակարգ, որը մենք կառուցում ենք, օգնում է հազարավոր մարդկանց հասանելիություն ստանալ ծառայություններին։', en: 'Every system we build helps thousands of people gain access to services.' },
     'careers.openings_link': { hy: 'Տեսնել բաց թափուր տեղերը', en: 'See open positions' },
     'careers.openings_label': { hy: 'Բաց թափուր տեղեր', en: 'Open Positions' },
     'careers.openings_title': { hy: 'Ներկայումս բաց դիրքերը', en: 'Current openings' },
