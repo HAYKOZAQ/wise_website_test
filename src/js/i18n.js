@@ -39,7 +39,7 @@
     'home.why_label':    { hy: 'Ինչու աշխատել WISE-ում', en: 'Why work at WISE' },
     'home.why_title':    { hy: 'Ի՞նչ ենք մենք առաջարկում', en: 'What we offer' },
     'home.why_text':     { hy: 'Աշխատանքը մեզ մոտ նշանակում է ազդեցություն, զարգացում և թիմ, որը տեսնում է մարդուն։', en: 'Working with us means impact, growth, and a team that sees people.' },
-    'home.why_1_title':  { hy: 'Իմաստալի աշխատանք', en: 'Meaningful work' },
+    'home.why_1_title':  { hy: 'Իմաստալից աշխատանք', en: 'Meaningful work' },
     'home.why_1_text':   { hy: 'Աշխատանք, որի արդյունքը փոխում է մարդկանց առօրյան և դարձնում ծառայությունները հասանելի։', en: 'Work whose results change people\'s everyday lives and make services accessible.' },
     'home.why_2_title':  { hy: 'Աճի հնարավորություններ', en: 'Growth opportunities' },
     'home.why_2_text':   { hy: 'Սովորում ենք միասին, աշխատում ենք բարդ խնդիրների վրա և զարգացնում ենք մասնագիտական ներուժը։', en: 'We learn together, solve complex problems, and grow professional potential.' },
