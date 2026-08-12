@@ -45,7 +45,7 @@
     'home.why_2_text':   { hy: 'Սովորում ենք միասին, աշխատում ենք բարդ խնդիրների վրա և զարգացնում ենք մասնագիտական ներուժը։', en: 'We learn together, solve complex problems, and grow professional potential.' },
     'home.why_3_title':  { hy: 'Մարդակենտրոն միջավայր', en: 'People-centered culture' },
     'home.why_3_text':   { hy: 'Թիմային մշակույթ, որտեղ կարծիքը լսելի է, իսկ փոխադարձ աջակցությունը՝ աշխատանքի հիմքում։', en: 'A team culture where opinions are heard and mutual support is at the core.' },
-    'home.cta_title':    { hy: 'Ունե՞ք հարց, մեզ միանալու մասին', en: 'Have a question about joining us?' },
+    'home.cta_title':    { hy: 'Ունե՞ք հարց', en: 'Have a question?' },
     'home.cta_text':     { hy: 'Գրեք մեզ, և կկապվենք Ձեզ հետ երկու աշխատանքային օրվա ընթացքում։', en: 'Write to us and we will get back to you within two working days.' },
     'home.cta_button':   { hy: 'Կապվել մեզ հետ', en: 'Contact us' },
 
