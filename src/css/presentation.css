@@ -139,8 +139,55 @@ body[lang="hy"],
   background: #fff;
 }
 
-.wise-page-intro {
+/* Page hero: full-width video cover for subpages */
+.wise-page-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: 420px;
   padding: 92px 0 64px;
+  color: #fff;
+  background: #082341;
+}
+
+.wise-page-hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.wise-page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(8, 35, 65, 0.96) 0%, rgba(8, 35, 65, 0.85) 42%, rgba(8, 35, 65, 0.32) 100%);
+}
+
+.wise-page-hero .wise-container {
+  position: relative;
+  z-index: 2;
+}
+
+.wise-page-hero .wise-eyebrow,
+.wise-page-hero .wise-title,
+.wise-page-hero .wise-lede {
+  color: #fff !important;
+}
+
+.wise-page-hero .wise-lede {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+.wise-page-intro {
+  padding: 0;
   max-width: 780px;
 }
 
@@ -1180,8 +1227,13 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
     padding: 76px 0;
   }
 
+  .wise-page-hero {
+    min-height: 360px;
+    padding: 64px 0 48px;
+  }
+
   .wise-page-intro {
-    padding: 72px 0 48px;
+    padding: 0;
   }
 
   .wise-three-grid,
