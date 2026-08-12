@@ -23,14 +23,43 @@ active: blog
 
 <section class="wise-section">
 <div class="wise-container">
-<article class="wise-news-article fade-in">
-<h2 class="wise-news-article__title" data-i18n="blog.news1_title">«WISE» բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն հիմնադրամի վերաբրենդավորման և վերջին ամիսների իրականացված աշխատանքների և զարգացման տեսլականի ներկայացումը</h2>
-<div class="wise-news-article__gallery">
-<figure><img src="/assets/images/news/rebrand-1.jpg" alt="«WISE» հիմնադրամի վերաբրենդավորման քննարկում"></figure>
-<figure><img src="/assets/images/news/rebrand-2.jpg" alt="«WISE» հիմնադրամի զարգացման տեսլականի ներկայացում"></figure>
-<figure><img src="/assets/images/news/rebrand-3.jpg" alt="Հանդիպման մասնակիցները"></figure>
+<div class="wise-blog-list">
+<article class="wise-blog-card fade-in" data-open-news role="button" tabindex="0" aria-haspopup="dialog">
+<div class="wise-blog-card__media">
+<img src="/assets/images/news/rebrand-1.jpg" alt="">
 </div>
-<div class="wise-news-article__body">
+<div class="wise-blog-card__body">
+<span class="wise-blog-card__badge" data-i18n="blog.news1_badge">Նորություն</span>
+<h2 class="wise-blog-card__title" data-i18n="blog.news1_title">«WISE» բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն հիմնադրամի վերաբրենդավորման և վերջին ամիսների իրականացված աշխատանքների և զարգացման տեսլականի ներկայացումը</h2>
+<p class="wise-blog-card__excerpt" data-i18n="blog.news1_excerpt">Աշխատանքի և սոցիալական հարցերի նախարար Արսեն Թորոսյանը մասնակցել է «WISE» հիմնադրամի վերաբրենդավորման և զարգացման տեսլականի քննարկմանը։</p>
+<button class="wise-btn wise-btn--outline" type="button" data-i18n="blog.readmore">Կարդալ ավելին</button>
+</div>
+</article>
+</div>
+</div>
+</section>
+
+<div class="wise-news-modal" id="wiseNewsModal" hidden>
+<div class="wise-news-modal__backdrop" data-close-news></div>
+<div class="wise-news-modal__panel" role="dialog" aria-modal="true" aria-labelledby="wiseNewsTitle">
+<button class="wise-news-modal__close" type="button" data-close-news aria-label="Close">✕</button>
+<div class="wise-news-modal__scroll">
+<h2 class="wise-news-modal__title" id="wiseNewsTitle" data-i18n="blog.news1_title">«WISE» բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն հիմնադրամի վերաբրենդավորման և վերջին ամիսների իրականացված աշխատանքների և զարգացման տեսլականի ներկայացումը</h2>
+
+<div class="wise-slider">
+<div class="wise-slider__viewport">
+<div class="wise-slider__track">
+<figure class="wise-slider__slide"><img src="/assets/images/news/rebrand-1.jpg" alt="«WISE» հիմնադրամի վերաբրենդավորման քննարկում"></figure>
+<figure class="wise-slider__slide"><img src="/assets/images/news/rebrand-2.jpg" alt="«WISE» հիմնադրամի զարգացման տեսլականի ներկայացում"></figure>
+<figure class="wise-slider__slide"><img src="/assets/images/news/rebrand-3.jpg" alt="Հանդիպման մասնակիցները"></figure>
+</div>
+</div>
+<button class="wise-slider__arrow wise-slider__arrow--prev" type="button" data-slide-prev aria-label="Previous">‹</button>
+<button class="wise-slider__arrow wise-slider__arrow--next" type="button" data-slide-next aria-label="Next">›</button>
+<div class="wise-slider__dots" data-slide-dots></div>
+</div>
+
+<div class="wise-news-modal__body">
 <p data-i18n="blog.news1_p1">Աշխատանքի և սոցիալական հարցերի նախարար Արսեն Թորոսյանը մասնակցել է «WISE» բարեկեցության տեղեկատվական համակարգերի ձեռնարկություն հիմնադրամի (նախկին «Նորք» տեխնոլոգիաների կենտրոն) կողմից վերջին վեց ամիսների ընթացքում իրականացված աշխատանքների և զարգացման տեսլականի վերաբերյալ քննարկմանը։ Հանդիպմանը ներկա են եղել նաև ԱՍՀ նախարարի տեղակալ Արաիկ Եսայանը, «WISE» հիմնադրամի տնօրեն Արմինե Հովսեփյանը, ՄՍԾ պետի տեղակալներ Աննա Մկրտումյանը, Լիանա Թովմասյանը և Աննա Բեգլարյանը, ինչպես նաև ներկայացուցիչներ` Միավորված ազգերի կազմակերպության զարգացման ծրագրից (ՄԱԶԾ)։</p>
 <p data-i18n="blog.news1_p2">Ներկայացվել է հիմնադրամի զարգացման տեսլականը, նոր բրենդինգը, համաձայն որի` թվային ծառայությունների մատուցման ոլորտում կազմակերպության գործունեությունը ուղղված կլինի մարդակենտրոն, տվյալահեն և ժամանակակից թվային միջավայրի ձևավորմանը։</p>
 <p data-i18n="blog.news1_p3">Կարևորելով սոցիալական պաշտպանության համակարգը միասնական թվային միջավայրում համախմբելու գաղափարը՝ նախարար Արսեն Թորոսյանը նշել է, որ իրականացվող թվային փոխակերպումները միտված են ձևավորելու այնպիսի համակարգ, որտեղ մատուցվող ծառայությունները կլինեն ոչ միայն թվայնացված, այլև փոխկապակցված, մարդակենտրոն, հասանելի և արդյունավետ։</p>
@@ -38,7 +67,7 @@ active: blog
 <p data-i18n="blog.news1_p5">«WISE» հիմնադրամի աշխատակիցները ներկայացրել են միջազգային գործընկերների հետ համատեղ իրականացված ծրագրերը, ներդրվելիք թվային նոր գործիքներն ու նախաձեռնությունները։</p>
 <p data-i18n="blog.news1_p6">Քննարկումը կազմակերպվել է Միավորված ազգերի կազմակերպության զարգացման ծրագրի աջակցությամբ` ԵՄ ֆինանսավորմամբ իրականացվող «Հայաստանի սոցիալական պաշտպանության համակարգի հզորացում» ծրագրի շրջանակում:</p>
 </div>
-</article>
 </div>
-</section>
+</div>
+</div>
 </main>
