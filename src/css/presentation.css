@@ -1249,8 +1249,9 @@ html[data-theme="dark"] .wise-contact-form textarea {
 .wise-career-banner__image img {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
   min-height: 320px;
+  max-height: 420px;
   object-fit: cover;
 }
 
