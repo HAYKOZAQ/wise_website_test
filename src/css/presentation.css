@@ -658,7 +658,7 @@ body[lang="hy"],
 
 .wise-news-feature__image {
   min-height: 320px;
-  background: linear-gradient(135deg, rgba(21,55,95,0.45), rgba(21,55,95,0.08)), url('/assets/images/team-meeting.jpg') center / cover;
+  background: linear-gradient(135deg, rgba(21,55,95,0.45), rgba(21,55,95,0.08));
 }
 
 .wise-news-feature__copy {
@@ -1396,7 +1396,8 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
   border: 1px solid rgba(255,255,255,0.14);
 }
 
-.wise-career-banner__image img {
+.wise-career-banner__image img,
+.wise-career-banner__image video {
   display: block;
   width: 100%;
   height: auto;
