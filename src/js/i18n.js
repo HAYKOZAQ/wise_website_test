@@ -1019,7 +1019,7 @@
       }
     });
 
-    if (lang === 'en') applyLang('en');
+    if (lang !== 'hy') applyLang(lang);
   }
 
   if (document.readyState === 'loading') {
