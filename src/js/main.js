@@ -51,32 +51,47 @@ function initCounters() {
   const counters = document.querySelectorAll('[data-counter]');
   if (!counters.length) return;
 
+  function fmt(n) {
+    return n >= 10000 ? n.toLocaleString('en-US') : String(n);
+  }
+
+  function animate(el) {
+    const target = parseInt(el.getAttribute('data-counter'), 10) || 0;
+    const suffix = el.getAttribute('data-suffix') || '';
+    const duration = 2400;
+    const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
+    const startTime = performance.now() + delay;
+    const stat = el.closest('.wise-stat');
+    if (stat) stat.classList.add('wise-stat--counting');
+
+    function tick(currentTime) {
+      const elapsed = Math.max(currentTime - startTime, 0);
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo: fast start, smooth settle
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const current = Math.round(eased * target);
+      el.textContent = fmt(current) + suffix;
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        el.textContent = fmt(target) + suffix;
+        el.classList.add('wise-stat__num--done');
+        el.closest('.wise-stat') && el.closest('.wise-stat').classList.add('wise-stat--counted');
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const el = entry.target;
-        const target = parseInt(el.getAttribute('data-counter'));
-        const duration = 2000;
-        const startTime = performance.now();
-
-        function update(currentTime) {
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const current = Math.floor(eased * target);
-          el.textContent = current + (el.getAttribute('data-suffix') || '');
-          if (progress < 1) {
-            requestAnimationFrame(update);
-          } else {
-            el.textContent = target + (el.getAttribute('data-suffix') || '');
-          }
-        }
-
-        requestAnimationFrame(update);
+        animate(el);
         observer.unobserve(el);
       }
     });
-  }, { threshold: 0.3 });
+  }, { threshold: 0.4, rootMargin: '0px 0px -40px 0px' });
 
   counters.forEach(el => observer.observe(el));
 }
