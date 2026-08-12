@@ -20,7 +20,7 @@
     'nav.services':   { hy: 'Ծառայություններ', en: 'Services' },
     'nav.partners':   { hy: 'Գործընկերներ', en: 'Partners' },
     'nav.contact':    { hy: 'Հետադարձ կապ', en: 'Contact' },
-    'nav.blog':       { hy: 'Բլոգ', en: 'Blog' },
+    'nav.blog':       { hy: 'Նորություններ', en: 'News' },
     'nav.careers':    { hy: 'Կարիերա', en: 'Careers' },
     'nav.faq':        { hy: 'ՀՏՀ', en: 'FAQ' },
 
@@ -165,15 +165,15 @@
     'footer.about':      { hy: 'Մեր մասին', en: 'About' },
     'footer.services':   { hy: 'Ծառայություններ', en: 'Services' },
     'footer.partners':   { hy: 'Գործընկերներ', en: 'Partners' },
-    'footer.blog':       { hy: 'Բլոգ', en: 'Blog' },
+    'footer.blog':       { hy: 'Նորություններ', en: 'News' },
     'footer.faq':        { hy: 'Հաճախ տրվող հարցեր', en: 'FAQ' },
     'footer.careers':    { hy: 'Կարիերա', en: 'Careers' },
     'footer.contact_us': { hy: 'Հետադարձ կապ', en: 'Contact Us' },
     'footer.copyright':  { hy: '© 2026 Designed by «WISE» foundation', en: '© 2026 Designed by «WISE» foundation' },
 
     /* Blog page */
-    'blog.pagetitle':  { hy: 'Բլոգ', en: 'Blog' },
-    'blog.breadcrumb': { hy: 'Գլխավոր / Բլոգ', en: 'Home / Blog' },
+    'blog.pagetitle':  { hy: 'Նորություններ', en: 'News' },
+    'blog.breadcrumb': { hy: 'Գլխավոր / Նորություններ', en: 'Home / News' },
     'blog.readmore':   { hy: 'Կարդալ ավելին', en: 'Read More' },
     'blog.loading':    { hy: 'Բեռնվում է...', en: 'Loading...' },
     'blog.close':      { hy: 'Փակել', en: 'Close' },
@@ -423,7 +423,7 @@
     'site.title.services': { hy: 'Ծառայություններ — WISE Foundation', en: 'Services — WISE Foundation' },
     'site.title.partners': { hy: 'Գործընկերներ — WISE Foundation', en: 'Partners — WISE Foundation' },
     'site.title.contact':  { hy: 'Հետադարձ կապ — WISE Foundation', en: 'Contact Us — WISE Foundation' },
-    'site.title.blog':     { hy: 'Բլոգ — WISE Foundation', en: 'Blog — WISE Foundation' },
+    'site.title.blog':     { hy: 'Նորություններ — WISE Foundation', en: 'News — WISE Foundation' },
     'site.title.faq':      { hy: 'Հաճախ տրվող հարցեր — WISE Foundation', en: 'FAQ — WISE Foundation' },
     'site.title.careers':  { hy: 'Կարիերա — WISE Foundation', en: 'Careers — WISE Foundation' },
 
