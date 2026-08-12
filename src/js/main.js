@@ -176,20 +176,23 @@ function initPageTransitions() {
       return {
         sending: 'Sending...',
         success: '✅ Your message has been successfully sent!',
-        error: '❌ An error occurred. Please try again.'
+        error: '❌ An error occurred. Please try again.',
+        mailto: '✉️ Your email app opened — just press Send to deliver the message.'
       };
     }
     if (lang === 'ru') {
       return {
         sending: 'Отправка...',
         success: '✅ Ваше сообщение успешно отправлено!',
-        error: '❌ Произошла ошибка. Пожалуйста, попробуйте ещё раз.'
+        error: '❌ Произошла ошибка. Пожалуйста, попробуйте ещё раз.',
+        mailto: '✉️ Открылось ваше почтовое приложение — нажмите «Отправить», чтобы доставить письмо.'
       };
     }
     return {
       sending: 'Ուղարկվում է...',
       success: '✅ Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց:',
-      error: '❌ Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:'
+      error: '❌ Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:',
+      mailto: '✉️ Բացվել է Ձեր էլ. փոստի ծրագիրը — սեղմեք «Ուղարկել»՝ նամակն առաքելու համար։'
     };
   }
 
@@ -211,8 +214,6 @@ function initPageTransitions() {
     const primaryUrl = apiBase ? (apiBase.replace(/\/$/, '') + '/api/contact') : '';
     // Optional secondary path only if site owner configures window.WISEF_CONTACT_FALLBACK_URL
     const fallbackUrl = (window.WISEF_CONFIG && window.WISEF_CONFIG.contactFallbackUrl) || '';
-    // Web3Forms: delivers the message to info@wisef.am by email — no SMTP needed.
-    const web3Key = (window.WISEF_CONFIG && window.WISEF_CONFIG.web3formsAccessKey || '').trim();
 
     function postContact(url) {
       return fetch(url, {
@@ -234,52 +235,35 @@ function initPageTransitions() {
       });
     }
 
-    function postWeb3Forms() {
-      return fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          access_key: web3Key,
-          name: data.name || '',
-          email: data.email || '',
-          subject: data.subject || 'Website contact',
-          message: data.message || '',
-          from_name: 'WISE Foundation Website'
-        })
-      }).then(async (response) => {
-        let result = {};
-        try {
-          result = await response.json();
-        } catch (_) {}
-        if (!response.ok || result.success === false) {
-          throw new Error((result && result.message) || ('HTTP ' + response.status));
-        }
-        return result;
-      });
-    }
-
-    // Try each delivery channel in order; success if any of them works.
+    // Delivery channels in order: backend API first, then the visitor's own
+    // email app (mailto) as a zero-config fallback — the letter is pre-filled
+    // to info@wisef.am and sent from the visitor's account.
     const channels = [];
-    if (web3Key) channels.push(postWeb3Forms);
     if (primaryUrl) channels.push(() => postContact(primaryUrl));
     if (fallbackUrl && primaryUrl) channels.push(() => postContact(fallbackUrl));
+    channels.push(openMailto);
 
-    if (!channels.length) {
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
-      showStatus(texts.error, false);
-      return;
+    function openMailto() {
+      const to = (window.WISEF_CONFIG && window.WISEF_CONFIG.contactToEmail || 'info@wisef.am').trim();
+      const subject = encodeURIComponent(data.subject || 'Website contact');
+      const body = encodeURIComponent(
+        (data.name ? 'Name: ' + data.name + '\n' : '') +
+        (data.email ? 'Email: ' + data.email + '\n\n' : '') +
+        (data.message || '')
+      );
+      const href = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
+      window.location.href = href;
+      return Promise.resolve({ via: 'mailto' });
     }
 
     (async function deliver() {
       let lastErr = null;
+      let sentVia = null;
       for (const send of channels) {
         try {
-          await send();
-          return;
+          const res = await send();
+          sentVia = (res && res.via) || 'auto';
+          return { via: sentVia };
         } catch (err) {
           lastErr = err;
           console.warn('[ContactForm] delivery failed, trying next channel:', err.message || err);
@@ -290,14 +274,19 @@ function initPageTransitions() {
       .then((result) => {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
-        showStatus(texts.success, true);
+        const texts = getTexts();
+        if (result && result.via === 'mailto') {
+          showStatus(texts.mailto, true);
+        } else {
+          showStatus(texts.success, true);
+        }
         form.reset();
       })
       .catch((error) => {
         console.warn('[ContactForm] submission failed:', error.message || error);
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
-        showStatus(texts.error, false);
+        showStatus(getTexts().error, false);
       });
   });
 }/** Ensure page-header stays navy + white (beats theme/cascade glitches). */

@@ -24,15 +24,10 @@ window.WISEF_CONFIG = {
   contactFallbackUrl: '',
 
   /**
-   * Web3Forms — sends contact form emails to an inbox with NO SMTP/password.
-   * 1) Go to https://web3forms.com (free)
-   * 2) Enter the recipient email (info@wisef.am) and confirm the
-   *    verification email once.
-   * 3) Copy the "Access Key" from the dashboard and paste it below.
-   * After that, every form submission is emailed to info@wisef.am automatically.
-   * Safe to commit — access keys are public by design.
+   * Recipient of contact form messages when the mailto fallback is used
+   * (opens the visitor's own email app pre-filled to this address).
    */
-  web3formsAccessKey: ''
+  contactToEmail: 'info@wisef.am'
 };
 
 /** Resolve which API the chat should call */
