@@ -41,11 +41,11 @@ class TestPageHeaderContrast(unittest.TestCase):
                 ctx = dark[max(0, idx - 80) : idx + 80]
                 self.assertNotIn("page-header", ctx.lower())
 
-    def test_partners_has_page_header(self):
+    def test_partners_has_page_hero(self):
         html = (PAGES / "partners.html").read_text(encoding="utf-8")
-        self.assertIn('class="page-header"', html)
-        self.assertNotIn("page-header fade-in", html)
-        self.assertIn("page-header__title", html)
+        self.assertIn('class="wise-page-hero', html)
+        self.assertIn("wise-page-hero__video", html)
+        self.assertIn("wise-page-intro", html)
 
     def test_main_js_force_function(self):
         js = (JS / "main.js").read_text(encoding="utf-8")
