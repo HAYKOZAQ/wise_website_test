@@ -25,6 +25,20 @@ services:
         value: "1"
       - key: ADMIN_TOKEN
         sync: false
+      # SMTP — contact form emails go to info@wisef.am.
+      # Fill in SMTP_HOST/SMTP_USER/SMTP_PASSWORD in the dashboard.
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: CONTACT_TO_EMAIL
+        value: info@wisef.am
       # Only needed if this API is paired with a separately hosted site.
       - key: WISEF_PAGES_ORIGIN
         sync: false

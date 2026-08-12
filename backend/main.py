@@ -2,7 +2,9 @@ import os
 import sys
 import time
 import json
+import smtplib
 from collections import defaultdict, deque
+from email.message import EmailMessage
 from pathlib import Path
 from threading import Lock
 
@@ -124,6 +126,46 @@ _RATE_LIMIT = _env_int("CHAT_RATE_LIMIT", 20)  # requests
 _RATE_WINDOW = _env_int("CHAT_RATE_WINDOW_SEC", 60)  # seconds
 _rate_buckets: dict[str, deque] = defaultdict(deque)
 _rate_lock = Lock()
+
+
+def _send_contact_email(entry: dict[str, str]) -> None:
+    """Email a contact form submission to the site inbox via SMTP (if configured)."""
+    host = (os.environ.get("SMTP_HOST") or "").strip()
+    if not host:
+        return
+    port = _env_int("SMTP_PORT", 587)
+    user = (os.environ.get("SMTP_USER") or "").strip()
+    password = os.environ.get("SMTP_PASSWORD") or ""
+    to_addr = (os.environ.get("CONTACT_TO_EMAIL") or "").strip() or "info@wisef.am"
+    from_addr = (os.environ.get("SMTP_FROM") or "").strip() or (user or "info@wisef.am")
+    use_tls = (os.environ.get("SMTP_USE_TLS") or "1").strip().lower() in ("1", "true", "yes")
+
+    subject = entry.get("subject") or "Website contact"
+    if not subject.lower().startswith("contact"):
+        subject = f"Website contact: {subject}"
+
+    body = (
+        f"Name: {entry.get('name')}\n"
+        f"Email: {entry.get('email')}\n"
+        f"Sent: {entry.get('ts')}\n"
+        f"IP: {entry.get('ip')}\n\n"
+        f"Subject: {subject}\n\n"
+        f"Message:\n{entry.get('message')}\n"
+    )
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = from_addr
+    msg["To"] = to_addr
+    msg["Reply-To"] = entry.get("email") or from_addr
+    msg.set_content(body)
+
+    with smtplib.SMTP(host, port, timeout=15) as smtp:
+        if use_tls:
+            smtp.starttls()
+        if user:
+            smtp.login(user, password)
+        smtp.send_message(msg)
 
 # Only trust X-Forwarded-For when we are explicitly behind a proxy / load balancer.
 # Unset → use the socket peer (safe default; XFF is client-supplied and spoofable).
@@ -723,6 +765,12 @@ def contact(payload: ContactRequest, req: Request):
     except Exception as e:
         print(f"Contact log error: {e}")
         raise HTTPException(status_code=500, detail="Could not save message")
+
+    # Email the site inbox (SMTP config via env vars)
+    try:
+        _send_contact_email(entry)
+    except Exception as e:
+        print(f"Contact email error: {e}")
 
     # Optional webhook (Slack/email service)
     webhook = (os.environ.get("CONTACT_WEBHOOK_URL") or "").strip()
