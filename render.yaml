@@ -20,6 +20,9 @@ services:
         value: "0"
       - key: REINGEST_MODE
         value: "off"
+      # Site is served behind Render's proxy — use real client IP for rate limiting
+      - key: TRUST_PROXY_HOPS
+        value: "1"
       - key: ADMIN_TOKEN
         sync: false
       # Only needed if this API is paired with a separately hosted site.

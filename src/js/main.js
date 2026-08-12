@@ -117,6 +117,7 @@ function initPageTransitions() {
   const isTransitioning = () => document.body.classList.contains('page-exit');
 
   document.addEventListener('click', (e) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const link = e.target.closest('a');
     if (!link) return;
     if (isTransitioning()) { e.preventDefault(); return; }

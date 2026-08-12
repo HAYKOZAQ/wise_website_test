@@ -599,6 +599,23 @@ body[lang="hy"],
   font-weight: 600;
 }
 
+.wise-partner-list a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--wise-ink);
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.wise-partner-list a:hover {
+  color: var(--wise-navy);
+}
+
+.wise-partner-list a:hover img {
+  border-color: var(--wise-yellow);
+}
+
 .wise-partner-list img {
   width: 42px;
   height: 42px;
@@ -866,6 +883,14 @@ body[lang="hy"],
   color: #fff !important;
 }
 
+.wise-career-banner .wise-eyebrow {
+  color: #fff !important;
+}
+
+.wise-career-banner .wise-eyebrow::before {
+  background: var(--wise-yellow);
+}
+
 .wise-career-banner p {
   max-width: 620px;
   color: rgba(255,255,255,0.72);
@@ -956,7 +981,8 @@ html[data-theme="dark"] .wise-news-feature p,
 html[data-theme="dark"] .wise-news-card p,
 html[data-theme="dark"] .wise-faq-item__answer,
 html[data-theme="dark"] .wise-lede,
-html[data-theme="dark"] .wise-story__copy p {
+html[data-theme="dark"] .wise-story__copy p,
+html[data-theme="dark"] .wise-story__copy strong {
   color: #b6c4d4 !important;
 }
 
@@ -976,6 +1002,92 @@ html[data-theme="dark"] .wise-contact-form textarea {
   color: #fff;
   border-color: rgba(255,255,255,0.16);
   background: #0c1d31;
+}
+
+html[data-theme="dark"] .wise-eyebrow,
+html[data-theme="dark"] .wise-inline-link,
+html[data-theme="dark"] .wise-stat span,
+html[data-theme="dark"] .wise-partner-list li,
+html[data-theme="dark"] .wise-partner-list a,
+html[data-theme="dark"] .wise-project-row__icon {
+  color: #b6c4d4 !important;
+}
+
+html[data-theme="dark"] .wise-partner-list a:hover {
+  color: #f8fbff !important;
+}
+
+html[data-theme="dark"] .wise-project-row__icon {
+  background: #183552 !important;
+  border-color: rgba(255,255,255,0.14) !important;
+}
+
+html[data-theme="dark"] .wise-empty {
+  background: #122943;
+  border-color: rgba(255,255,255,0.14);
+}
+
+html[data-theme="dark"] .wise-empty__text {
+  color: #b6c4d4 !important;
+}
+
+html[data-theme="dark"] .wise-stat:nth-child(even) strong {
+  color: var(--wise-yellow) !important;
+}
+
+html[data-theme="dark"] .wise-btn--outline {
+  color: #f8fbff !important;
+  border-color: rgba(255,255,255,0.5) !important;
+}
+
+html[data-theme="dark"] .wise-btn--outline:hover {
+  color: #0c1d31 !important;
+  background: #f8fbff !important;
+}
+
+html[data-theme="dark"] .wise-partner-list img,
+html[data-theme="dark"] .wise-feature-card__icon,
+html[data-theme="dark"] .wise-service-card__icon {
+  background: #183552;
+  border-color: rgba(255,255,255,0.14);
+}
+
+html[data-theme="dark"] .wise-feature-card__icon svg,
+html[data-theme="dark"] .wise-service-card__icon svg {
+  stroke: #f8fbff;
+}
+
+html[data-theme="dark"] .wise-faq-item summary::after {
+  color: #f8fbff;
+  border-color: rgba(255,255,255,0.5);
+}
+
+html[data-theme="dark"] .wise-faq-item[open] summary::after {
+  color: var(--wise-navy);
+  border-color: var(--wise-yellow);
+  background: var(--wise-yellow);
+}
+
+html[data-theme="dark"] .wise-partner-column h2 {
+  border-bottom-color: rgba(255,255,255,0.5) !important;
+}
+
+html[data-theme="dark"] .wise-home-hero .wise-eyebrow,
+html[data-theme="dark"] .wise-home-hero .wise-lede,
+html[data-theme="dark"] .wise-section--navy .wise-eyebrow,
+html[data-theme="dark"] .wise-section--navy .wise-lede,
+html[data-theme="dark"] .wise-career-banner .wise-lede {
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .wise-home-hero .wise-btn--outline {
+  color: #fff !important;
+  border-color: rgba(255,255,255,0.72) !important;
+}
+
+html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
+  color: var(--wise-navy) !important;
+  background: #fff !important;
 }
 
 @media (max-width: 1050px) {
@@ -1115,6 +1227,25 @@ html[data-theme="dark"] .wise-contact-form textarea {
   .wise-stat strong {
     font-size: 1.8rem;
   }
+}
+
+/* Blog: empty state */
+.wise-empty {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: 48px 24px;
+  border: 1px dashed var(--wise-line);
+  border-radius: var(--wise-radius);
+  background: var(--wise-surface);
+  text-align: center;
+}
+
+.wise-empty__text {
+  color: var(--wise-muted);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 480px;
 }
 
 /* Blog: search bar */

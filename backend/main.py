@@ -112,8 +112,16 @@ app.add_middleware(
 )
 
 # Simple in-memory rate limit (per IP) for expensive endpoints
-_RATE_LIMIT = int(os.environ.get("CHAT_RATE_LIMIT", "20"))  # requests
-_RATE_WINDOW = int(os.environ.get("CHAT_RATE_WINDOW_SEC", "60"))  # seconds
+def _env_int(name: str, default: int) -> int:
+    try:
+        return int(os.environ.get(name, str(default)))
+    except (TypeError, ValueError):
+        print(f"WARNING: invalid {name}={os.environ.get(name)!r}, using {default}")
+        return default
+
+
+_RATE_LIMIT = _env_int("CHAT_RATE_LIMIT", 20)  # requests
+_RATE_WINDOW = _env_int("CHAT_RATE_WINDOW_SEC", 60)  # seconds
 _rate_buckets: dict[str, deque] = defaultdict(deque)
 _rate_lock = Lock()
 
@@ -151,6 +159,11 @@ def _rate_limit_ok(ip: str, limit: int = _RATE_LIMIT, window: int = _RATE_WINDOW
         if len(q) >= limit:
             return False
         q.append(now)
+        # Evict empty buckets so the dict doesn't grow unbounded
+        if len(_rate_buckets) > 4096:
+            stale = [k for k, v in _rate_buckets.items() if not v]
+            for k in stale:
+                del _rate_buckets[k]
         return True
 
 print("Initializing RAG Engine...")

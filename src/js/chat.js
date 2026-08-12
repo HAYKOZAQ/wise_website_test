@@ -13,6 +13,7 @@
   var backendOnline = false;
   var chatOpen = false;
   var chatInitialized = false;
+  var chatPending = false;
   var pollTimer = null;
   var POLL_INTERVAL_OPEN = 12000;
   var POLL_INTERVAL_CLOSED = 60000;
@@ -392,6 +393,7 @@
       newChatBtn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
+        if (chatPending) return;
         startNewChat();
       });
     }
@@ -449,7 +451,7 @@
     if (chatOpen || animating) return;
     animating = true;
     chatOpen = true;
-    schedulePoll(false);  // switch to faster polling while open
+    schedulePoll(true);  // poll immediately + faster polling while open
     panel.hidden = false;
     panel.classList.remove('wise-help__panel--closing');
     fab.setAttribute('aria-expanded', 'true');
@@ -663,7 +665,7 @@
 
   async function ask(text) {
     var q = (text || '').trim();
-    if (!q) return;
+    if (!q || chatPending) return;
 
     ensureSession();
     showConversation();
@@ -683,13 +685,18 @@
       return;
     }
 
+    chatPending = true;
     try {
       var historyPayload = conversationHistory.slice(0, -1).slice(-8);
-      var res = await fetch(API_BASE + '/api/chat', {
+      var opts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: q, lang: lang(), history: historyPayload })
-      });
+      };
+      if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+        opts.signal = AbortSignal.timeout(70_000);
+      }
+      var res = await fetch(API_BASE + '/api/chat', opts);
       typing.remove();
 
       if (!res.ok) {
@@ -721,9 +728,13 @@
       }
 
       var data = await res.json();
-      if (data.answer) {
-        conversationHistory.push({ role: 'assistant', content: String(data.answer).slice(0, 2000) });
+      if (!data.answer) {
+        addBotBubble(
+          '<p>' + escapeHtml(t('chat.err_offline', 'Հիմա չեմ կարող պատասխանել։')) + '</p>'
+        );
+        return;
       }
+      conversationHistory.push({ role: 'assistant', content: String(data.answer).slice(0, 2000) });
       if (conversationHistory.length > 16) {
         conversationHistory = conversationHistory.slice(-16);
       }
@@ -735,10 +746,22 @@
       persistActive();
     } catch (e) {
       typing.remove();
-      addBotBubble(
-        '<p>' + escapeHtml(t('chat.err_offline', 'Կապ չկա սերվերի հետ։')) + '</p>' +
-        '<p><strong>114</strong> — ՄՍԾ թեժ գիծ</p>'
-      );
+      if (e && (e.name === 'AbortError' || e.name === 'TimeoutError')) {
+        addBotBubble(
+          '<p>' + escapeHtml(
+            lang() === 'en'
+              ? 'The request took too long. Please try again.'
+              : 'Պատասխանը շատ երկար տևեց։ Խնդրում ենք կրկին փորձել։'
+          ) + '</p>'
+        );
+      } else {
+        addBotBubble(
+          '<p>' + escapeHtml(t('chat.err_offline', 'Կապ չկա սերվերի հետ։')) + '</p>' +
+          '<p><strong>114</strong> — ՄՍԾ թեժ գիծ</p>'
+        );
+      }
+    } finally {
+      chatPending = false;
     }
   }
 

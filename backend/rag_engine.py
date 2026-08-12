@@ -11,6 +11,7 @@ import math
 import os
 import re
 import sys
+import time
 from collections import defaultdict
 from functools import lru_cache
 from typing import Any
@@ -63,16 +64,19 @@ USE_LOCAL_EMBEDDER = os.environ.get("USE_LOCAL_EMBEDDER", "1").strip().lower() n
 USE_RERANKER = os.environ.get("USE_RERANKER", "0").strip().lower() in ("1", "true", "yes")
 HYBRID_SEMANTIC_WEIGHT = float(os.environ.get("HYBRID_SEMANTIC_WEIGHT", "0.6"))
 QUERY_EXPANSION = os.environ.get("QUERY_EXPANSION", "0").strip().lower() in ("1", "true", "yes")
-# Prefer stable Gemini models first; Gemma experimental last
+# Fast stable Gemini models first; override via env when needed
 GEMINI_GENERATE_MODELS = [
     m.strip()
     for m in os.environ.get(
         "GEMINI_GENERATE_MODELS",
-        "gemma-4-26b-a4b-it,gemma-4-31b-it",
+        "gemini-2.5-flash,gemini-2.5-flash-lite",
     ).split(",")
     if m.strip()
 ]
-GEMINI_MAX_RETRIES = int(os.environ.get("GEMINI_MAX_RETRIES", "2"))
+GEMINI_MAX_RETRIES = int(os.environ.get("GEMINI_MAX_RETRIES", "1"))
+# Overall wall-clock budget for one generation call (Render gateway ~60s).
+GEMINI_DEADLINE_SEC = float(os.environ.get("GEMINI_DEADLINE_SEC", "45"))
+GEMINI_TIMEOUT_SEC = float(os.environ.get("GEMINI_TIMEOUT_SEC", "40"))
 
 LEGAL_QUERY_HINTS = (
     "իրավունք", "չափորոշիչ", "հոդված", "մերժում", "ստաժ", "կարգ", "որոշում",
@@ -969,27 +973,36 @@ Write a complete answer in clear English:"""
         return answer.strip(), finish
 
     def _generate_with_gemini(self, system_prompt: str) -> str:
-        """Try multiple Gemini models with light retries on 5xx/timeouts."""
+        """Try multiple Gemini models with light retries, bounded by a hard deadline."""
         if not self.use_gemini:
             return ""
         payload = {
             "contents": [{"parts": [{"text": system_prompt}]}],
             "generationConfig": {
                 "temperature": 0.15,
-                "maxOutputTokens": 8192,
+                "maxOutputTokens": 4096,
                 # gemini-2.5* may spend tokens on hidden "thinking" and hit MAX_TOKENS early
                 "thinkingConfig": {"thinkingBudget": 0},
             },
         }
+        deadline = time.monotonic() + GEMINI_DEADLINE_SEC
         for model in GEMINI_GENERATE_MODELS:
             for attempt in range(1, GEMINI_MAX_RETRIES + 1):
+                remaining = deadline - time.monotonic()
+                if remaining <= 2:
+                    print("Gemini deadline reached; giving up")
+                    return ""
                 try:
                     print(f"Querying Gemini model={model} attempt={attempt}…")
                     url = (
                         f"https://generativelanguage.googleapis.com/v1beta/models/"
                         f"{model}:generateContent?key={GEMINI_API_KEY}"
                     )
-                    r = requests.post(url, json=payload, timeout=90)
+                    r = requests.post(
+                        url,
+                        json=payload,
+                        timeout=min(GEMINI_TIMEOUT_SEC, remaining),
+                    )
                     if r.status_code == 200:
                         answer, finish = self._parse_gemini_answer(r.json())
                         if answer:
@@ -1082,18 +1095,6 @@ Write a complete answer in clear English:"""
             answer = self._generate_with_gemini(system_prompt)
             if answer:
                 mode = "gemini"
-                # Retry once if truncated / incomplete
-                if is_answer_incomplete(answer):
-                    print("Answer looks incomplete — regenerating with stricter finish instruction…")
-                    retry_prompt = system_prompt + (
-                        "\n\nIMPORTANT: Your previous draft was incomplete. "
-                        "Rewrite the FULL answer. Complete every section. Do not stop mid-sentence."
-                        if user_lang == "en"
-                        else "\n\nԿԱՐևՈՐ. Նախորդ տարբերակը կիսատ էր։ Վերագրեք ԱՄԲՈՂՋԱԿԱՆ պատասխանը։ Ավարտեք բոլոր բաժինները։ Մի կանգնեք նախադասության կեսից։"
-                    )
-                    retry = self._generate_with_gemini(retry_prompt)
-                    if retry and len(retry) > len(answer):
-                        answer = retry
 
         if not answer:
             answer = self._generate_with_ollama(system_prompt)

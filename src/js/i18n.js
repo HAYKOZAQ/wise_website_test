@@ -183,6 +183,7 @@
     'blog.featured_title':{ hy: 'Պատրաստ է գործարկման «Աշխատանք առանց սահմանների» որոնման միասնական համակարգ»-ը', en: '"Work Without Borders" Unified Search System Launched' },
     'blog.featured_text': { hy: '«Աշխատանքի էլեկտրոնային բորսա» ծրագրի ֆինանսական աուդիտի հաշվետվությունները', en: 'Financial audit reports of the Electronic Labor Exchange program' },
     'blog.news_title':  { hy: 'Նորություններ և հայտարարություններ', en: 'News & Announcements' },
+    'blog.empty':       { hy: 'Առայժմ հայտարարություններ չկան։', en: 'No announcements yet.' },
     'blog.news_text':   { hy: 'Մեր համակարգերի, ծրագրերի և թիմի կյանքի մասին թարմ տեղեկություններ։', en: 'Fresh updates about our systems, programs, and team.' },
     'blog.news_badge':  { hy: 'Լրահոս', en: 'News' },
 
