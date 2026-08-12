@@ -165,7 +165,7 @@
     'footer.services':   { hy: 'Ծառայություններ', en: 'Services' },
     'footer.partners':   { hy: 'Գործընկերներ', en: 'Partners' },
     'footer.blog':       { hy: 'Նորություններ', en: 'News' },
-    'footer.faq':        { hy: 'Հաճախ տրվող հարցեր', en: 'FAQ' },
+    'footer.faq':        { hy: 'ՀՏՀ', en: 'FAQ' },
     'footer.careers':    { hy: 'Կարիերա', en: 'Careers' },
     'footer.contact_us': { hy: 'Հետադարձ կապ', en: 'Contact Us' },
     'footer.copyright':  { hy: '© 2026 Designed by «WISE» foundation', en: '© 2026 Designed by «WISE» foundation' },
