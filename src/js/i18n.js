@@ -288,7 +288,7 @@
     'contact.hero_title': { hy: 'Ստեղծենք միասին', en: 'Let\'s Create Together' },
     'contact.hero_text': { hy: 'Պատրաստ ենք լսել Ձեր գաղափարները և առաջարկությունները', en: 'We are ready to hear your ideas and suggestions' },
     'contact.label': { hy: 'Կապնվել', en: 'Get In Touch' },
-    'contact.title': { hy: 'Կապնվեք մեզ հետ', en: 'Contact Us' },
+    'contact.title': { hy: 'Կապվեք մեզ հետ', en: 'Contact Us' },
     'contact.address': { hy: 'Հասցե', en: 'Address' },
     'contact.address_val': { hy: 'Երևան, Հայաստան', en: 'Yerevan, Armenia' },
     'contact.panel_title': { hy: 'Գրեք մեզ, և կպատասխանենք', en: 'Write to us and we will reply' },
@@ -393,7 +393,7 @@
     'faq.q5':          { hy: 'Ինչպե՞ս եք ապահովում տվյալների անվտանգությունը', en: 'How do you ensure data security?' },
     'faq.a5':          { hy: 'Տվյալների անվտանգությունը մեր ամենօրյա աշխատանքի մասն է. մշտապես թարմացնում ենք պաշտպանական մեխանիզմները, իրականացնում ենք աուդիտ և վերապատրաստում թիմի համար։', en: 'Data security is part of our daily work: we constantly update protection mechanisms, conduct audits, and train our team.' },
     'faq.cta_title':   { hy: 'Չեք գտե՞լ Ձեր հարցի պատասխանը', en: 'Didn\'t find an answer to your question?' },
-    'faq.cta_text':    { hy: 'Կապնվեք մեզ հետ, և մենք կպատասխանենք։', en: 'Contact us and we will answer.' },
+    'faq.cta_text':    { hy: 'Կապվեք մեզ հետ, և մենք կպատասխանենք։', en: 'Contact us and we will answer.' },
     'faq.cta_button':  { hy: 'Կապվել մեզ հետ', en: 'Contact us' },
 
     /* Careers page */
@@ -413,7 +413,7 @@
     'careers.job3_meta':   { hy: 'Երևան · Լրիվ դրույք', en: 'Yerevan · Full-time' },
     'careers.job3_text':   { hy: 'Մեր համակարգերի որակի և հուսալիության պատասխանատու՝ ավտոմատացված և մեխանիկական թեստավորում։', en: 'Responsible for the quality and reliability of our systems through automated and manual testing.' },
     'careers.apply':       { hy: 'Դիմել', en: 'Apply' },
-    'careers.cv_title':    { hy: 'Չեք գտե՞լ Ձեզ հարմար դիրք', en: 'No position that fits?' },
+    'careers.cv_title':    { hy: 'Չեք գտե՞լ Ձեզ հարմար պաշտոն', en: 'No position that fits?' },
     'careers.cv_text':     { hy: 'Ուղարկեք Ձեր ինքնակենսագրությունը, և կապվելու ենք առկա հնարավորությունների շրջանակում։', en: 'Send your CV and we will reach out within current opportunities.' },
     'careers.cv_button':   { hy: 'Ուղարկել ինքնակենսագրություն', en: 'Send your CV' },
 
@@ -432,7 +432,7 @@
     'site.desc.about':    { hy: 'Իմացեք ավելին WISE Foundation-ի մասին՝ 25 տարվա փորձ տեղեկատվական տեխնոլոգիաների ոլորտում:', en: 'Learn more about WISE Foundation — 25 years of experience in information technology.' },
     'site.desc.services': { hy: 'WISE Foundation-ի ծառայություններ՝ տեղեկատվական համակարգերի նախագծում, կիբեռանվտանգություն, տվյալների մշակում և ավելին:', en: 'WISE Foundation services — information systems design, cybersecurity, data processing and more.' },
     'site.desc.partners': { hy: 'WISE Foundation-ի գործընկերներ՝ պետական հաստատություններ, միջազգային կազմակերպություններ, բանկեր:', en: 'WISE Foundation partners — government institutions, international organizations, banks.' },
-    'site.desc.contact':  { hy: 'Կապնվեք WISE Foundation-ի հետ: Էլ. փոստ, հեռախոս, կոնտակտային ձև:', en: 'Contact WISE Foundation. Email, phone, contact form.' },
+    'site.desc.contact':  { hy: 'Կապվեք WISE Foundation-ի հետ: Էլ. փոստ, հեռախոս, կոնտակտային ձև:', en: 'Contact WISE Foundation. Email, phone, contact form.' },
     'site.desc.blog':     { hy: 'WISE Foundation-ի բլոգ՝ նորություններ, հոդվածներ և հայտարարություններ տեղեկատվական տեխնոլոգիաների ոլորտում:', en: 'WISE Foundation blog — news, articles and announcements in information technology.' },
     'site.desc.faq':      { hy: 'Պատասխաններ WISE Foundation-ի ծառայությունների, կարիերայի և համագործակցության վերաբերյալ հաճախ տրվող հարցերին։', en: 'Answers to frequently asked questions about WISE Foundation services, careers, and cooperation.' },
     'site.desc.careers':  { hy: 'Աշխատեք WISE Foundation-ում. բաց թափուր տեղեր, թիմ, մշակույթ և ինքնակենսագրություն ուղարկելու հնարավորություն։', en: 'Work at WISE Foundation. Open positions, team, culture, and the ability to submit your CV.' }
