@@ -33,8 +33,8 @@
     'home.btn_services': { hy: 'Դիտել ծառայությունները', en: 'Our Services' },
     'home.btn_contact':  { hy: 'Կապնվել մեզ հետ', en: 'Contact Us' },
     'home.hero_label':   { hy: 'Կայքի կոնցեպտի ստեղծում', en: 'Building the site concept' },
-    'home.hero_title':   { hy: 'Միացեք մեզ,<br><em>հավաքեք ապագայի թվային լուծումները</em>', en: 'Join us,<br><em>shape the digital solutions of the future</em>' },
-    'home.hero_presentation_text': { hy: 'Մենք ստեղծում ենք պետական և մասնավոր ոլորտի համար վստահելի, հասանելի և մարդկանց կյանքը հեշտացնող տեխնոլոգիական լուծումներ։', en: 'We build trusted, accessible technology solutions for the public and private sectors that make people\'s lives easier.' },
+    'home.hero_title':   { hy: 'Թվային լուծումներ՝ հանուն մարդու բարեկեցության', en: 'Join us,<br><em>shape the digital solutions of the future</em>' },
+    'home.hero_presentation_text': { hy: 'Միասնական, մարդակենտրոն և վստահելի թվային միջավայր՝ յուրաքանչյուր քաղաքացու համար', en: 'We build trusted, accessible technology solutions for the public and private sectors that make people\'s lives easier.' },
     'home.hero_career':  { hy: 'Ուղարկել ինքնակենսագրություն', en: 'Send your CV' },
     'home.hero_about':   { hy: 'Իմանալ ավելին մեր մասին', en: 'Learn more about us' },
     'home.why_label':    { hy: 'Ինչու աշխատել WISE-ում', en: 'Why work at WISE' },
@@ -487,6 +487,8 @@
         el.setAttribute(attr, text);
       } else if (el.matches('input, textarea')) {
         el.setAttribute('placeholder', text);
+      } else if (/<[a-z][\s\S]*>/i.test(text)) {
+        el.innerHTML = text;
       } else {
         el.textContent = text;
       }
