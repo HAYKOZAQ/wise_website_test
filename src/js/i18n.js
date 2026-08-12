@@ -33,7 +33,7 @@
     'home.btn_services': { hy: 'Դիտել ծառայությունները', en: 'Our Services' },
     'home.btn_contact':  { hy: 'Կապնվել մեզ հետ', en: 'Contact Us' },
     'home.hero_label':   { hy: 'Կայքի կոնցեպտի ստեղծում', en: 'Building the site concept' },
-    'home.hero_title':   { hy: 'Թվային լուծումներ՝ հանուն մարդու բարեկեցության', en: 'Join us,<br><em>shape the digital solutions of the future</em>' },
+    'home.hero_title':   { hy: 'Թվային լուծումներ՝ հանուն մարդու բարեկեցության', en: 'Join us,<br>shape the digital solutions of the future' },
     'home.hero_presentation_text': { hy: 'Միասնական, մարդակենտրոն և վստահելի թվային միջավայր՝ յուրաքանչյուր քաղաքացու համար', en: 'We build trusted, accessible technology solutions for the public and private sectors that make people\'s lives easier.' },
     'home.hero_career':  { hy: 'Ուղարկել ինքնակենսագրություն', en: 'Send your CV' },
     'home.hero_about':   { hy: 'Իմանալ ավելին մեր մասին', en: 'Learn more about us' },
