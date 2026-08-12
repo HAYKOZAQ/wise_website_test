@@ -759,6 +759,7 @@ body[lang="hy"],
   display: grid;
   gap: 14px;
   max-width: 960px;
+  margin: 0 auto;
 }
 
 .wise-faq-item {
