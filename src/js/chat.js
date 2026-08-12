@@ -49,8 +49,15 @@
     return window.wisefI18n ? window.wisefI18n.getLang() : 'hy';
   }
 
+  function loc(hy, en, ru) {
+    var l = lang();
+    if (l === 'en') return en;
+    if (l === 'ru') return ru || en;
+    return hy;
+  }
+
   function topicLabel(item) {
-    return t(item.key, lang() === 'en' ? item.en : item.hy);
+    return t(item.key, loc(item.hy, item.en));
   }
 
   function uid() {
@@ -125,7 +132,7 @@
     }
     activeSession = {
       id: uid(),
-      title: lang() === 'en' ? 'New chat' : 'Նոր զրույց',
+      title: loc('Նոր զրույց', 'New chat', 'Новый чат'),
       history: [],
       messages: [],
       updated: Date.now()
@@ -144,7 +151,7 @@
     }
     activeSession = {
       id: uid(),
-      title: lang() === 'en' ? 'New chat' : 'Նոր զրույց',
+      title: loc('Նոր զրույց', 'New chat', 'Новый чат'),
       history: [],
       messages: [],
       updated: Date.now()
@@ -434,8 +441,8 @@
       }
     });
     if (newChatBtn) {
-      newChatBtn.setAttribute('title', t('chat.new', lang() === 'en' ? 'New chat' : 'Նոր զրույց'));
-      newChatBtn.setAttribute('aria-label', t('chat.new', lang() === 'en' ? 'New chat' : 'Նոր զրույց'));
+      newChatBtn.setAttribute('title', t('chat.new', loc('Նոր զրույց', 'New chat', 'Новый чат')));
+      newChatBtn.setAttribute('aria-label', t('chat.new', loc('Նոր զրույց', 'New chat', 'Новый чат')));
     }
   }
 
@@ -624,9 +631,11 @@
       var g = extras.fidelity.grounding_score;
       var risk = extras.fidelity.risk || '';
       var pct = Math.round(g * 100);
-      var label = lang() === 'en'
-        ? 'Answer grounded in sources: ' + pct + '% (' + risk + ' risk)'
-        : 'Աղբյուրներին համապատասխանություն՝ ' + pct + '% (' + risk + ')';
+      var label = loc(
+        'Աղբյուրներին համապատասխանություն՝ ' + pct + '% (' + risk + ')',
+        'Answer grounded in sources: ' + pct + '% (' + risk + ' risk)',
+        'Соответствие источникам: ' + pct + '% (' + risk + ')'
+      );
       body += '<p class="wise-help__ground">' + escapeHtml(label) + '</p>';
     }
 
@@ -703,9 +712,11 @@
         if (res.status === 429) {
           addBotBubble(
             '<p>' + escapeHtml(
-              lang() === 'en'
-                ? 'Too many questions in a short time. Please wait a minute and try again.'
-                : 'Շատ հարցեր կարճ ժամանակում։ Սպասեք մեկ րոպե և կրկին փորձեք։'
+              loc(
+                'Շատ հարցեր կարճ ժամանակում։ Սպասեք մեկ րոպե և կրկին փորձեք։',
+                'Too many questions in a short time. Please wait a minute and try again.',
+                'Слишком много вопросов за короткое время. Подождите минуту и попробуйте снова.'
+              )
             ) + '</p>'
           );
           return;
@@ -714,9 +725,11 @@
           addBotBubble(
             '<p>' + escapeHtml(t('chat.err_offline', 'Հիմա չեմ կարող պատասխանել։')) + '</p>' +
             '<p style="font-size:0.85rem;margin-top:4px;opacity:0.7">' + escapeHtml(
-              lang() === 'en'
-                ? 'The AI service encountered an error. Our team has been notified.'
-                : 'AI ծառայությունը սխալ է հայտնաբերել։ Մեր թիմը տեղեկացված է։'
+              loc(
+                'AI ծառայությունը սխալ է հայտնաբերել։ Մեր թիմը տեղեկացված է։',
+                'The AI service encountered an error. Our team has been notified.',
+                'Сервис ИИ обнаружил ошибку. Наша команда уведомлена.'
+              )
             ) + '</p>'
           );
           return;
@@ -749,9 +762,11 @@
       if (e && (e.name === 'AbortError' || e.name === 'TimeoutError')) {
         addBotBubble(
           '<p>' + escapeHtml(
-            lang() === 'en'
-              ? 'The request took too long. Please try again.'
-              : 'Պատասխանը շատ երկար տևեց։ Խնդրում ենք կրկին փորձել։'
+            loc(
+              'Պատասխանը շատ երկար տևեց։ Խնդրում ենք կրկին փորձել։',
+              'The request took too long. Please try again.',
+              'Ответ занял слишком много времени. Пожалуйста, попробуйте снова.'
+            )
           ) + '</p>'
         );
       } else {

@@ -400,31 +400,22 @@ html[data-theme="dark"] .contact-grid {
 }
 
 /* ── Header Controls ── */
-html[data-theme="dark"] .lang-toggle__track {
+html[data-theme="dark"] .lang-toggle {
   background: rgba(30, 41, 59, 0.9) !important;
   border-color: rgba(148, 163, 184, 0.2) !important;
 }
 
-html[data-theme="dark"] .lang-toggle__hy,
-html[data-theme="dark"] .lang-toggle__en {
+html[data-theme="dark"] .lang-toggle__opt {
   color: #cbd5e1 !important;
 }
 
-html[data-theme="dark"] .lang-toggle:not(.lang-toggle--en) .lang-toggle__hy,
-html[data-theme="dark"] .lang-toggle.lang-toggle--en .lang-toggle__en {
+html[data-theme="dark"] .lang-toggle__opt:hover {
   color: #38bdf8 !important;
 }
 
-html[data-theme="dark"] .lang-toggle__thumb {
+html[data-theme="dark"] .lang-toggle__opt--active {
+  color: #0f172a !important;
   background: #38bdf8 !important;
-}
-
-html[data-theme="dark"] .lang-toggle.lang-toggle--en .lang-toggle__thumb {
-  background: white !important;
-}
-
-html[data-theme="dark"] .lang-toggle:hover .lang-toggle__track {
-  border-color: #38bdf8 !important;
 }
 
 html[data-theme="dark"] .theme-toggle {

@@ -161,78 +161,45 @@ html[lang="en"] .nav__link {
   border-radius: 2px;
 }
 
-/* ── Language Toggle Switch ────────────────────────────── */
+/* ── Language Toggle (3-way segmented control) ────────── */
 .lang-toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 4px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
+  gap: 2px;
+  padding: 3px;
+  border: 1.5px solid var(--color-glass-border);
   border-radius: 999px;
-  transition: background var(--transition-fast);
+  background: var(--color-glass-bg);
   flex-shrink: 0;
-  outline: none;
 }
 
-.lang-toggle:focus-visible {
+.lang-toggle:focus-within {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-.lang-toggle__hy,
-.lang-toggle__en {
-  font-size: 0.75rem;
+.lang-toggle__opt {
+  border: none;
+  background: transparent;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--color-text-light);
-  transition: color var(--transition-fast);
+  cursor: pointer;
   line-height: 1;
   user-select: none;
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
-/* Active side is highlighted */
-.lang-toggle:not(.lang-toggle--en) .lang-toggle__hy,
-.lang-toggle.lang-toggle--en .lang-toggle__en {
+.lang-toggle__opt:hover {
   color: var(--color-accent);
 }
 
-.lang-toggle__track {
-  position: relative;
-  width: 36px;
-  height: 20px;
-  background: var(--color-glass-bg);
-  border: 1.5px solid var(--color-glass-border);
-  border-radius: 999px;
-  flex-shrink: 0;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
-}
-
-.lang-toggle.lang-toggle--en .lang-toggle__track {
+.lang-toggle__opt--active {
+  color: #fff;
   background: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-.lang-toggle__thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  background: var(--color-accent);
-  border-radius: 50%;
-  transition: transform var(--transition-fast), background var(--transition-fast);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.lang-toggle.lang-toggle--en .lang-toggle__thumb {
-  transform: translateX(16px);
-  background: white;
-}
-
-.lang-toggle:hover .lang-toggle__track {
-  border-color: var(--color-accent);
 }
 
 
@@ -1433,13 +1400,13 @@ html[data-theme="dark"] .blog-download-banner__text code {
   }
 
   .lang-toggle {
-    padding: 6px 4px;
-    gap: 6px;
+    padding: 3px;
+    gap: 2px;
   }
 
-  .lang-toggle__hy,
-  .lang-toggle__en {
-    font-size: 0.75rem;
+  .lang-toggle__opt {
+    font-size: 0.72rem;
+    padding: 5px 8px;
   }
 
   .grid-2, .grid-3, .grid-4 {

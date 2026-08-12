@@ -500,11 +500,25 @@ function initContactForm() {
   }
 
   function getTexts() {
-    const isArmenian = document.documentElement.lang !== 'en';
+    const lang = document.documentElement.lang;
+    if (lang === 'en') {
+      return {
+        sending: 'Sending...',
+        success: '✅ Your message has been successfully sent!',
+        error: '❌ An error occurred. Please try again.'
+      };
+    }
+    if (lang === 'ru') {
+      return {
+        sending: 'Отправка...',
+        success: '✅ Ваше сообщение успешно отправлено!',
+        error: '❌ Произошла ошибка. Пожалуйста, попробуйте ещё раз.'
+      };
+    }
     return {
-      sending: isArmenian ? 'Ուղարկվում է...' : 'Sending...',
-      success: isArmenian ? '✅ Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց:' : '✅ Your message has been successfully sent!',
-      error: isArmenian ? '❌ Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:' : '❌ An error occurred. Please try again.'
+      sending: 'Ուղարկվում է...',
+      success: '✅ Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց:',
+      error: '❌ Տեղի է ունեցել սխալ: Խնդրում ենք փորձել կրկին:'
     };
   }
 
