@@ -211,6 +211,8 @@ function initPageTransitions() {
     const primaryUrl = apiBase ? (apiBase.replace(/\/$/, '') + '/api/contact') : '';
     // Optional secondary path only if site owner configures window.WISEF_CONTACT_FALLBACK_URL
     const fallbackUrl = (window.WISEF_CONFIG && window.WISEF_CONFIG.contactFallbackUrl) || '';
+    // Web3Forms: delivers the message to info@wisef.am by email — no SMTP needed.
+    const web3Key = (window.WISEF_CONFIG && window.WISEF_CONFIG.web3formsAccessKey || '').trim();
 
     function postContact(url) {
       return fetch(url, {
@@ -232,21 +234,59 @@ function initPageTransitions() {
       });
     }
 
-    if (!primaryUrl) {
+    function postWeb3Forms() {
+      return fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: web3Key,
+          name: data.name || '',
+          email: data.email || '',
+          subject: data.subject || 'Website contact',
+          message: data.message || '',
+          from_name: 'WISE Foundation Website'
+        })
+      }).then(async (response) => {
+        let result = {};
+        try {
+          result = await response.json();
+        } catch (_) {}
+        if (!response.ok || result.success === false) {
+          throw new Error((result && result.message) || ('HTTP ' + response.status));
+        }
+        return result;
+      });
+    }
+
+    // Try each delivery channel in order; success if any of them works.
+    const channels = [];
+    if (web3Key) channels.push(postWeb3Forms);
+    if (primaryUrl) channels.push(() => postContact(primaryUrl));
+    if (fallbackUrl && primaryUrl) channels.push(() => postContact(fallbackUrl));
+
+    if (!channels.length) {
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
       showStatus(texts.error, false);
       return;
     }
 
-    const tryPrimary = fallbackUrl
-      ? postContact(primaryUrl).catch((err) => {
-          console.warn('[ContactForm] API contact failed, trying configured fallback:', err);
-          return postContact(fallbackUrl);
-        })
-      : postContact(primaryUrl);
-
-    tryPrimary
+    (async function deliver() {
+      let lastErr = null;
+      for (const send of channels) {
+        try {
+          await send();
+          return;
+        } catch (err) {
+          lastErr = err;
+          console.warn('[ContactForm] delivery failed, trying next channel:', err.message || err);
+        }
+      }
+      throw lastErr;
+    })()
       .then((result) => {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;

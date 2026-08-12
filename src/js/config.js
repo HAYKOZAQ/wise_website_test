@@ -21,7 +21,18 @@ window.WISEF_CONFIG = {
    * Optional secondary contact URL (only if /api/contact is unreachable).
    * Leave empty — primary path is POST /api/contact on the backend.
    */
-  contactFallbackUrl: ''
+  contactFallbackUrl: '',
+
+  /**
+   * Web3Forms — sends contact form emails to an inbox with NO SMTP/password.
+   * 1) Go to https://web3forms.com (free)
+   * 2) Enter the recipient email (info@wisef.am) and confirm the
+   *    verification email once.
+   * 3) Copy the "Access Key" from the dashboard and paste it below.
+   * After that, every form submission is emailed to info@wisef.am automatically.
+   * Safe to commit — access keys are public by design.
+   */
+  web3formsAccessKey: ''
 };
 
 /** Resolve which API the chat should call */
