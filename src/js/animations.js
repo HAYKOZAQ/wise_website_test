@@ -113,6 +113,29 @@
     els.forEach(function (el) { io.observe(el); });
   }
 
+  /* ── Job card details (accordion) ── */
+  function jobToggleLabel(key) {
+    if (window.wisefI18n && window.wisefI18n.t) {
+      var v = window.wisefI18n.t(key);
+      if (v && v !== key) return v;
+    }
+    return key === 'careers.hide' ? 'Թաքցնել' : 'Մանրամասներ';
+  }
+
+  function initJobToggles() {
+    document.querySelectorAll('[data-job]').forEach(function (card) {
+      var toggle = card.querySelector('[data-job-toggle]');
+      var details = card.querySelector('[data-job-details]');
+      if (!toggle || !details) return;
+      toggle.addEventListener('click', function () {
+        var isOpen = details.getAttribute('data-open') === 'true';
+        details.setAttribute('data-open', isOpen ? 'false' : 'true');
+        toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+        toggle.textContent = jobToggleLabel(isOpen ? 'careers.details' : 'careers.hide');
+      });
+    });
+  }
+
   function init() {
     initTilt();
     injectOrbs();
@@ -120,6 +143,7 @@
     initMarquee();
     initThemeTransition();
     initReveal();
+    initJobToggles();
   }
 
   if (document.readyState === 'loading') {
