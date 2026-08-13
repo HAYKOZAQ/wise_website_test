@@ -1199,40 +1199,115 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
 }
 
 @media (max-width: 768px) {
+  /* Prevent horizontal scroll jumps */
+  html, body {
+    overflow-x: clip;
+    max-width: 100vw;
+  }
+
   .wise-container {
     width: min(var(--wise-container), calc(100% - 32px));
   }
 
+  .site-header.header {
+    min-height: 70px;
+  }
+
+  .site-header .header__inner {
+    height: 70px;
+    gap: 12px;
+  }
+
+  .site-header .header__logo {
+    width: 104px;
+  }
+
+  .site-header .header__logo img {
+    width: 104px;
+  }
+
   .site-header .nav {
-    top: 78px;
-    padding: 22px 24px 28px;
+    top: 70px;
+    padding: 20px 20px 26px;
     background: #fff;
     border-bottom: 1px solid var(--wise-line);
+    box-shadow: 0 16px 36px rgba(21, 55, 95, 0.12);
   }
 
   .site-header .nav__link {
     justify-content: flex-start;
-    padding: 13px 0;
+    padding: 12px 0;
     font-size: 1rem;
   }
 
   .site-header .nav__link--active::after {
-    bottom: 4px;
-    width: 42px;
+    bottom: 2px;
+    width: 36px;
   }
 
   .site-header .nav__link--contact {
-    padding: 13px 16px;
+    padding: 12px 18px;
     margin: 8px 0 0;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .wise-home-hero {
+    min-height: min(640px, calc(100svh - 70px));
+  }
+
+  .wise-hero-copy {
+    padding: 52px 0 40px;
+  }
+
+  .wise-home-hero .wise-title {
+    font-size: clamp(2.1rem, 7.5vw, 3.2rem);
+    margin-bottom: 20px;
+  }
+
+  .wise-home-hero .wise-lede {
+    font-size: 1.02rem;
+    line-height: 1.7;
+  }
+
+  .wise-hero-actions {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 26px;
+    width: 100%;
+  }
+
+  .wise-hero-actions .wise-btn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
   }
 
   .wise-section {
-    padding: 76px 0;
+    padding: 64px 0;
   }
 
   .wise-page-hero {
-    min-height: 360px;
-    padding: 64px 0 48px;
+    min-height: 290px;
+    padding: 52px 0 38px;
+  }
+
+  .wise-page-hero .wise-title {
+    font-size: clamp(1.85rem, 6.5vw, 2.75rem);
+    margin-bottom: 16px;
+  }
+
+  .wise-page-hero .wise-lede {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .wise-section-heading {
+    margin-bottom: 36px;
+  }
+
+  .wise-section-heading .wise-title {
+    font-size: clamp(1.75rem, 5.5vw, 2.45rem);
   }
 
   .wise-page-intro {
@@ -1245,34 +1320,103 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
   .wise-story,
   .wise-contact-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .wise-feature-card,
+  .wise-service-card {
+    min-height: auto;
+    padding: 24px 20px;
+  }
+
+  .wise-feature-card__icon,
+  .wise-service-card__icon {
+    margin-bottom: 24px;
+    width: 48px;
+    height: 48px;
   }
 
   .wise-news-article__gallery {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .wise-blog-card {
     grid-template-columns: 1fr;
+    border-radius: 16px;
   }
 
   .wise-blog-card__media {
-    min-height: 200px;
+    min-height: 190px;
+    max-height: 220px;
   }
 
   .wise-blog-card__body {
-    padding: 26px 24px;
+    padding: 24px 20px;
+    gap: 12px;
+  }
+
+  .wise-blog-card__title {
+    font-size: 1.22rem;
+  }
+
+  .wise-blog-card__excerpt {
+    font-size: 0.92rem;
+  }
+
+  .wise-blog-card .wise-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .wise-news-modal {
-    padding: 12px;
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .wise-news-modal__panel {
+    max-height: 92svh;
+    border-radius: 22px 22px 0 0;
+    width: 100%;
   }
 
   .wise-news-modal__scroll {
     padding: 24px 20px 32px;
   }
 
+  .wise-news-modal__title {
+    font-size: 1.3rem;
+    padding-right: 36px;
+    margin-bottom: 18px;
+  }
+
+  .wise-slider__slide img {
+    aspect-ratio: 4 / 3;
+  }
+
+  .wise-slider__arrow {
+    width: 38px;
+    height: 38px;
+    font-size: 1.4rem;
+  }
+
   .wise-stat-strip {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wise-stat {
+    min-height: 130px;
+    padding: 22px 18px;
+  }
+
+  .wise-stat strong {
+    font-size: clamp(1.6rem, 5vw, 2.3rem);
+    margin-bottom: 8px;
+  }
+
+  .wise-stat span {
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 
   .wise-stat:nth-child(2) {
@@ -1290,20 +1434,82 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
   .wise-ribbon {
     align-items: flex-start;
     flex-direction: column;
-    padding: 28px;
+    padding: 28px 22px;
+    gap: 18px;
+  }
+
+  .wise-ribbon .wise-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wise-partner-columns {
+    gap: 32px;
+  }
+
+  .wise-partner-column h2 {
+    font-size: 1rem;
+    padding-bottom: 12px;
+  }
+
+  .wise-partner-list li {
+    min-height: 60px;
+    font-size: 0.88rem;
+  }
+
+  .wise-partner-list img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .wise-faq-item summary {
+    padding: 18px 20px;
+    font-size: 0.94rem;
+    gap: 14px;
+  }
+
+  .wise-faq-item summary::after {
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+    flex: 0 0 30px;
+  }
+
+  .wise-faq-item__answer {
+    padding: 0 20px 20px;
+    font-size: 0.92rem;
+    line-height: 1.7;
   }
 
   .wise-contact-panel,
   .wise-contact-form {
-    padding: 30px 24px;
+    padding: 28px 20px;
+    border-radius: 18px;
   }
 
-  .wise-career-banner {
-    padding: 44px 28px;
+  .wise-contact-panel h2 {
+    font-size: 1.6rem;
+  }
+
+  .wise-contact-panel p {
+    margin-bottom: 26px;
+    font-size: 0.92rem;
+  }
+
+  .wise-contact-form h2 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
   }
 
   .wise-contact-form form {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .wise-contact-form input,
+  .wise-contact-form textarea {
+    font-size: 16px !important; /* Prevents iOS auto-zoom */
+    padding: 13px 14px;
   }
 
   .wise-contact-form .wise-field--wide,
@@ -1312,35 +1518,144 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
     grid-column: auto;
   }
 
+  .wise-contact-form button {
+    min-height: 48px;
+  }
+
+  .wise-career-banner {
+    padding: 36px 20px;
+    border-radius: 18px;
+    min-height: 360px;
+  }
+
+  .wise-career-banner .wise-title {
+    font-size: clamp(1.8rem, 6.5vw, 2.6rem);
+  }
+
+  .wise-career-banner .wise-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wise-job-card {
+    padding: 24px 20px;
+    border-radius: 18px;
+  }
+
+  .wise-job-card__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .wise-job-card__head .wise-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wise-job-card__toggle {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .wise-cv-callout {
+    padding: 28px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    border-radius: 18px;
+  }
+
+  .wise-cv-callout .wise-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .wise-project-list {
     grid-template-columns: 1fr;
+  }
+
+  .wise-project-row {
+    padding: 16px 0;
+    font-size: 0.92rem;
+  }
+
+  .presentation-footer.footer {
+    padding: 48px 20px 24px;
+  }
+
+  .presentation-footer .footer__inner {
+    gap: 36px;
   }
 }
 
 @media (max-width: 480px) {
+  .wise-container {
+    width: min(var(--wise-container), calc(100% - 24px));
+  }
+
   .wise-home-hero {
-    min-height: 670px;
+    min-height: min(580px, calc(100svh - 70px));
   }
 
   .wise-hero-copy {
-    padding: 62px 0;
+    padding: 44px 0 32px;
   }
 
   .wise-home-hero .wise-title {
-    font-size: 2.65rem;
+    font-size: clamp(2rem, 7.5vw, 2.65rem);
+    line-height: 1.14;
+    margin-bottom: 18px;
+  }
+
+  .wise-home-hero .wise-lede {
+    font-size: 0.98rem;
+    line-height: 1.65;
   }
 
   .wise-hero-actions .wise-btn {
     width: 100%;
+    min-height: 48px;
+  }
+
+  .wise-stat-strip {
+    grid-template-columns: 1fr;
   }
 
   .wise-stat {
-    min-height: 140px;
-    padding: 22px 16px;
+    min-height: auto;
+    padding: 20px 18px;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--wise-line);
+  }
+
+  .wise-stat:last-child {
+    border-bottom: 0 !important;
   }
 
   .wise-stat strong {
-    font-size: 1.8rem;
+    font-size: 1.9rem;
+    margin-bottom: 6px;
+  }
+
+  .wise-section {
+    padding: 52px 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .site-header .header__logo {
+    width: 92px;
+  }
+
+  .site-header .header__logo img {
+    width: 92px;
+  }
+
+  .lang-toggle__opt {
+    padding: 4px 6px;
+    font-size: 0.68rem;
   }
 }
 

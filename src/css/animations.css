@@ -229,6 +229,21 @@ html[data-theme="dark"] .wise-tilt:hover {
   to { transform: translateX(-50%); }
 }
 
+@media (max-width: 768px) {
+  .wise-marquee {
+    padding: 13px 0;
+  }
+  .wise-marquee__item {
+    font-size: 0.84rem;
+    gap: 16px;
+    padding-right: 16px;
+  }
+  .wise-orb {
+    filter: blur(48px);
+    opacity: 0.35;
+  }
+}
+
 /* ── 7. Smooth theme transition ── */
 html.theme-anim body,
 html.theme-anim .wise-page,
