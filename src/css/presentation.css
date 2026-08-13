@@ -1832,8 +1832,9 @@ html[data-theme="dark"] .wise-slider__viewport {
   grid-template-rows: 1fr;
 }
 
-.wise-job-card__details > div {
+.wise-job-card__details-inner {
   overflow: hidden;
+  min-height: 0;
 }
 
 .wise-job-card__section {
