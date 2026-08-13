@@ -250,6 +250,165 @@ html.theme-anim .wise-cv-callout {
   transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
 }
 
+/* ── Partner logos ── */
+.wise-partner-list li {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.wise-partner-column.visible .wise-partner-list li {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wise-partner-column.visible .wise-partner-list li:nth-child(1) { transition-delay: 0.05s; }
+.wise-partner-column.visible .wise-partner-list li:nth-child(2) { transition-delay: 0.12s; }
+.wise-partner-column.visible .wise-partner-list li:nth-child(3) { transition-delay: 0.19s; }
+.wise-partner-column.visible .wise-partner-list li:nth-child(4) { transition-delay: 0.26s; }
+.wise-partner-column.visible .wise-partner-list li:nth-child(5) { transition-delay: 0.33s; }
+.wise-partner-column.visible .wise-partner-list li:nth-child(6) { transition-delay: 0.4s; }
+
+/* Logo grayscale → color on hover, with lift + shine */
+.wise-partner-list img {
+  filter: grayscale(100%);
+  opacity: 0.78;
+  transition: filter 0.45s ease, opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.45s ease;
+}
+
+.wise-partner-list li:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: translateY(-3px) scale(1.08) rotate(-2deg);
+  box-shadow: 0 8px 20px rgba(21, 55, 95, 0.18), 0 0 0 1px rgba(245, 186, 53, 0.4);
+}
+
+html[data-theme="dark"] .wise-partner-list li:hover img {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(245, 186, 53, 0.5);
+}
+
+/* Partner name underline sweep on hover */
+.wise-partner-list a span {
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.wise-partner-list a span::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--wise-yellow);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s ease;
+}
+
+.wise-partner-list a:hover span::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ── Project rows: slide arrow on hover ── */
+.wise-project-row {
+  position: relative;
+  transition: color 0.3s ease, background-color 0.3s ease, padding-left 0.3s ease;
+}
+
+.wise-project-row::after {
+  content: '→';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px);
+  opacity: 0;
+  color: var(--wise-yellow);
+  font-weight: 800;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.wise-project-row:hover {
+  padding-left: 26px;
+}
+
+.wise-project-row:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.wise-project-row__icon {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, color 0.3s ease;
+}
+
+.wise-project-row:hover .wise-project-row__icon {
+  transform: scale(1.12) rotate(-4deg);
+  background: var(--wise-yellow) !important;
+  color: var(--wise-navy) !important;
+}
+
+/* ── CV callout hover ── */
+.wise-cv-callout {
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.wise-cv-callout:hover {
+  transform: translateY(-3px);
+  border-color: rgba(245, 186, 53, 0.5);
+  box-shadow: 0 16px 40px rgba(21, 55, 95, 0.1), 0 0 0 1px rgba(245, 186, 53, 0.25);
+}
+
+/* ── Footer social links: hover bounce ── */
+.presentation-footer .footer__social a,
+.wise-contact-panel__social a {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.presentation-footer .footer__social a:hover,
+.wise-contact-panel__social a:hover {
+  transform: translateY(-4px) scale(1.08);
+}
+
+/* ── Footer text links: slide in on hover ── */
+.presentation-footer .footer__links a {
+  transition: transform 0.3s ease, color 0.3s ease;
+  display: inline-block;
+}
+
+.presentation-footer .footer__links a:hover {
+  transform: translateX(5px);
+}
+
+/* ── FAQ items: hover lift ── */
+.wise-faq-item {
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wise-faq-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(21, 55, 95, 0.35);
+}
+
+.wise-faq-item summary {
+  transition: color 0.3s ease;
+}
+
+.wise-faq-item:hover summary {
+  color: var(--wise-navy);
+}
+
+/* ── Ribbon (CTA): subtle pulse on the gold button ── */
+.wise-ribbon .wise-btn--gold {
+  animation: wise-cta-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes wise-cta-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 186, 53, 0.45); }
+  50% { box-shadow: 0 0 0 10px rgba(245, 186, 53, 0); }
+}
+
 /* ── Reduced motion: disable fancy animations ── */
 @media (prefers-reduced-motion: reduce) {
   .wise-orb,
