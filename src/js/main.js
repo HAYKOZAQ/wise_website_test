@@ -305,6 +305,55 @@ function forcePageHeaderContrast() {
   });
 }
 
+function initReadingProgress() {
+  const bar = document.createElement('div');
+  bar.className = 'wise-reading-progress';
+  bar.id = 'wiseReadingProgress';
+  bar.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(bar);
+
+  function update() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const progress = scrollHeight > 0 ? Math.min(Math.max((scrollTop / scrollHeight) * 100, 0), 100) : 0;
+    bar.style.width = progress + '%';
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+function initScrollToTop() {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'wise-scroll-top';
+  btn.id = 'wiseScrollTop';
+  btn.setAttribute('aria-label', 'Scroll to top');
+  btn.setAttribute('title', 'Scroll to top');
+  btn.innerHTML =
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M18 15l-6-6-6 6"/>' +
+    '</svg>';
+  document.body.appendChild(btn);
+
+  let visible = false;
+  function check() {
+    const shouldShow = (window.scrollY || document.documentElement.scrollTop) > 350;
+    if (shouldShow !== visible) {
+      visible = shouldShow;
+      btn.classList.toggle('wise-scroll-top--visible', visible);
+    }
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  window.addEventListener('scroll', check, { passive: true });
+  check();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   forcePageHeaderContrast();
   initMobileMenu();
@@ -314,4 +363,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initPageTransitions();
   initContactForm();
+  initReadingProgress();
+  initScrollToTop();
 });

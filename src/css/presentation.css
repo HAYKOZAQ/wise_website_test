@@ -1929,3 +1929,163 @@ html[data-theme="dark"] .wise-cv-callout p {
     gap: 0;
   }
 }
+
+/* ── Reading Progress Bar (Top) ── */
+.wise-reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--wise-yellow), #ffd15d);
+  z-index: 99999;
+  pointer-events: none;
+  transition: width 80ms ease-out;
+  box-shadow: 0 0 10px rgba(245, 186, 53, 0.5);
+}
+
+/* ── Floating Scroll-to-Top Button ── */
+.wise-scroll-top {
+  position: fixed;
+  right: 20px;
+  bottom: 84px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--wise-navy);
+  border: 1.5px solid var(--wise-line);
+  box-shadow: 0 8px 24px rgba(21, 55, 95, 0.16);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.85);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    visibility 0.3s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.wise-scroll-top--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.wise-scroll-top:hover {
+  background: var(--wise-yellow);
+  color: var(--wise-navy);
+  border-color: var(--wise-yellow);
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 12px 28px rgba(245, 186, 53, 0.4);
+}
+
+html[data-theme="dark"] .wise-scroll-top {
+  background: #122943;
+  color: #f8fbff;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"] .wise-scroll-top:hover {
+  background: var(--wise-yellow);
+  color: var(--wise-navy);
+  border-color: var(--wise-yellow);
+}
+
+/* ── Chat: Direct Call 114 Button ── */
+.wise-help__call-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  background: var(--wise-yellow);
+  color: var(--wise-navy);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(245, 186, 53, 0.3);
+}
+
+.wise-help__call-btn:hover {
+  transform: scale(1.06);
+  background: #ffd15d;
+  color: var(--wise-navy);
+  box-shadow: 0 4px 12px rgba(245, 186, 53, 0.45);
+}
+
+/* ── Chat: Voice Input (Microphone) ── */
+.wise-help__mic {
+  width: 46px;
+  height: 48px;
+  border: 1.5px solid var(--wh-line);
+  border-radius: 12px;
+  background: var(--wh-surface);
+  color: var(--wh-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.wise-help__mic:hover {
+  color: var(--wh-brand);
+  border-color: var(--wh-brand);
+  background: var(--wh-bg);
+  transform: translateY(-1px);
+}
+
+.wise-help__mic--recording {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  animation: wiseMicPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes wiseMicPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+/* ── Chat: Enhanced Follow-up Chips ── */
+.wise-help__chip {
+  border: 1.5px solid rgba(245, 186, 53, 0.6) !important;
+  background: var(--wh-bg) !important;
+  color: var(--wh-brand) !important;
+  border-radius: 999px !important;
+  padding: 6px 13px !important;
+  font-size: 0.79rem !important;
+  font-weight: 700 !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.wise-help__chip:hover {
+  background: var(--wise-yellow) !important;
+  color: var(--wise-navy) !important;
+  border-color: var(--wise-yellow) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 4px 14px rgba(245, 186, 53, 0.35) !important;
+}
+
+@media (max-width: 768px) {
+  .wise-scroll-top {
+    right: 16px;
+    bottom: 78px;
+    width: 40px;
+    height: 40px;
+  }
+}

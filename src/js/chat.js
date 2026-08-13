@@ -335,6 +335,10 @@
       '<span class="wise-help__status-text" data-i18n="chat.status_offline">Միացում…</span>' +
       '</p></div>' +
       '<div class="wise-help__header-actions">' +
+      '<a href="tel:114" class="wise-help__call-btn" data-i18n-title="chat.q8" title="114" aria-label="Call 114">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' +
+      '<span>114</span>' +
+      '</a>' +
       '<button type="button" class="wise-help__new" data-new-chat data-i18n-title="chat.new" title="New chat" aria-label="New chat">' +
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
       '<path d="M12 5v14M5 12h14"/></svg>' +
@@ -359,6 +363,14 @@
       '<label class="wise-help__sr-only" for="wise-help-input" data-i18n="chat.placeholder">Գրեք հարցը</label>' +
       '<input id="wise-help-input" class="wise-help__input" type="text" autocomplete="off" enterkeyhint="send" ' +
       'placeholder="Օրինակ՝ տարիքային կենսաթոշակ" data-i18n="chat.placeholder" />' +
+      '<button type="button" class="wise-help__mic" data-mic title="Voice input" aria-label="Voice input">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>' +
+      '<path d="M19 10v2a7 7 0 0 1-14 0v-2"/>' +
+      '<line x1="12" y1="19" x2="12" y2="23"/>' +
+      '<line x1="8" y1="23" x2="16" y2="23"/>' +
+      '</svg>' +
+      '</button>' +
       '<button type="submit" class="wise-help__send" aria-label="Send">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>' +
       '</button></form>' +
@@ -393,9 +405,84 @@
     });
   }
 
+  function initVoiceInput() {
+    var micBtn = root.querySelector('[data-mic]');
+    if (!micBtn) return;
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      micBtn.style.display = 'none';
+      return;
+    }
+
+    var recognition = null;
+    var isRecording = false;
+
+    function stopRecording() {
+      isRecording = false;
+      micBtn.classList.remove('wise-help__mic--recording');
+      micBtn.setAttribute('title', loc('Ձայնային մուտքագրում', 'Voice input', 'Голосовой ввод'));
+      try {
+        if (recognition) recognition.stop();
+      } catch (_) {}
+    }
+
+    function startRecording() {
+      try {
+        if (!recognition) {
+          recognition = new SpeechRecognition();
+          recognition.continuous = false;
+          recognition.interimResults = true;
+
+          recognition.onstart = function () {
+            isRecording = true;
+            micBtn.classList.add('wise-help__mic--recording');
+            micBtn.setAttribute('title', loc('Լսում եմ… (սեղմեք դադարեցնելու համար)', 'Listening… (click to stop)', 'Слушаю… (нажмите для остановки)'));
+          };
+
+          recognition.onresult = function (event) {
+            var transcript = '';
+            for (var i = event.resultIndex; i < event.results.length; i++) {
+              transcript += event.results[i][0].transcript;
+            }
+            if (inputEl && transcript) {
+              inputEl.value = transcript;
+            }
+          };
+
+          recognition.onerror = function (event) {
+            console.warn('[wise-chat] voice error:', event.error);
+            stopRecording();
+          };
+
+          recognition.onend = function () {
+            stopRecording();
+          };
+        }
+
+        var curLang = lang();
+        var langMap = { 'hy': 'hy-AM', 'en': 'en-US', 'ru': 'ru-RU' };
+        recognition.lang = langMap[curLang] || 'hy-AM';
+        recognition.start();
+      } catch (e) {
+        console.warn('[wise-chat] voice start error', e);
+        stopRecording();
+      }
+    }
+
+    micBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    });
+  }
+
   function bindEvents() {
     fab.addEventListener('click', toggle);
     root.querySelector('.wise-help__close').addEventListener('click', close);
+    initVoiceInput();
     if (newChatBtn) {
       newChatBtn.addEventListener('click', function (e) {
         e.preventDefault();
@@ -620,8 +707,18 @@
         escapeHtml(t('chat.sources_label', 'Աղբյուրներ')) + '</span>' + links + '</div>';
     }
 
-    if (extras && extras.follow_ups && extras.follow_ups.length) {
-      var chips = extras.follow_ups.slice(0, 3).map(function (q) {
+    var followUps = (extras && extras.follow_ups && extras.follow_ups.length)
+      ? extras.follow_ups
+      : (htmlInner.indexOf('offline') === -1 && htmlInner.indexOf('սխալ') === -1 && htmlInner.indexOf('Շատ հարցեր') === -1 && htmlInner.indexOf('Too many') === -1
+          ? [
+              loc('Ի՞նչ փաստաթղթեր են պետք', 'What documents are needed?', 'Какие документы нужны?'),
+              loc('Ինչպե՞ս և որտե՞ղ դիմել', 'How and where to apply?', 'Как и куда обратиться?'),
+              loc('Ո՞վ ունի իրավունք', 'Who is eligible?', 'Кто имеет право?')
+            ]
+          : []);
+
+    if (followUps && followUps.length) {
+      var chips = followUps.slice(0, 3).map(function (q) {
         return '<button type="button" class="wise-help__chip" data-q="' + escapeHtml(q) + '">' + escapeHtml(q) + '</button>';
       }).join('');
       body += '<div class="wise-help__chips">' + chips + '</div>';
