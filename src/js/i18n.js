@@ -310,7 +310,7 @@
     'contact.label': { hy: 'Կապնվել', en: 'Get In Touch' },
     'contact.title': { hy: 'Կապվեք մեզ հետ', en: 'Contact Us' },
     'contact.address': { hy: 'Հասցե', en: 'Address' },
-    'contact.address_val': { hy: 'Երևան, Կ․ Ուլնեցի 68, Հայաստան', en: 'Yerevan, K. Ulnetsi 68, Armenia' },
+    'contact.address_val': { hy: 'Հայաստան, Երևան, Կ․ Ուլնեցի 68', en: 'Yerevan, K. Ulnetsi 68, Armenia' },
     'contact.panel_title': { hy: 'Գրեք մեզ, և կպատասխանենք', en: 'Write to us and we will reply' },
     'contact.panel_text': { hy: 'Երկու աշխատանքային օրվա ընթացքում կկապվենք Ձեզ հետ։', en: 'We will get back to you within two working days.' },
     'contactpage.form_title': { hy: 'Գրել նամակ', en: 'Send a Message' },
