@@ -185,8 +185,7 @@ html[data-theme="dark"] .wise-tilt:hover {
   transition: transform 0.35s ease;
 }
 
-.nav__link:hover::before,
-.nav__link--active::before {
+.nav__link:hover::before {
   transform: scaleX(1);
   transform-origin: left;
 }
