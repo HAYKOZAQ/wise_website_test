@@ -49,6 +49,13 @@
     'home.cta_text':     { hy: 'Գրեք մեզ, և կկապվենք Ձեզ հետ երկու աշխատանքային օրվա ընթացքում։', en: 'Write to us and we will get back to you within two working days.' },
     'home.cta_button':   { hy: 'Կապվել մեզ հետ', en: 'Contact us' },
 
+    /* Marquee band */
+    'marquee.1':     { hy: 'Թվային լուծումներ', en: 'Digital Solutions' },
+    'marquee.2':     { hy: 'Տեղեկատվական համակարգեր', en: 'Information Systems' },
+    'marquee.3':     { hy: 'Տվյալների վերլուծություն', en: 'Data Processing' },
+    'marquee.4':     { hy: 'Կիբեռանվտանգություն', en: 'Cybersecurity' },
+    'marquee.5':     { hy: 'Կրթական ծրագրեր', en: 'Educational Programs' },
+
     /* Why section */
     'why.label':     { hy: 'Մեր ուղղությունները', en: 'Our Approach' },
     'why.title':     { hy: 'Երազեք, ստեղծեք, կիսվեք մեզ հետ', en: 'Dream, Create, Share with Us' },
@@ -486,6 +493,12 @@
     'home.cta_title': 'Есть вопрос?',
     'home.cta_text': 'Напишите нам, и мы свяжемся с вами в течение двух рабочих дней.',
     'home.cta_button': 'Связаться с нами',
+
+    'marquee.1': 'Цифровые решения',
+    'marquee.2': 'Информационные системы',
+    'marquee.3': 'Анализ данных',
+    'marquee.4': 'Кибербезопасность',
+    'marquee.5': 'Образовательные программы',
 
     'why.label': 'Наши направления',
     'why.title': 'Мечтайте, создавайте, делитесь с нами',
