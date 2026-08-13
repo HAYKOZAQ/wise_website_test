@@ -15,15 +15,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY backend/requirements.txt /app/requirements.txt
+COPY backend/requirements-slim.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Cache bust argument — MUST be before COPY to invalidate Docker layer cache on Render
-ARG CACHEBUST=47
+ARG CACHEBUST=48
 ARG BUILD_SHA=dev
 ARG BUILD_TIME=unknown
 
@@ -39,10 +35,13 @@ RUN test -f /app/frontend/css/base.css \
     && test -f /app/frontend/css/glass.css \
     && test -f /app/frontend/css/components.css \
     && test -f /app/frontend/css/dark.css \
+    && test -f /app/frontend/css/animations.css \
     && test -f /app/frontend/js/main.js \
     && test -f /app/frontend/js/i18n.js \
     && test -f /app/frontend/js/chat.js \
     && test -f /app/frontend/js/config.js \
+    && test -f /app/frontend/js/animations.js \
+    && test -f /app/frontend/js/blog.js \
     && test -f /app/frontend/index.html \
     && test -f /app/frontend/about.html \
     && test -f /app/frontend/services.html \
@@ -56,6 +55,7 @@ RUN test -f /app/frontend/css/base.css \
     && test -f /app/frontend/en/contact.html \
     && test -f /app/frontend/en/blog.html \
     && test -f /app/frontend/assets/data/blog-posts.json \
+    && test -f /app/frontend/assets/videos/hero.mp4 \
     && test -f /app/frontend/assets/images/partners/HH_Gerb.svg \
     && test -f /app/frontend/assets/images/partners/usaid.svg \
     && test -f /app/frontend/assets/images/partners/microsoft.svg \
