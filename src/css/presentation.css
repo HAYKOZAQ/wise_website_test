@@ -833,13 +833,13 @@ body[lang="hy"],
 /* Contact */
 .wise-contact-grid {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
+  grid-template-columns: 0.9fr 1.1fr;
   gap: 24px;
   align-items: stretch;
 }
 
 .wise-contact-panel {
-  padding: 42px;
+  padding: 42px 36px;
   border-radius: var(--wise-radius);
   color: #fff;
   background: var(--wise-navy-deep);
@@ -867,6 +867,9 @@ body[lang="hy"],
 .wise-contact-detail div {
   color: #fff;
   font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .wise-contact-detail small {
