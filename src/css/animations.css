@@ -1,0 +1,276 @@
+/* ====================================================
+   WISE Foundation — Animations
+   Section reveals · title underline sweep · 3D tilt ·
+   floating orbs · micro-interactions · marquee ·
+   smooth theme transition
+   ==================================================== */
+
+/* ── 1. Section reveals: soft rise + fade, staggered ── */
+.fade-in,
+.fade-in-left,
+.fade-in-right,
+.fade-in-scale {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.fade-in { transform: translateY(36px); }
+.fade-in-left { transform: translateX(-36px); }
+.fade-in-right { transform: translateX(36px); }
+.fade-in-scale { transform: scale(0.92); }
+
+.fade-in.visible,
+.fade-in-left.visible,
+.fade-in-right.visible,
+.fade-in-scale.visible {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
+
+/* ── 2. Title underline sweep ── */
+.wise-title {
+  position: relative;
+}
+
+.wise-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -14px;
+  width: 72px;
+  height: 4px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--wise-yellow), rgba(245, 186, 53, 0));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fade-in.visible .wise-title::after,
+.fade-in-left.visible .wise-title::after,
+.fade-in-right.visible .wise-title::after,
+.fade-in-scale.visible .wise-title::after,
+.visible .wise-title::after {
+  transform: scaleX(1);
+}
+
+/* Hero titles underline: auto after load */
+.wise-page-hero .wise-title::after,
+.wise-home-hero .wise-title::after {
+  animation: wise-sweep 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+@keyframes wise-sweep {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ── 3. 3D tilt + glow on cards ── */
+.wise-tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  will-change: transform;
+}
+
+.wise-tilt:hover {
+  box-shadow:
+    0 22px 48px rgba(21, 55, 95, 0.14),
+    0 0 0 1px rgba(245, 186, 53, 0.45),
+    0 0 30px rgba(245, 186, 53, 0.12);
+}
+
+html[data-theme="dark"] .wise-tilt:hover {
+  box-shadow:
+    0 22px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(245, 186, 53, 0.5),
+    0 0 30px rgba(245, 186, 53, 0.16);
+}
+
+/* ── 4. Floating orbs in heroes ── */
+.wise-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  animation: wise-orb-float 16s ease-in-out infinite alternate;
+}
+
+.wise-orb--yellow {
+  background: radial-gradient(circle, rgba(245, 186, 53, 0.55), transparent 70%);
+}
+
+.wise-orb--navy {
+  background: radial-gradient(circle, rgba(64, 120, 190, 0.5), transparent 70%);
+}
+
+.wise-orb--blue {
+  background: radial-gradient(circle, rgba(52, 152, 219, 0.45), transparent 70%);
+}
+
+@keyframes wise-orb-float {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(38px, -42px, 0) scale(1.15); }
+}
+
+/* Orbs follow the mouse slightly (parallax handled in JS) */
+.wise-home-hero .wise-orb,
+.wise-page-hero .wise-orb {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── 5. Micro-interactions ── */
+/* Icon bounce on card hover */
+.wise-feature-card:hover .wise-feature-card__icon,
+.wise-service-card:hover .wise-service-card__icon {
+  animation: wise-icon-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes wise-icon-bounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-9px) scale(1.06); }
+  70% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+/* Button shine sweep */
+.wise-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.wise-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 45%;
+  height: 100%;
+  z-index: 1;
+  transform: skewX(-24deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+
+.wise-btn:hover::after {
+  left: 130%;
+}
+
+/* Nav link underline slide */
+.nav__link {
+  position: relative;
+}
+
+.nav__link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--wise-yellow);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s ease;
+}
+
+.nav__link:hover::before,
+.nav__link--active::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ── 6. Marquee band ── */
+.wise-marquee {
+  overflow: hidden;
+  padding: 18px 0;
+  background: var(--wise-navy-deep);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.wise-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: wise-marquee-scroll 34s linear infinite;
+}
+
+.wise-marquee:hover .wise-marquee__track {
+  animation-play-state: paused;
+}
+
+.wise-marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  padding-right: 22px;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.wise-marquee__item::after {
+  content: '✦';
+  color: var(--wise-yellow);
+}
+
+@keyframes wise-marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ── 7. Smooth theme transition ── */
+html.theme-anim body,
+html.theme-anim .wise-page,
+html.theme-anim .site-header,
+html.theme-anim .site-header .nav__link,
+html.theme-anim .site-header .theme-toggle,
+html.theme-anim .wise-section--soft,
+html.theme-anim .wise-section--navy,
+html.theme-anim .wise-title,
+html.theme-anim .wise-lede,
+html.theme-anim .wise-feature-card,
+html.theme-anim .wise-service-card,
+html.theme-anim .wise-blog-card,
+html.theme-anim .wise-faq-item,
+html.theme-anim .wise-contact-form,
+html.theme-anim .wise-btn,
+html.theme-anim .wise-job-card,
+html.theme-anim .wise-cv-callout {
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+
+/* ── Reduced motion: disable fancy animations ── */
+@media (prefers-reduced-motion: reduce) {
+  .wise-orb,
+  .wise-marquee__track,
+  .wise-btn::after,
+  .wise-title::after {
+    animation: none !important;
+  }
+
+  .fade-in,
+  .fade-in-left,
+  .fade-in-right,
+  .fade-in-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .wise-tilt {
+    transform: none !important;
+    transition: none !important;
+  }
+}
