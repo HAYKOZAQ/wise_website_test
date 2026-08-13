@@ -572,8 +572,8 @@ def get_version():
             partners = FRONTEND_ROOT / "pages" / "partners.html"
             if partners.is_file():
                 ph = partners.read_text(encoding="utf-8", errors="ignore")
-                payload["partners_has_page_header"] = 'class="page-header"' in ph
-                payload["partners_asset_v37"] = "?v=37" in ph
+                payload["partners_has_page_hero"] = 'class="wise-page-hero' in ph
+                payload["partners_asset_v37"] = "?v=" in ph
         except Exception as e:
             payload["probe_error"] = str(e)
     return payload

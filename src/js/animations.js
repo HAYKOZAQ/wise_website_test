@@ -123,6 +123,16 @@
   }
 
   function initJobToggles() {
+    function updateLabels() {
+      document.querySelectorAll('[data-job]').forEach(function (card) {
+        var toggle = card.querySelector('[data-job-toggle]');
+        var details = card.querySelector('[data-job-details]');
+        if (!toggle || !details) return;
+        var isOpen = details.getAttribute('data-open') === 'true';
+        toggle.textContent = jobToggleLabel(isOpen ? 'careers.hide' : 'careers.details');
+      });
+    }
+
     document.querySelectorAll('[data-job]').forEach(function (card) {
       var toggle = card.querySelector('[data-job-toggle]');
       var details = card.querySelector('[data-job-details]');
@@ -131,9 +141,11 @@
         var isOpen = details.getAttribute('data-open') === 'true';
         details.setAttribute('data-open', isOpen ? 'false' : 'true');
         toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-        toggle.textContent = jobToggleLabel(isOpen ? 'careers.details' : 'careers.hide');
+        toggle.textContent = jobToggleLabel(!isOpen ? 'careers.hide' : 'careers.details');
       });
     });
+
+    document.addEventListener('wisefLangChanged', updateLabels);
   }
 
   function init() {

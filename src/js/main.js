@@ -289,7 +289,9 @@ function initPageTransitions() {
         showStatus(getTexts().error, false);
       });
   });
-}/** Ensure page-header stays navy + white (beats theme/cascade glitches). */
+}
+
+/** Ensure page-header stays navy + white (beats theme/cascade glitches). */
 function forcePageHeaderContrast() {
   document.querySelectorAll('.page-header').forEach((el) => {
     el.style.setProperty('background', '#0f2740', 'important');
