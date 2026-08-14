@@ -3,16 +3,29 @@ function initMobileMenu() {
   const nav = document.querySelector('.nav');
   if (!toggle || !nav) return;
 
+  function closeMenu() {
+    toggle.classList.remove('active');
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-label', 'Toggle Navigation Menu');
+
   toggle.addEventListener('click', () => {
-    toggle.classList.toggle('active');
-    nav.classList.toggle('open');
+    const isOpen = nav.classList.toggle('open');
+    toggle.classList.toggle('active', isOpen);
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
 
   document.querySelectorAll('.nav__link').forEach(link => {
-    link.addEventListener('click', () => {
-      toggle.classList.remove('active');
-      nav.classList.remove('open');
-    });
+    link.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav.classList.contains('open')) {
+      closeMenu();
+    }
   });
 }
 

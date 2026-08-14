@@ -22,10 +22,38 @@ import numpy as np
 from filelock import FileLock
 
 
+_ARMENIAN_SUFFIXES = (
+    "ությունների", "ություններին", "ություններով", "ություններից",
+    "ությունները", "ությունների", "ությանը", "ությամբ", "ություն", "ության",
+    "ներին", "ներով", "ներից", "ներում", "ները", "ների", "ներ",
+    "ականին", "ականով", "ականից", "ական",
+    "այինին", "այինով", "այինից", "ային",
+    "ավորին", "ավորով", "ավորից", "ավոր",
+    "ում", "ով", "ից", "ին", "ի", "ը", "ն",
+)
+
+
+def _stem_armenian(word: str) -> str:
+    """Strip common Armenian inflectional suffixes while protecting roots."""
+    if len(word) < 4:
+        return word
+    for suffix in _ARMENIAN_SUFFIXES:
+        if word.endswith(suffix) and (len(word) - len(suffix)) >= 3:
+            return word[:-len(suffix)]
+    return word
+
+
 def _tokenize_bm25(text: str) -> list[str]:
-    """Whitespace-ish tokenization that keeps Armenian letters."""
+    """Tokenization with Armenian morphology normalization."""
     text = (text or "").lower()
-    return [t for t in re.findall(r"[\w\u0531-\u0587]+", text, flags=re.UNICODE) if len(t) > 1]
+    raw_tokens = [t for t in re.findall(r"[\w\u0531-\u0587]+", text, flags=re.UNICODE) if len(t) > 1]
+    result: list[str] = []
+    for t in raw_tokens:
+        result.append(t)
+        stem = _stem_armenian(t)
+        if stem != t and len(stem) >= 3:
+            result.append(stem)
+    return result
 
 
 class CompactBM25:

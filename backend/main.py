@@ -1,23 +1,21 @@
+"""
+WISE Foundation — MLSA Welfare RAG API Application Entry Point.
+Modular FastAPI architecture with Clean separation of concerns.
+"""
+
+from __future__ import annotations
+
 import os
 import sys
-import time
-import json
-import smtplib
-from collections import defaultdict, deque
-from email.message import EmailMessage
 from pathlib import Path
-from threading import Lock
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request, Response, Header
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
-from pydantic import BaseModel, Field
-from typing import Any, Optional
-import requests
 
 if sys.platform == "win32":
     try:
@@ -25,86 +23,53 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from rag_engine import RAGEngine, OLLAMA_HOST, OLLAMA_MODEL
-from fidelity import load_eval_stats, EVAL_CASES, evaluate_grounding, log_qa_event
-from reingest import (
-    get_state as get_reingest_state,
-    run_reingest_async,
-    start_scheduler,
-)
+from core.config import settings
+from rag_engine import RAGEngine, get_rag_engine, rag_engine_instance
+import rag_engine as rag_module
+from routers import health_router, chat_router, contact_router, admin_router, eval_router
 
+BACKEND_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BACKEND_DIR / "frontend"
+if not FRONTEND_DIR.is_dir():
+    FRONTEND_DIR = BACKEND_DIR.parent / "_site"
+if not FRONTEND_DIR.is_dir():
+    FRONTEND_DIR = None
+
+# Initialize FastAPI application
 app = FastAPI(
-    title="MLSA Welfare RAG API",
-    version="2.6",
-    description="WISE Foundation website + MLSA/ARLIS RAG (summaries, legal acts, PDFs, web) + scheduled re-ingest",
+    title=settings.app_title,
+    version=settings.app_version,
+    description=settings.app_description,
 )
 
 
 class RenderFriendlyMiddleware(BaseHTTPMiddleware):
-    """
-    Render probes often send HEAD / which Starlette may 405 on GET-only routes.
-    Also set cache headers so HTML is never sticky after deploys.
-    """
+    """Normalize HEAD requests and manage deploy-safe cache headers."""
 
     async def dispatch(self, request: Request, call_next):
-        # Convert HEAD → GET for routing, then strip body
         is_head = request.method == "HEAD"
         if is_head:
-            # Mutate scope so routes registered as GET still match
             request.scope["method"] = "GET"
 
         response = await call_next(request)
-
         path = request.url.path or ""
-        # HTML pages: always revalidate after deploy
+
         if path.endswith(".html") or path in ("/", "/pages", "/pages/"):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
-        # Versioned assets (?v=) can be cached briefly
         elif path.startswith(("/css/", "/js/", "/assets/")):
-            response.headers.setdefault(
-                "Cache-Control", "public, max-age=300, must-revalidate"
-            )
+            response.headers.setdefault("Cache-Control", "public, max-age=300, must-revalidate")
 
         if is_head:
-            return Response(
-                status_code=response.status_code,
-                headers=dict(response.headers),
-            )
+            return Response(status_code=response.status_code, headers=dict(response.headers))
         return response
 
 
+# Register middlewares
 app.add_middleware(RenderFriendlyMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=500)
 
-# CORS: production-safe default is same-origin + localhost.
-# Set CORS_ORIGINS=* only when you explicitly want wide-open public API.
-# Or CORS_ORIGINS=https://a.com,https://b.com for multi-host.
-def _resolve_cors_origins() -> list[str]:
-    raw = (os.environ.get("CORS_ORIGINS") or "").strip()
-    if raw:
-        return [o.strip() for o in raw.split(",") if o.strip()] or ["*"]
-    # Explicit opt-in to wide open
-    if (os.environ.get("WISEF_CORS_OPEN") or "").strip().lower() in ("1", "true", "yes"):
-        return ["*"]
-    # Default: allow same-origin style hosts + common local dev + live Render URL.
-    # A separately hosted Cloudflare Pages site should be added with
-    # CORS_ORIGINS (or WISEF_PAGES_ORIGIN) on the API service.
-    origins = [
-        "http://127.0.0.1:8000",
-        "http://localhost:8000",
-        "http://127.0.0.1:3000",
-        "http://localhost:3000",
-        "https://wise-website-test.onrender.com",
-        "http://wise-website-test.onrender.com",
-    ]
-    pages_origin = (os.environ.get("WISEF_PAGES_ORIGIN") or "").strip().rstrip("/")
-    if pages_origin and pages_origin not in origins:
-        origins.append(pages_origin)
-    return origins
-
-
-_cors_origins = _resolve_cors_origins()
+_cors_origins = settings.resolve_cors_origins()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
@@ -113,770 +78,82 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Simple in-memory rate limit (per IP) for expensive endpoints
-def _env_int(name: str, default: int) -> int:
-    try:
-        return int(os.environ.get(name, str(default)))
-    except (TypeError, ValueError):
-        print(f"WARNING: invalid {name}={os.environ.get(name)!r}, using {default}")
-        return default
+
+@app.on_event("startup")
+def startup_event():
+    """Ensure RAGEngine initializes on startup."""
+    rag_module.rag_engine_instance = get_rag_engine()
 
 
-_RATE_LIMIT = _env_int("CHAT_RATE_LIMIT", 20)  # requests
-_RATE_WINDOW = _env_int("CHAT_RATE_WINDOW_SEC", 60)  # seconds
-_rate_buckets: dict[str, deque] = defaultdict(deque)
-_rate_lock = Lock()
+# Mount Modular API Routers
+app.include_router(health_router)
+app.include_router(chat_router)
+app.include_router(contact_router)
+app.include_router(admin_router)
+app.include_router(eval_router)
 
 
-def _send_contact_email(entry: dict[str, str]) -> None:
-    """Email a contact form submission to the site inbox via SMTP (if configured)."""
-    host = (os.environ.get("SMTP_HOST") or "").strip()
-    if not host:
-        return
-    port = _env_int("SMTP_PORT", 587)
-    user = (os.environ.get("SMTP_USER") or "").strip()
-    password = os.environ.get("SMTP_PASSWORD") or ""
-    to_addr = (os.environ.get("CONTACT_TO_EMAIL") or "").strip() or "info@wisef.am"
-    from_addr = (os.environ.get("SMTP_FROM") or "").strip() or (user or "info@wisef.am")
-    use_tls = (os.environ.get("SMTP_USE_TLS") or "1").strip().lower() in ("1", "true", "yes")
-
-    subject = entry.get("subject") or "Website contact"
-    if not subject.lower().startswith("contact"):
-        subject = f"Website contact: {subject}"
-
-    body = (
-        f"Name: {entry.get('name')}\n"
-        f"Email: {entry.get('email')}\n"
-        f"Sent: {entry.get('ts')}\n"
-        f"IP: {entry.get('ip')}\n\n"
-        f"Subject: {subject}\n\n"
-        f"Message:\n{entry.get('message')}\n"
-    )
-
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = from_addr
-    msg["To"] = to_addr
-    msg["Reply-To"] = entry.get("email") or from_addr
-    msg.set_content(body)
-
-    with smtplib.SMTP(host, port, timeout=15) as smtp:
-        if use_tls:
-            smtp.starttls()
-        if user:
-            smtp.login(user, password)
-        smtp.send_message(msg)
-
-# Only trust X-Forwarded-For when we are explicitly behind a proxy / load balancer.
-# Unset → use the socket peer (safe default; XFF is client-supplied and spoofable).
-_TRUST_PROXY = (os.environ.get("TRUST_PROXY_HOPS") or "").strip()
-_TRUST_PROXY_HOPS = int(_TRUST_PROXY) if _TRUST_PROXY.isdigit() else (1 if _TRUST_PROXY.lower() in ("1", "true", "yes") else 0)
-
-
-def _client_ip(request: Request) -> str:
-    if _TRUST_PROXY_HOPS > 0:
-        forwarded = request.headers.get("x-forwarded-for") or ""
-        if forwarded:
-            # Take the hop at position (count - TRUST_PROXY_HOPS) from the left,
-            # i.e. the address our immediate trusted proxy saw as the client.
-            parts = [p.strip() for p in forwarded.split(",") if p.strip()]
-            if parts:
-                idx = max(0, len(parts) - _TRUST_PROXY_HOPS)
-                return parts[idx]
-    if request.client:
-        return request.client.host or "unknown"
-    return "unknown"
-
-
-def _is_loopback_ip(ip: str) -> bool:
-    return ip in ("127.0.0.1", "::1", "localhost") or ip.startswith("::ffff:127.0.0.1")
-
-
-def _rate_limit_ok(ip: str, limit: int = _RATE_LIMIT, window: int = _RATE_WINDOW) -> bool:
-    now = time.time()
-    with _rate_lock:
-        q = _rate_buckets[ip]
-        while q and now - q[0] > window:
-            q.popleft()
-        if len(q) >= limit:
-            return False
-        q.append(now)
-        # Evict empty buckets so the dict doesn't grow unbounded
-        if len(_rate_buckets) > 4096:
-            stale = [k for k, v in _rate_buckets.items() if not v]
-            for k in stale:
-                del _rate_buckets[k]
-        return True
-
-print("Initializing RAG Engine...")
-try:
-    rag_engine = RAGEngine()
-except Exception as e:
-    print(f"Error starting RAG Engine: {e}")
-    rag_engine = None
-
-_rag_lock = Lock()
-_ADMIN_TOKEN = (os.environ.get("ADMIN_TOKEN") or os.environ.get("REINGEST_TOKEN") or "").strip()
-
-
-def reload_rag_engine() -> dict[str, Any]:
-    """Hot-reload corpus into a new RAGEngine without restarting the process."""
-    global rag_engine
-    print("[main] Hot-reloading RAG engine…")
-    new_engine = RAGEngine()
-    with _rag_lock:
-        rag_engine = new_engine
-    return {
-        "ok": True,
-        "documents": new_engine.document_count,
-        "chunks": len(new_engine.chunks),
-        "vector_search": new_engine.vector_enabled,
-        "corpus_hash": new_engine.corpus_hash,
-        "legal_acts": new_engine.legal_acts,
-    }
-
-
-def _require_admin(authorization: Optional[str], x_admin_token: Optional[str]) -> None:
-    """
-    Protect admin/ingest endpoints.
-    If ADMIN_TOKEN is unset, allow only from localhost (dev convenience).
-    """
-    provided = ""
-    if x_admin_token:
-        provided = x_admin_token.strip()
-    elif authorization and authorization.lower().startswith("bearer "):
-        provided = authorization[7:].strip()
-
-    if _ADMIN_TOKEN:
-        if provided != _ADMIN_TOKEN:
-            raise HTTPException(status_code=401, detail="Invalid or missing admin token")
-        return
-
-    # No token configured — only local machine may trigger re-ingest
-    # (checked by caller with request client when needed)
-
-
-def _admin_or_local(request: Request, authorization: Optional[str], x_admin_token: Optional[str]) -> None:
-    if _ADMIN_TOKEN:
-        _require_admin(authorization, x_admin_token)
-        return
-    # No admin token configured: only allow calls from the actual socket peer at
-    # loopback. Never trust X-Forwarded-For here — it is client-supplied and an
-    # attacker behind a reverse proxy could spoof "127.0.0.1" to bypass admin.
-    peer = (request.client.host if request.client else "") or ""
-    if not _is_loopback_ip(peer):
-        raise HTTPException(
-            status_code=401,
-            detail="Set ADMIN_TOKEN env to allow remote re-ingest, or call from localhost",
-        )
-
-
-# Frontend paths (Docker: /app/frontend ; local: ../_site next to backend/)
-_BACKEND_DIR = Path(__file__).resolve().parent
-_FRONTEND_CANDIDATES = [
-    _BACKEND_DIR / "frontend",
-    _BACKEND_DIR.parent / "_site",
-]
-FRONTEND_ROOT = next((p for p in _FRONTEND_CANDIDATES if p.is_dir()), None)
-if FRONTEND_ROOT:
-    print(f"Frontend static files: {FRONTEND_ROOT}")
-else:
-    print("Frontend static folder not found — / will show API-only page")
-
-
-# Allowlist of roots admin endpoints may import PDFs from.
-# Comma-separated absolute paths via env; always permits the bundled backend/pdfs.
-def _import_roots() -> list[Path]:
-    raw = (os.environ.get("WISEF_IMPORT_ROOTS") or "").strip()
-    roots = [Path(p.strip()).resolve() for p in raw.split(",") if p.strip()]
-    roots.append((_BACKEND_DIR / "pdfs").resolve())
-    return roots
-
-
-def _validate_import_path(source: Optional[str]) -> Optional[str]:
-    """Return a safe path string, or None to mean 'use the bundled pdfs library'.
-
-    Rejects paths that escape the configured WISEF_IMPORT_ROOTS allowlist, so an
-    admin-token-bearing attacker cannot exfiltrate or ingest arbitrary files.
-    """
-    if not source:
-        return None
-    try:
-        # If relative, resolve against the backend dir so behavior is independent
-        # of the process's current working directory.
-        p = Path(source)
-        if not p.is_absolute():
-            p = _BACKEND_DIR / p
-        resolved = p.resolve()
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid source path")
-    # Always allow the bundled library.
-    lib = (_BACKEND_DIR / "pdfs").resolve()
-    if resolved == lib:
-        return None
-    for root in _import_roots():
-        try:
-            # Both Path.is_relative_to and os.path.commonpath work on Windows/Unix.
-            if resolved.is_relative_to(root):
-                return str(resolved)
-        except Exception:
-            continue
-    raise HTTPException(
-        status_code=403,
-        detail="Source path is outside WISEF_IMPORT_ROOTS allowlist",
-    )
-
-
-def _reingest_mode_file() -> Path:
-    return _BACKEND_DIR / "data" / "reingest_mode.json"
-
-
-def _read_reingest_mode() -> str:
-    """
-    Single schedule path:
-      - env REINGEST_MODE=inprocess|windows|off overrides
-      - data/reingest_mode.json written by install_scheduled_reingest.ps1
-      - default: inprocess when REINGEST_INTERVAL_HOURS>0, else off
-    """
-    env_mode = (os.environ.get("REINGEST_MODE") or "").strip().lower()
-    if env_mode in ("inprocess", "windows", "off"):
-        return env_mode
-    path = _BACKEND_DIR / "data" / "reingest_mode.json"
-    if path.is_file():
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-            m = (data.get("mode") or "").strip().lower()
-            if m in ("inprocess", "windows", "off"):
-                return m
-        except Exception:
-            pass
-    return "inprocess"
-
-
-# Optional background re-ingest — disabled if Windows task owns the schedule
-try:
-    _interval = float(os.environ.get("REINGEST_INTERVAL_HOURS") or "0")
-except ValueError:
-    _interval = 0.0
-_sched_force = (os.environ.get("REINGEST_FORCE") or "").lower() in ("1", "true", "yes")
-_sched_immediate = (os.environ.get("REINGEST_ON_START") or "").lower() in ("1", "true", "yes")
-_reingest_mode = _read_reingest_mode()
-if _reingest_mode == "windows":
-    print("[main] Re-ingest mode=windows — in-process scheduler OFF (use Task Scheduler only)")
-    _interval = 0.0
-elif _reingest_mode == "off":
-    print("[main] Re-ingest mode=off")
-    _interval = 0.0
-if _interval > 0:
-    start_scheduler(
-        _interval,
-        force=_sched_force,
-        reload_callback=reload_rag_engine,
-        run_immediately=_sched_immediate,
-    )
-else:
-    print("[main] In-process scheduled re-ingest off (set REINGEST_INTERVAL_HOURS=24 + mode=inprocess)")
-
-
-class ChatHistoryTurn(BaseModel):
-    role: str = "user"
-    content: str = ""
-
-
-class ChatRequest(BaseModel):
-    query: str
-    lang: str = "hy"
-    history: list[ChatHistoryTurn] = Field(default_factory=list)
-
-
-class ChatResponse(BaseModel):
-    answer: str
-    sources: list[Any] = Field(default_factory=list)
-    vector_search: bool = False
-    follow_ups: list[str] = Field(default_factory=list)
-    fidelity: Optional[dict[str, Any]] = None
-    generation_mode: Optional[str] = None
-
-
-class ContactRequest(BaseModel):
-    name: str = Field(..., min_length=1, max_length=200)
-    email: str = Field(..., min_length=3, max_length=200)
-    subject: str = Field(default="", max_length=300)
-    message: str = Field(..., min_length=5, max_length=5000)
-
-
-def _doc_type_counts() -> dict[str, int]:
-    if not rag_engine:
-        return {}
-    return dict(getattr(rag_engine, "doc_type_counts", {}) or {})
-
-
-def _status_payload() -> dict:
-    ollama_ok = False
-    try:
-        r = requests.get(OLLAMA_HOST, timeout=2)
-        if r.status_code == 200:
-            ollama_ok = True
-    except Exception:
-        pass
-
-    legal_acts = 0
-    cache_ok = False
-    corpus_hash = ""
-    if rag_engine:
-        legal_acts = getattr(rag_engine, "legal_acts", 0)
-        cache_ok = getattr(rag_engine, "cache_ok", False)
-        corpus_hash = getattr(rag_engine, "corpus_hash", "")
-
-    stats = load_eval_stats(limit=200)
-    return {
-        "status": "ready" if rag_engine else "error",
-        "version": "2.6",
-        "vector_search_active": rag_engine.vector_enabled if rag_engine else False,
-        "vector_backend": getattr(rag_engine, "vector_backend", None) if rag_engine else None,
-        "embed_skip_reason": getattr(rag_engine, "embed_skip_reason", None) if rag_engine else None,
-        "ollama_connected": ollama_ok,
-        "ollama_host": OLLAMA_HOST,
-        "model": OLLAMA_MODEL,
-        "documents_indexed": rag_engine.document_count if rag_engine else 0,
-        "chunks_indexed": len(rag_engine.chunks) if rag_engine else 0,
-        "doc_types": _doc_type_counts(),
-        "legal_acts": legal_acts,
-        "cache_ok": cache_ok,
-        "corpus_hash": corpus_hash,
-        "frontend_mounted": bool(FRONTEND_ROOT),
-        "rate_limit": {"max": _RATE_LIMIT, "window_sec": _RATE_WINDOW},
-        "admin_token_configured": bool(_ADMIN_TOKEN),
-        "cors_origins": _cors_origins,
-        "reingest_mode": _reingest_mode,
-        "reingest": get_reingest_state(),
-        "fidelity_summary": {
-            "entries": stats.get("entries"),
-            "avg_grounding_score": stats.get("avg_grounding_score"),
-            "avg_hallucination_rate": stats.get("avg_hallucination_rate"),
-            "risk_counts": stats.get("risk_counts"),
-        },
-    }
-
-
-def _api_only_html() -> str:
-    s = _status_payload()
-    ok = s["status"] == "ready"
-    badge = "#10b981" if ok else "#ef4444"
-    label = "READY" if ok else "ERROR"
-    fs = s.get("fidelity_summary") or {}
-    hall = fs.get("avg_hallucination_rate")
-    ground = fs.get("avg_grounding_score")
-    hall_s = f"{hall:.0%}" if isinstance(hall, (int, float)) else "n/a"
-    ground_s = f"{ground:.0%}" if isinstance(ground, (int, float)) else "n/a"
+# Dashboard HTML for standalone API deployments
+def _api_dashboard_html() -> str:
+    engine = rag_module.rag_engine_instance
+    docs = getattr(engine, "document_count", 0) if engine else 0
+    chunks = len(getattr(engine, "chunks", [])) if engine else 0
+    acts = getattr(engine, "legal_acts", 0) if engine else 0
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WISE AI Backend (not the full site)</title>
+  <title>WISE AI Backend</title>
   <style>
-    body {{ font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto;
-           padding: 0 20px; color: #0f172a; line-height: 1.5; }}
-    .warn {{ background: #fff7ed; border: 1px solid #fdba74; border-radius: 12px;
-             padding: 14px 16px; margin: 16px 0; }}
-    .badge {{ display: inline-block; background: {badge}; color: #fff;
-              padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }}
+    body {{ font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #0f172a; line-height: 1.5; }}
+    .badge {{ display: inline-block; background: #10b981; color: #fff; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }}
+    .card {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin: 16px 0; }}
     a {{ color: #183960; }}
-    code {{ background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }}
-    .card {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
-             padding: 14px 16px; margin: 16px 0; }}
   </style>
 </head>
 <body>
   <h1>WISE AI Backend</h1>
-  <p><span class="badge">{label}</span></p>
-  <div class="warn">
-    <strong>This is not the full WISE marketing website.</strong><br>
-    This page is the <em>AI server</em> status. The public site is either:
-    <ul>
-      <li>Cloudflare Pages (your static site), built with <code>WISEF_API_BASE</code> pointing here, or</li>
-      <li>Redeploy this service with the latest Docker image that includes the frontend
-          (then open <code>/index.html</code>).</li>
-    </ul>
-  </div>
+  <p><span class="badge">READY</span></p>
   <div class="card">
-    <strong>Corpus</strong>
+    <strong>Corpus Status</strong>
     <ul>
-      <li>Documents: {s['documents_indexed']}</li>
-      <li>Chunks: {s['chunks_indexed']}</li>
-      <li>ARLIS acts: {s['legal_acts']}</li>
-    </ul>
-    <strong>Fidelity</strong>
-    <ul>
-      <li>Logged: {fs.get('entries', 0)}</li>
-      <li>Grounding: {ground_s}</li>
-      <li>Hallucination rate: {hall_s}</li>
+      <li>Indexed Documents: {docs}</li>
+      <li>Semantic Chunks: {chunks}</li>
+      <li>ARLIS Legal Acts: {acts}</li>
     </ul>
   </div>
-  <p>API:</p>
+  <p>Available Endpoints:</p>
   <ul>
     <li><a href="/api/status"><code>GET /api/status</code></a></li>
     <li><code>POST /api/chat</code></li>
     <li><a href="/api/eval/stats"><code>GET /api/eval/stats</code></a></li>
-    <li><a href="/docs"><code>/docs</code></a></li>
+    <li><a href="/docs"><code>Interactive Docs (/docs)</code></a></li>
   </ul>
 </body>
 </html>"""
 
 
-@app.api_route("/api/status", methods=["GET", "HEAD"])
-def get_status():
-    return _status_payload()
-
-
-@app.get("/api/version")
-def get_version():
-    """Deploy stamp so we can confirm Render is on the latest build."""
-    payload = {
-        "ok": True,
-        "asset_version": "33",
-        "frontend_root": str(FRONTEND_ROOT) if FRONTEND_ROOT else None,
-        "frontend_mounted": bool(FRONTEND_ROOT),
-    }
-    for cand in (
-        _BACKEND_DIR / "version.json",
-        Path("/app/version.json"),
-    ):
-        if cand.is_file():
-            try:
-                payload.update(json.loads(cand.read_text(encoding="utf-8")))
-            except Exception as e:
-                payload["version_file_error"] = str(e)
-            break
-    # Prove newest CSS/JS files exist in the image
-    if FRONTEND_ROOT:
-        dark = FRONTEND_ROOT / "css" / "dark.css"
-        i18n = FRONTEND_ROOT / "js" / "i18n.js"
-        payload["has_dark_css"] = dark.is_file()
-        payload["has_i18n_js"] = i18n.is_file()
-        try:
-            payload["dark_css_bytes"] = dark.stat().st_size if dark.is_file() else 0
-            payload["i18n_has_insertBefore"] = (
-                "insertBefore" in i18n.read_text(encoding="utf-8", errors="ignore")
-                if i18n.is_file()
-                else False
-            )
-            components_css = (FRONTEND_ROOT / "css" / "components.css").read_text(
-                encoding="utf-8", errors="ignore"
-            )
-            payload["components_has_header_controls"] = "header-controls" in components_css
-            payload["page_header_navy"] = "#0f2740" in components_css and ".page-header" in components_css
-            main_js = (FRONTEND_ROOT / "js" / "main.js").read_text(encoding="utf-8", errors="ignore")
-            payload["page_header_js_force"] = "forcePageHeaderContrast" in main_js
-            partners = FRONTEND_ROOT / "pages" / "partners.html"
-            if partners.is_file():
-                ph = partners.read_text(encoding="utf-8", errors="ignore")
-                payload["partners_has_page_hero"] = 'class="wise-page-hero' in ph
-                payload["partners_asset_v37"] = "?v=" in ph
-        except Exception as e:
-            payload["probe_error"] = str(e)
-    return payload
-
-
-@app.post("/api/chat", response_model=ChatResponse)
-def chat(request: ChatRequest, req: Request):
-    if not rag_engine:
-        raise HTTPException(status_code=500, detail="RAG Engine is not initialized")
-
-    if not request.query.strip():
-        raise HTTPException(status_code=400, detail="Query cannot be empty")
-
-    if len(request.query) > 2000:
-        raise HTTPException(status_code=400, detail="Query too long (max 2000 characters)")
-
-    ip = _client_ip(req)
-    if not _rate_limit_ok(ip):
-        raise HTTPException(
-            status_code=429,
-            detail=f"Too many requests. Limit {_RATE_LIMIT} per {_RATE_WINDOW}s. Try again shortly.",
-        )
-
-    print(f"Received query ({request.lang}) from {ip}: {request.query[:120]}")
-    try:
-        with _rag_lock:
-            engine = rag_engine
-        if not engine:
-            raise HTTPException(status_code=500, detail="RAG Engine is not initialized")
-        hist = [
-            {"role": t.role, "content": t.content}
-            for t in (request.history or [])
-            if (t.content or "").strip()
-        ][-8:]
-        result = engine.generate_response(request.query, request.lang, history=hist or None)
-        return ChatResponse(
-            answer=result["answer"],
-            sources=result.get("sources") or [],
-            vector_search=bool(result.get("vector_search")),
-            follow_ups=result.get("follow_ups") or [],
-            fidelity=result.get("fidelity"),
-            generation_mode=result.get("generation_mode"),
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Chat generation error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-class ReingestRequest(BaseModel):
-    force: bool = False
-    import_path: Optional[str] = Field(
-        default=None,
-        description="Optional folder of PDFs to copy into backend/pdfs before rebuild",
-    )
-
-
-class ImportPdfsRequest(BaseModel):
-    source: Optional[str] = Field(
-        default=None,
-        description="Folder or PDF path. Default: backend/pdfs",
-    )
-    force: bool = False
-    rebuild: bool = True
-
-
-@app.get("/api/admin/ingest-status")
-def ingest_status(
-    request: Request,
-    authorization: Optional[str] = Header(default=None),
-    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
-):
-    _admin_or_local(request, authorization, x_admin_token)
-    st = get_reingest_state()
-    pdf_dir = _BACKEND_DIR / "pdfs"
-    pdfs = sorted([p.name for p in pdf_dir.glob("*.pdf")]) if pdf_dir.is_dir() else []
-    return {
-        "reingest": st,
-        "library_pdfs": pdfs,
-        "library_count": len(pdfs),
-        "documents_indexed": rag_engine.document_count if rag_engine else 0,
-        "doc_types": _doc_type_counts(),
-        "corpus_hash": getattr(rag_engine, "corpus_hash", None) if rag_engine else None,
-    }
-
-
-@app.post("/api/admin/reingest")
-def admin_reingest(
-    payload: ReingestRequest,
-    request: Request,
-    authorization: Optional[str] = Header(default=None),
-    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
-):
-    """Trigger full corpus rebuild (async) and hot-reload RAG when done."""
-    _admin_or_local(request, authorization, x_admin_token)
-    safe_import_path = _validate_import_path(payload.import_path)
-    out = run_reingest_async(
-        force=bool(payload.force),
-        import_pdfs_from=safe_import_path,
-        reload_callback=reload_rag_engine,
-    )
-    if not out.get("ok") and not out.get("started"):
-        raise HTTPException(status_code=409, detail=out.get("error") or "Could not start re-ingest")
-    return out
-
-
-@app.post("/api/admin/import-pdfs")
-def admin_import_pdfs(
-    payload: ImportPdfsRequest,
-    request: Request,
-    authorization: Optional[str] = Header(default=None),
-    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
-):
-    """
-    Bulk-import PDFs from a folder (or backend/pdfs), rebuild corpus, hot-reload.
-    Runs async so the HTTP call returns immediately.
-    """
-    _admin_or_local(request, authorization, x_admin_token)
-
-    source = (payload.source or "").strip() or str(_BACKEND_DIR / "pdfs")
-    source = _validate_import_path(source) or str(_BACKEND_DIR / "pdfs")
-    lib = str((_BACKEND_DIR / "pdfs").resolve())
-    try:
-        src_resolved = str(Path(source).resolve())
-    except Exception:
-        src_resolved = source
-
-    st = get_reingest_state()
-    if st.get("running"):
-        raise HTTPException(status_code=409, detail="Re-ingest already running")
-
-    # Always rebuild via reingest; copy from external folders first
-    import_from = None if src_resolved == lib else source
-    out = run_reingest_async(
-        force=bool(payload.force),
-        import_pdfs_from=import_from,
-        reload_callback=reload_rag_engine if payload.rebuild else None,
-    )
-    if not out.get("started") and not out.get("ok"):
-        raise HTTPException(status_code=409, detail=out.get("error") or "busy")
-
-    mode = "rebuild_from_library" if import_from is None else "import_and_rebuild"
-    return {**out, "source": source, "mode": mode}
-
-
-@app.post("/api/admin/reload")
-def admin_reload(
-    request: Request,
-    authorization: Optional[str] = Header(default=None),
-    x_admin_token: Optional[str] = Header(default=None, alias="X-Admin-Token"),
-):
-    """Reload RAG from existing mlsa_programs.json without re-downloading."""
-    _admin_or_local(request, authorization, x_admin_token)
-    try:
-        return reload_rag_engine()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/api/contact")
-def contact(payload: ContactRequest, req: Request):
-    """Store contact form submissions (and optional webhook)."""
-    ip = _client_ip(req)
-    if not _rate_limit_ok(ip, limit=8, window=300):
-        raise HTTPException(status_code=429, detail="Too many contact submissions. Try later.")
-
-    name = payload.name.strip()
-    email = payload.email.strip()
-    subject = (payload.subject or "").strip() or "Website contact"
-    message = payload.message.strip()
-    if "@" not in email or "." not in email.split("@")[-1]:
-        raise HTTPException(status_code=400, detail="Invalid email")
-
-    entry = {
-        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "ip": ip,
-        "name": name,
-        "email": email,
-        "subject": subject,
-        "message": message,
-    }
-    data_dir = _BACKEND_DIR / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-    log_path = data_dir / "contact_messages.jsonl"
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    except Exception as e:
-        print(f"Contact log error: {e}")
-        raise HTTPException(status_code=500, detail="Could not save message")
-
-    # Email the site inbox (SMTP config via env vars)
-    try:
-        _send_contact_email(entry)
-    except Exception as e:
-        print(f"Contact email error: {e}")
-
-    # Optional webhook (Slack/email service)
-    webhook = (os.environ.get("CONTACT_WEBHOOK_URL") or "").strip()
-    if webhook:
-        try:
-            requests.post(webhook, json=entry, timeout=10)
-        except Exception as e:
-            print(f"Contact webhook error: {e}")
-
-    return {"ok": True, "message": "Message received"}
-
-
-@app.get("/api/eval/stats")
-def eval_stats(limit: int = 500):
-    return load_eval_stats(limit=min(max(limit, 10), 5000))
-
-
-@app.post("/api/eval/check")
-def eval_check(payload: dict[str, Any]):
-    answer = (payload or {}).get("answer") or ""
-    context = (payload or {}).get("context") or ""
-    if not answer:
-        raise HTTPException(status_code=400, detail="answer is required")
-    result = evaluate_grounding(answer, context)
-    try:
-        log_qa_event({
-            "query": (payload or {}).get("query") or "(manual check)",
-            "mode": "manual",
-            "answer_preview": answer[:400],
-            **result,
-        })
-    except Exception:
-        pass
-    return result
-
-
-@app.post("/api/eval/run")
-def eval_run():
-    if not rag_engine:
-        raise HTTPException(status_code=500, detail="RAG Engine is not initialized")
-
-    results = []
-    for case in EVAL_CASES:
-        try:
-            out = rag_engine.generate_response(case["query"], case.get("lang", "hy"))
-            answer = out.get("answer") or ""
-            fid = out.get("fidelity") or {}
-            must = case.get("must_contain_any") or []
-            hit = any(m.lower() in answer.lower() for m in must) if must else True
-            results.append({
-                "id": case["id"],
-                "query": case["query"],
-                "ok_keyword_check": hit,
-                "generation_mode": out.get("generation_mode"),
-                "answer_len": len(answer),
-                "answer_preview": answer[:280],
-                "fidelity": fid,
-                "sources": [s.get("title") for s in (out.get("sources") or [])[:4]],
-            })
-        except Exception as e:
-            results.append({
-                "id": case["id"],
-                "query": case["query"],
-                "error": str(e),
-            })
-
-    halls = [
-        r["fidelity"]["hallucination_rate"]
-        for r in results
-        if r.get("fidelity") and r["fidelity"].get("hallucination_rate") is not None
-    ]
-    grounds = [
-        r["fidelity"]["grounding_score"]
-        for r in results
-        if r.get("fidelity") and r["fidelity"].get("grounding_score") is not None
-    ]
-    summary = {
-        "cases": len(results),
-        "avg_hallucination_rate": round(sum(halls) / len(halls), 3) if halls else None,
-        "avg_grounding_score": round(sum(grounds) / len(grounds), 3) if grounds else None,
-        "keyword_pass": sum(1 for r in results if r.get("ok_keyword_check")),
-    }
-    return {"summary": summary, "results": results}
-
-
 @app.get("/api", response_class=HTMLResponse, include_in_schema=False)
 @app.get("/api/", response_class=HTMLResponse, include_in_schema=False)
 def api_dashboard():
-    """Backend status dashboard (not the public marketing site)."""
-    return HTMLResponse(content=_api_only_html())
+    return HTMLResponse(content=_api_dashboard_html())
 
 
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
-    if FRONTEND_ROOT:
-        icon = FRONTEND_ROOT / "assets" / "logos" / "favicon.svg"
+    if FRONTEND_DIR:
+        icon = FRONTEND_DIR / "assets" / "logos" / "favicon.svg"
         if icon.is_file():
             return FileResponse(icon, media_type="image/svg+xml")
     return Response(status_code=204)
 
 
-# ── Static website (when frontend folder is present) ─────────────────
-if FRONTEND_ROOT:
-    _css = FRONTEND_ROOT / "css"
-    _js = FRONTEND_ROOT / "js"
-    _assets = FRONTEND_ROOT / "assets"
+# Static Site Mounting (Eleventy output)
+if FRONTEND_DIR and FRONTEND_DIR.is_dir():
+    _css = FRONTEND_DIR / "css"
+    _js = FRONTEND_DIR / "js"
+    _assets = FRONTEND_DIR / "assets"
 
     if _css.is_dir():
         app.mount("/css", StaticFiles(directory=str(_css)), name="css")
@@ -895,23 +172,12 @@ if FRONTEND_ROOT:
         target = (path or "index.html").lstrip("/")
         return RedirectResponse(url=f"/{target}", status_code=301)
 
-    @app.api_route("/healthz", methods=["GET", "HEAD"], include_in_schema=False)
-    def healthz():
-        return {"ok": True, "status": "ready"}
-
-    # Eleventy builds the site into FRONTEND_ROOT; serve it from / after all
-    # API routes so /api/* keeps working. html=True serves /index.html for /.
-    app.mount("/", StaticFiles(directory=str(FRONTEND_ROOT), html=True), name="site")
-
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="site")
 else:
-
     @app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
     def root_api_only():
-        return HTMLResponse(content=_api_only_html())
+        return HTMLResponse(content=_api_dashboard_html())
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "8000"))
-    host = os.environ.get("HOST", "0.0.0.0")
-    reload = os.environ.get("UVICORN_RELOAD", "").lower() in ("1", "true", "yes")
-    uvicorn.run("main:app", host=host, port=port, reload=reload)
+    uvicorn.run("main:app", host=settings.host, port=settings.port, reload=False)

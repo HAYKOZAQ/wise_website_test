@@ -271,15 +271,50 @@ class TestPdfExclude(unittest.TestCase):
 
 class TestAdminAuthLogic(unittest.TestCase):
     def test_require_admin_when_token_set(self):
-        # Import after env so module-level token is re-read via function that uses env
         os.environ["ADMIN_TOKEN"] = "test-secret-xyz"
-        # The live main module may already be imported; test pure comparison logic
         token = os.environ["ADMIN_TOKEN"]
         provided = "wrong"
         self.assertNotEqual(provided, token)
         provided_ok = "test-secret-xyz"
         self.assertEqual(provided_ok, token)
         del os.environ["ADMIN_TOKEN"]
+
+
+class TestArmenianNLPAndRAGPerfection(unittest.TestCase):
+    def test_armenian_stemmer(self):
+        from rag_index import _stem_armenian, _tokenize_bm25
+
+        self.assertEqual(_stem_armenian("կենսաթոշակառուներին"), "կենսաթոշակառու")
+        self.assertEqual(_stem_armenian("նպաստների"), "նպաստ")
+        self.assertEqual(_stem_armenian("կարգավիճակով"), "կարգավիճակ")
+        tokens = _tokenize_bm25("կենսաթոշակառուներին տրվող նպաստների չափը")
+        self.assertIn("կենսաթոշակառու", tokens)
+        self.assertIn("նպաստ", tokens)
+
+    def test_colloquial_expansion(self):
+        from llm.prompts import expand_colloquial_query
+
+        res = expand_colloquial_query("երեխայի փող")
+        self.assertTrue(any("խնամքի նպաստ" in r or "ծննդյան" in r for r in res))
+
+        res_pension = expand_colloquial_query("թոշակի տարիք")
+        self.assertTrue(any("տարիքային" in r or "63" in r for r in res_pension))
+
+    def test_context_reordering(self):
+        from llm.prompts import reorder_context_chunks
+
+        chunks = [{"id": i} for i in range(6)]
+        reordered = reorder_context_chunks(chunks)
+        # Top chunk (id 0) at left, second (id 1) at right, etc.
+        self.assertEqual(reordered[0]["id"], 0)
+        self.assertEqual(reordered[-1]["id"], 1)
+
+    def test_quick_fact_classifier(self):
+        from llm.prompts import is_quick_factual_query
+
+        self.assertTrue(is_quick_factual_query("ՄՍԾ թեժ գիծ"))
+        self.assertTrue(is_quick_factual_query("hotline phone number"))
+        self.assertFalse(is_quick_factual_query("Ինչպես դիմել մինչև 2 տարեկան երեխայի խնամքի նպաստ ստանալու համար ամբողջական ընթացակարգով"))
 
 
 if __name__ == "__main__":

@@ -638,6 +638,18 @@
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  function scrollToElementTop(el) {
+    if (!messagesEl || !el) return;
+    setTimeout(function () {
+      var targetTop = el.offsetTop - 12;
+      if (typeof messagesEl.scrollTo === 'function') {
+        messagesEl.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      } else {
+        messagesEl.scrollTop = Math.max(0, targetTop);
+      }
+    }, 40);
+  }
+
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -752,8 +764,10 @@
           : '';
       } catch (e) { plain = ''; }
       recordMessage('assistant', plain || htmlInner, extras);
+      scrollToElementTop(el);
+    } else {
+      scrollMessagesBottom();
     }
-    scrollMessagesBottom();
   }
 
   function addTyping() {
@@ -876,6 +890,14 @@
       chatPending = false;
     }
   }
+
+  window.WISEF = window.WISEF || {};
+  window.WISEF.chat = {
+    open: open,
+    close: close,
+    toggle: toggle,
+    ask: ask
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

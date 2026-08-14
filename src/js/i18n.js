@@ -1147,4 +1147,7 @@
     setLang: applyLang,
   };
 
+  window.WISEF = window.WISEF || {};
+  window.WISEF.i18n = window.wisefI18n;
+
 })();

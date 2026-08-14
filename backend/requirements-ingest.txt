@@ -1,0 +1,8 @@
+# Requirements for local harvesting, PDF OCR extraction, and scraping
+-r requirements.txt
+pdf2image==1.17.0
+pytesseract==0.3.13
+Pillow==10.3.0
+beautifulsoup4==4.12.3
+pypdf==5.1.0
+lxml==5.3.0

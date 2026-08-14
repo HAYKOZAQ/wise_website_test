@@ -1,11 +1,26 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ lang | default('hy') }}">
 <head>
   <script>try{var t=localStorage.getItem('wisef_theme')||'light';document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=(t==='dark'?'dark':'light');}catch(e){}</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0d233a">
   <title{% if title_key %} data-i18n="{{ title_key }}"{% endif %}>{{ title | default('WISE Foundation') }}</title>
-  <meta name="description" content="{{ description | default('') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
+  <meta name="description" content="{{ description | default('Welfare Information Systems Enterprise Foundation — Leading technology center in Armenia.') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
+  
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WISE Foundation">
+  <meta property="og:title" content="{{ title | default('WISE Foundation') }}"{% if title_key %} data-i18n="{{ title_key }}" data-i18n-attr="content"{% endif %}>
+  <meta property="og:description" content="{{ description | default('Welfare Information Systems Enterprise Foundation — Leading technology center in Armenia.') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
+  <meta property="og:image" content="/assets/logos/logo.svg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title | default('WISE Foundation') }}"{% if title_key %} data-i18n="{{ title_key }}" data-i18n-attr="content"{% endif %}>
+  <meta name="twitter:description" content="{{ description | default('Welfare Information Systems Enterprise Foundation — Leading technology center in Armenia.') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
+  <meta name="twitter:image" content="/assets/logos/logo.svg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Armenian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,12 +36,12 @@
 {% include "header.njk" %}
 {{ content | safe }}
 {% include "footer.njk" %}
-<script src="/js/main.js?v=52"></script>
-<script src="/js/vendor/purify.min.js?v=48"></script>
-<script src="/js/i18n.js?v=57"></script>
-<script src="/js/config.js?v=48"></script>
-<script src="/js/chat.js?v=49"></script>
-<script src="/js/animations.js?v=2"></script>
-<script src="/js/blog.js?v=52"></script>
+<script src="/js/main.js?v=52" defer></script>
+<script src="/js/vendor/purify.min.js?v=48" defer></script>
+<script src="/js/i18n.js?v=57" defer></script>
+<script src="/js/config.js?v=48" defer></script>
+<script src="/js/chat.js?v=50" defer></script>
+<script src="/js/animations.js?v=2" defer></script>
+<script src="/js/blog.js?v=52" defer></script>
 </body>
 </html>
