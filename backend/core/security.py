@@ -4,6 +4,7 @@ Security utilities including sliding-window rate limiting and admin token authen
 
 from __future__ import annotations
 
+import secrets
 import time
 from collections import defaultdict, deque
 from threading import Lock
@@ -65,7 +66,7 @@ def verify_admin_token(
         if len(parts) == 2 and parts[0].lower() == "bearer":
             token = parts[1]
 
-    if token != expected:
+    if not secrets.compare_digest(token, expected):
         raise HTTPException(
             status_code=401,
             detail="Admin token missing or invalid. Set X-Admin-Token or Authorization: Bearer <token>",

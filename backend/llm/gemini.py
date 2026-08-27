@@ -75,6 +75,25 @@ class GeminiClient:
                         answer, finish = self.parse_response(r.json())
                         if answer:
                             return answer
+                    elif r.status_code == 400 and "thinkingConfig" in r.text:
+                        # Model does not support thinkingConfig; retry without it
+                        payload_compat = {
+                            "contents": payload["contents"],
+                            "generationConfig": {
+                                "temperature": 0.15,
+                                "maxOutputTokens": 4096,
+                            },
+                        }
+                        r_compat = requests.post(
+                            url,
+                            json=payload_compat,
+                            timeout=min(self.timeout_sec, remaining),
+                        )
+                        if r_compat.status_code == 200:
+                            answer, finish = self.parse_response(r_compat.json())
+                            if answer:
+                                return answer
+                        break
                     elif r.status_code in (429, 500, 502, 503, 504):
                         continue
                     else:

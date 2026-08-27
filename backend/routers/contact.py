@@ -14,6 +14,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
+from core.config import settings
 from core.security import rate_limiter
 from services.mailer import mail_service
 
@@ -70,7 +71,7 @@ def contact_endpoint(payload: ContactRequest, req: Request):
     mail_service.send_contact_email(entry)
 
     # Optional webhook (e.g., Slack / Discord notifications)
-    webhook = (os.environ.get("CONTACT_WEBHOOK_URL") or "").strip()
+    webhook = settings.contact_webhook_url.strip()
     if webhook:
         try:
             requests.post(webhook, json=entry, timeout=10)

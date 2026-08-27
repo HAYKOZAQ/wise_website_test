@@ -7,19 +7,24 @@
   <meta name="theme-color" content="#0d233a">
   <title{% if title_key %} data-i18n="{{ title_key }}"{% endif %}>{{ title | default('WISE Foundation') }}</title>
   <meta name="description" content="{{ description | default('Welfare Information Systems Enterprise Foundation — Leading technology center in Armenia.') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
+  <link rel="canonical" href="https://wisef.am{{ page.url or permalink or '/' }}">
   
   <!-- Open Graph / Facebook / LinkedIn -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="WISE Foundation">
+  <meta property="og:url" content="https://wisef.am{{ page.url or permalink or '/' }}">
+  <meta property="og:locale" content="{{ 'hy_AM' if (lang == 'hy' or not lang) else ('ru_RU' if lang == 'ru' else 'en_US') }}">
   <meta property="og:title" content="{{ title | default('WISE Foundation') }}"{% if title_key %} data-i18n="{{ title_key }}" data-i18n-attr="content"{% endif %}>
   <meta property="og:description" content="{{ description | default('Welfare Information Systems Enterprise Foundation — Leading technology center in Armenia.') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
-  <meta property="og:image" content="/assets/logos/logo.svg">
+  <meta property="og:image" content="https://wisef.am/assets/logos/wisef-logo.svg">
+  <meta property="og:image:alt" content="WISE Foundation Logo">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://wisef.am{{ page.url or permalink or '/' }}">
   <meta name="twitter:title" content="{{ title | default('WISE Foundation') }}"{% if title_key %} data-i18n="{{ title_key }}" data-i18n-attr="content"{% endif %}>
   <meta name="twitter:description" content="{{ description | default('Welfare Information Systems Enterprise Foundation — Leading technology center in Armenia.') }}"{% if desc_key %} data-i18n="{{ desc_key }}" data-i18n-attr="content"{% endif %}>
-  <meta name="twitter:image" content="/assets/logos/logo.svg">
+  <meta name="twitter:image" content="https://wisef.am/assets/logos/wisef-logo.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

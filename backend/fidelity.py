@@ -287,8 +287,8 @@ def is_answer_incomplete(answer: str) -> bool:
     if not answer or len(answer.strip()) < 280:
         return True
     a = answer.strip()
-    # ends mid-word without punctuation
-    if a[-1] not in ".!?:…»\"'”)":
+    # ends mid-word without punctuation (includes Western and Armenian marks)
+    if a[-1] not in ".!?:…»«\"'”)։՝՞՜՛֊":
         if re.search(r"[\w\u0531-\u0587]{2,}$", a) and len(a) < 1500:
             return True
     if re.search(r"(Մինչև|մինչև|դրամ|տարեկան|Հոդված|Հայաստ)\s*$", a):

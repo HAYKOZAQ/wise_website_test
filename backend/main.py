@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import uvicorn
@@ -35,11 +36,20 @@ if not FRONTEND_DIR.is_dir():
 if not FRONTEND_DIR.is_dir():
     FRONTEND_DIR = None
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Ensure RAGEngine initializes on application startup."""
+    rag_module.rag_engine_instance = get_rag_engine()
+    yield
+
+
 # Initialize FastAPI application
 app = FastAPI(
     title=settings.app_title,
     version=settings.app_version,
     description=settings.app_description,
+    lifespan=lifespan,
 )
 
 
@@ -53,6 +63,13 @@ class RenderFriendlyMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
         path = request.url.path or ""
+
+        # Enforce security headers
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+        response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        response.headers.setdefault("X-XSS-Protection", "1; mode=block")
 
         if path.endswith(".html") or path in ("/", "/pages", "/pages/"):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -77,12 +94,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-def startup_event():
-    """Ensure RAGEngine initializes on startup."""
-    rag_module.rag_engine_instance = get_rag_engine()
 
 
 # Mount Modular API Routers

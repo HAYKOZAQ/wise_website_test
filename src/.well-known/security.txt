@@ -1,0 +1,4 @@
+Contact: mailto:info@wisef.am
+Preferred-Languages: hy, en, ru
+Canonical: https://wisef.am/.well-known/security.txt
+Policy: https://wisef.am/contact.html

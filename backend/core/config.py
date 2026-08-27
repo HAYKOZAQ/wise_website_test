@@ -107,10 +107,12 @@ class Settings(BaseModel):
     smtp_from: str = Field(default_factory=lambda: os.environ.get("SMTP_FROM", ""))
     contact_to_email: str = Field(default_factory=lambda: os.environ.get("CONTACT_TO_EMAIL", "info@wisef.am"))
     smtp_use_tls: bool = Field(default_factory=lambda: _env_bool("SMTP_USE_TLS", True))
+    contact_webhook_url: str = Field(default_factory=lambda: os.environ.get("CONTACT_WEBHOOK_URL", ""))
 
     def resolve_cors_origins(self) -> list[str]:
         if self.cors_origins_raw.strip():
-            return [o.strip() for o in self.cors_origins_raw.split(",") if o.strip()] or ["*"]
+            raw_list = [o.strip().rstrip("/") for o in self.cors_origins_raw.split(",") if o.strip()]
+            return [o for o in raw_list if o] or ["*"]
         if self.cors_open:
             return ["*"]
         origins = [
@@ -123,7 +125,7 @@ class Settings(BaseModel):
         ]
         if self.pages_origin.strip():
             cleaned = self.pages_origin.strip().rstrip("/")
-            if cleaned not in origins:
+            if cleaned and cleaned not in origins:
                 origins.append(cleaned)
         return origins
 
