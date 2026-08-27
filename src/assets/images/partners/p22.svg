@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="ussGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#006266"/>
+      <stop offset="100%" stop-color="#1B9CFC"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="18" fill="url(#ussGrad)"/>
+  <circle cx="60" cy="42" r="14" fill="none" stroke="#ffffff" stroke-width="3"/>
+  <path d="M38 68 C38 56, 82 56, 82 68" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="60" y="94" font-family="'Noto Sans Armenian', 'Manrope', system-ui, sans-serif" font-size="22" font-weight="900" text-anchor="middle" fill="#ffffff" letter-spacing="2">ՄՍԾ</text>
+  <text x="60" y="108" font-family="'Manrope', system-ui, sans-serif" font-size="8" font-weight="600" text-anchor="middle" fill="rgba(255,255,255,0.85)" letter-spacing="1">USS ARMENIA</text>
+</svg>

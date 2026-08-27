@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="uiteGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ea2027"/>
+      <stop offset="100%" stop-color="#b71540"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="18" fill="url(#uiteGrad)"/>
+  <path d="M34 38 L86 38 M60 38 L60 70 M44 70 L76 70" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <text x="60" y="96" font-family="'Manrope', system-ui, sans-serif" font-size="20" font-weight="900" text-anchor="middle" fill="#ffffff" letter-spacing="2">UITE</text>
+</svg>

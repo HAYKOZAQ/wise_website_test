@@ -312,31 +312,23 @@ html.theme-anim .wise-cv-callout {
 .wise-partner-column.visible .wise-partner-list li:nth-child(5) { transition-delay: 0.33s; }
 .wise-partner-column.visible .wise-partner-list li:nth-child(6) { transition-delay: 0.4s; }
 
-/* Logo grayscale → color on hover, with lift + shine */
-.wise-partner-list img {
-  filter: grayscale(100%);
-  opacity: 0.78;
-  transition: filter 0.45s ease, opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.45s ease;
+/* Logo smooth transition */
+.wise-partner-logo-box img {
+  opacity: 0.96;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-.wise-partner-list li:hover img {
-  filter: grayscale(0%);
+.wise-partner-list li:hover .wise-partner-logo-box img {
   opacity: 1;
-  transform: translateY(-3px) scale(1.08) rotate(-2deg);
-  box-shadow: 0 8px 20px rgba(21, 55, 95, 0.18), 0 0 0 1px rgba(245, 186, 53, 0.4);
-}
-
-html[data-theme="dark"] .wise-partner-list li:hover img {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(245, 186, 53, 0.5);
 }
 
 /* Partner name underline sweep on hover */
-.wise-partner-list a span {
+.wise-partner-list a > span:not(.wise-partner-logo-box) {
   position: relative;
   padding-bottom: 2px;
 }
 
-.wise-partner-list a span::after {
+.wise-partner-list a > span:not(.wise-partner-logo-box)::after {
   content: '';
   position: absolute;
   left: 0;
@@ -350,7 +342,7 @@ html[data-theme="dark"] .wise-partner-list li:hover img {
   transition: transform 0.35s ease;
 }
 
-.wise-partner-list a:hover span::after {
+.wise-partner-list a:hover > span:not(.wise-partner-logo-box)::after {
   transform: scaleX(1);
   transform-origin: left;
 }

@@ -733,11 +733,11 @@ body[lang="hy"],
   display: flex;
   align-items: center;
   gap: 14px;
-  min-height: 68px;
-  padding: 10px 0;
-  border-bottom: 1px solid #edf0f4;
+  min-height: 64px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--wise-line);
   color: var(--wise-ink);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
 }
 
@@ -747,25 +747,43 @@ body[lang="hy"],
   gap: 14px;
   color: var(--wise-ink);
   text-decoration: none;
+  width: 100%;
   transition: color 180ms ease;
+}
+
+.wise-partner-logo-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--wise-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.wise-partner-logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
 }
 
 .wise-partner-list a:hover {
   color: var(--wise-navy);
 }
 
-.wise-partner-list a:hover img {
+.wise-partner-list a:hover .wise-partner-logo-box {
+  transform: translateY(-2px) scale(1.06);
   border-color: var(--wise-yellow);
-}
-
-.wise-partner-list img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
-  border: 1px solid var(--wise-line);
-  border-radius: 10px;
-  padding: 7px;
-  background: #fff;
+  box-shadow: 0 6px 16px rgba(245, 186, 53, 0.28);
 }
 
 /* FAQ */
@@ -1162,7 +1180,17 @@ html[data-theme="dark"] .wise-section--soft {
   background: #10253c;
 }
 
-html[data-theme="dark"] .wise-partner-list img,
+html[data-theme="dark"] .wise-partner-logo-box {
+  background: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .wise-partner-list a:hover .wise-partner-logo-box {
+  border-color: var(--wise-yellow);
+  box-shadow: 0 6px 20px rgba(245, 186, 53, 0.4);
+}
+
 html[data-theme="dark"] .wise-feature-card__icon,
 html[data-theme="dark"] .wise-service-card__icon {
   background: #183552;
@@ -1195,11 +1223,11 @@ html[data-theme="dark"] .wise-stat span,
 html[data-theme="dark"] .wise-partner-list li,
 html[data-theme="dark"] .wise-partner-list a,
 html[data-theme="dark"] .wise-project-row__icon {
-  color: #b6c4d4 !important;
+  color: #e2e8f0 !important;
 }
 
 html[data-theme="dark"] .wise-partner-list a:hover {
-  color: #f8fbff !important;
+  color: var(--wise-yellow) !important;
 }
 
 html[data-theme="dark"] .wise-project-row__icon {
