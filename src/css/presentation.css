@@ -1454,11 +1454,14 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
 
   .wise-blog-card {
     grid-template-columns: 1fr;
+    min-height: auto;
     border-radius: 16px;
   }
 
   .wise-blog-card__media {
-    min-height: 190px;
+    position: relative;
+    height: 220px;
+    min-height: 220px;
     max-height: 220px;
   }
 
@@ -1469,10 +1472,12 @@ html[data-theme="dark"] .wise-home-hero .wise-btn--outline:hover {
 
   .wise-blog-card__title {
     font-size: 1.22rem;
+    min-height: auto;
   }
 
   .wise-blog-card__excerpt {
     font-size: 0.92rem;
+    min-height: auto;
   }
 
   .wise-blog-card .wise-btn {
@@ -1837,8 +1842,9 @@ html[data-theme="dark"] .wise-news-article__body p {
 
 .wise-blog-card {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: minmax(280px, 42%) 1fr;
   align-items: stretch;
+  min-height: 360px;
   overflow: hidden;
   border: 1px solid var(--wise-line);
   border-radius: var(--wise-radius);
@@ -1854,11 +1860,16 @@ html[data-theme="dark"] .wise-news-article__body p {
 }
 
 .wise-blog-card__media {
+  position: relative;
   overflow: hidden;
-  min-height: 260px;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
 }
 
 .wise-blog-card__media img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -1875,7 +1886,8 @@ html[data-theme="dark"] .wise-news-article__body p {
   flex-direction: column;
   justify-content: center;
   gap: 14px;
-  padding: 36px 38px;
+  padding: 32px 36px;
+  min-width: 0;
 }
 
 .wise-blog-card__badge {
@@ -1892,14 +1904,26 @@ html[data-theme="dark"] .wise-news-article__body p {
 
 .wise-blog-card__title {
   color: var(--wise-navy);
-  font-size: clamp(1.15rem, 2vw, 1.5rem);
-  line-height: 1.4;
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  line-height: 1.38;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 4.15em;
+  word-break: break-word;
 }
 
 .wise-blog-card__excerpt {
   color: var(--wise-muted);
   font-size: 0.95rem;
-  line-height: 1.75;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 4.8em;
+  word-break: break-word;
 }
 
 .wise-blog-card .wise-btn {
