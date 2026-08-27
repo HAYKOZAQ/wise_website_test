@@ -79,23 +79,23 @@ npx wrangler pages deploy _site --project-name wisef-website
 Set `CORS_ORIGINS` on the Space to the exact Pages origin, for example
 `https://wisef-website.pages.dev`. A custom domain can be used instead.
 
-## Render fallback: 512 MB slim service
+## Render deployment: 512 MB slim service
 
-`render.yaml` uses `Dockerfile.slim`. It is deliberately lexical-only:
+`render.yaml` uses `Dockerfile`. It is deliberately lightweight and optimized:
 
-- no torch, sentence-transformers, FAISS, or rank_bm25
+- fast multi-stage build compiling Eleventy and serving via FastAPI
 - compact NumPy BM25 postings instead of the large Python BM25 object
 - no source PDFs, seed snapshots, per-document corpus cache, or ingestion data
 - one Uvicorn process and a prebuilt corpus/index
 
-The slim image still supports grounded answer generation through
+The image supports grounded answer generation through
 `GEMINI_API_KEY`, and answers use BM25 retrieval. Dense retrieval is available
 in the full Hugging Face image with `USE_LOCAL_EMBEDDER=1`.
 
 To deploy manually on Render:
 
 1. Create a Docker Web Service from this repository.
-2. Use `Dockerfile.slim`.
+2. Use `Dockerfile`.
 3. Set `GEMINI_API_KEY` in the dashboard only.
 4. Set `ADMIN_TOKEN` only if remote admin endpoints are required.
 5. Use `/api/status` as the health check.
