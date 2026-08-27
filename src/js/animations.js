@@ -9,26 +9,9 @@
 
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ── 3D tilt on cards ── */
+  /* ── 3D tilt on cards (disabled for rock-solid stability) ── */
   function initTilt() {
-    if (reduceMotion || !window.matchMedia('(hover: hover)').matches) return;
-    document.querySelectorAll('.wise-tilt').forEach(function (card) {
-      var raf = null;
-      card.addEventListener('mousemove', function (e) {
-        if (raf) return;
-        raf = requestAnimationFrame(function () {
-          raf = null;
-          var r = card.getBoundingClientRect();
-          var px = (e.clientX - r.left) / r.width - 0.5;
-          var py = (e.clientY - r.top) / r.height - 0.5;
-          card.style.transform =
-            'perspective(900px) rotateX(' + (-py * 6).toFixed(2) + 'deg) rotateY(' + (px * 6).toFixed(2) + 'deg)';
-        });
-      });
-      card.addEventListener('mouseleave', function () {
-        card.style.transform = '';
-      });
-    });
+    // Disabled: cards remain stationary without shifting/wobbling on mousemove
   }
 
   /* ── Floating orbs in heroes (injected, mouse-parallax) ── */
