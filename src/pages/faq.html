@@ -23,38 +23,52 @@ active: faq
 </section>
 
 <section class="wise-section">
-<div class="wise-faq-list fade-in">
-<details class="wise-faq-item fade-in">
-<summary data-i18n="faq.q1">Որո՞նք են ձեր հիմնական գործունեության ուղղությունները</summary>
-<div class="wise-faq-item__answer">
-<p data-i18n="faq.a1">Մենք նախագծում, սպասարկում և զարգացնում ենք տեղեկատվական համակարգեր սոցիալական պաշտպանության ոլորտի համար, մշակում և վերլուծում ենք տվյալներ, իրականացնում ենք կրթական ծրագրեր և ապահովում կիբեռանվտանգություն։</p>
-</div>
-</details>
-<details class="wise-faq-item fade-in delay-1">
-<summary data-i18n="faq.q2">Ինչպե՞ս կարող եմ դառնալ ձեր գործընկերը</summary>
-<div class="wise-faq-item__answer">
-<p data-i18n="faq.a2">Գրեք մեզ հետադարձ կապի էջի միջոցով՝ նշելով Ձեր կազմակերպությունը և համագործակցության առաջարկը։ Մեր թիմը կապվելու է Ձեզ հետ երկու աշխատանքային օրվա ընթացքում։</p>
-</div>
-</details>
-<details class="wise-faq-item fade-in delay-2">
-<summary data-i18n="faq.q3">Ինչպե՞ս կարող եմ միանալ ձեր թիմին</summary>
-<div class="wise-faq-item__answer">
-<p data-i18n="faq.a3">Կարիերա էջում հրապարակում ենք թափուր հաստիքները։ Կարող եք նաև ուղարկել Ձեր ինքնակենսագրությունը՝ նշելով հետաքրքրող մասնագիտությունը, և մենք կքննարկենք այն առկա հնարավորությունների հետ։</p>
-</div>
-</details>
-<details class="wise-faq-item fade-in delay-3">
-<summary data-i18n="faq.q4">Ո՞ւմ են սպասարկում ձեր տեղեկատվական համակարգերը</summary>
-<div class="wise-faq-item__answer">
-<p data-i18n="faq.a4">Մեր համակարգերը սպասարկում են ՀՀ քաղաքացիներին՝ սոցիալական ծառայությունների, զբաղվածության և այլ ոլորտների գործընթացները դարձնելով հասանելի և թափանցիկ։</p>
-</div>
-</details>
-<details class="wise-faq-item fade-in delay-4">
-<summary data-i18n="faq.q5">Ինչպե՞ս եք ապահովում տվյալների անվտանգությունը</summary>
-<div class="wise-faq-item__answer">
-<p data-i18n="faq.a5">Տվյալների անվտանգությունը մեր ամենօրյա աշխատանքի մասն է. մշտապես թարմացնում ենք պաշտպանական մեխանիզմները, իրականացնում ենք աուդիտ և վերապատրաստում թիմի համար։</p>
-</div>
-</details>
-</div>
+  <div class="wise-container">
+    <div class="wise-faq-search-wrap fade-in">
+      <div class="wise-faq-search">
+        <svg class="wise-faq-search__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="search" id="faqSearchInput" class="wise-faq-search__input" placeholder="Որոնել հարցերի մեջ..." data-i18n="faq.search_ph" data-i18n-attr="placeholder" aria-label="Search FAQ" autocomplete="off" />
+        <button type="button" id="faqSearchClear" class="wise-faq-search__clear" aria-label="Clear search" style="display: none;">✕</button>
+      </div>
+    </div>
+
+    <div class="wise-faq-list fade-in" id="faqList">
+      <details class="wise-faq-item fade-in">
+        <summary data-i18n="faq.q1">Որո՞նք են ձեր հիմնական գործունեության ուղղությունները</summary>
+        <div class="wise-faq-item__answer">
+          <p data-i18n="faq.a1">Մենք նախագծում, սպասարկում և զարգացնում ենք տեղեկատվական համակարգեր սոցիալական պաշտպանության ոլորտի համար, մշակում և վերլուծում ենք տվյալներ, իրականացնում ենք կրթական ծրագրեր և ապահովում կիբեռանվտանգություն։</p>
+        </div>
+      </details>
+      <details class="wise-faq-item fade-in delay-1">
+        <summary data-i18n="faq.q2">Ինչպե՞ս կարող եմ դառնալ ձեր գործընկերը</summary>
+        <div class="wise-faq-item__answer">
+          <p data-i18n="faq.a2">Գրեք մեզ հետադարձ կապի էջի միջոցով՝ նշելով Ձեր կազմակերպությունը և համագործակցության առաջարկը։ Մեր թիմը կապվելու է Ձեզ հետ երկու աշխատանքային օրվա ընթացքում։</p>
+        </div>
+      </details>
+      <details class="wise-faq-item fade-in delay-2">
+        <summary data-i18n="faq.q3">Ինչպե՞ս կարող եմ միանալ ձեր թիմին</summary>
+        <div class="wise-faq-item__answer">
+          <p data-i18n="faq.a3">Կարիերա էջում հրապարակում ենք թափուր հաստիքները։ Կարող եք նաև ուղարկել Ձեր ինքնակենսագրությունը՝ նշելով հետաքրքրող մասնագիտությունը, և մենք կքննարկենք այն առկա հնարավորությունների հետ։</p>
+        </div>
+      </details>
+      <details class="wise-faq-item fade-in delay-3">
+        <summary data-i18n="faq.q4">Ո՞ւմ են սպասարկում ձեր տեղեկատվական համակարգերը</summary>
+        <div class="wise-faq-item__answer">
+          <p data-i18n="faq.a4">Մեր համակարգերը սպասարկում են ՀՀ քաղաքացիներին՝ սոցիալական ծառայությունների, զբաղվածության և այլ ոլորտների գործընթացները դարձնելով հասանելի և թափանցիկ։</p>
+        </div>
+      </details>
+      <details class="wise-faq-item fade-in delay-4">
+        <summary data-i18n="faq.q5">Ինչպե՞ս եք ապահովում տվյալների անվտանգությունը</summary>
+        <div class="wise-faq-item__answer">
+          <p data-i18n="faq.a5">Տվյալների անվտանգությունը մեր ամենօրյա աշխատանքի մասն է. մշտապես թարմացնում ենք պաշտպանական մեխանիզմները, իրականացնում ենք աուդիտ և վերապատրաստում թիմի համար։</p>
+        </div>
+      </details>
+    </div>
+    <div id="faqNoResults" class="wise-faq-no-results" data-i18n="faq.no_results">Համապատասխան հարցեր չեն գտնվել</div>
+  </div>
 </section>
 
 <section class="wise-section wise-section--navy">

@@ -860,7 +860,33 @@ body[lang="hy"],
 
 .wise-contact-detail {
   display: grid;
-  gap: 22px;
+  gap: 16px;
+}
+
+.wise-contact-detail__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.25s ease;
+}
+
+.wise-contact-detail__row:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(245, 186, 53, 0.35);
+  transform: translateX(4px);
+}
+
+.wise-contact-detail__row svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--wise-yellow);
+  fill: none;
+  stroke-width: 2;
+  flex-shrink: 0;
 }
 
 .wise-contact-detail a,
@@ -870,14 +896,48 @@ body[lang="hy"],
   min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
+  text-decoration: none;
+}
+
+.wise-contact-detail a:hover {
+  color: var(--wise-yellow);
 }
 
 .wise-contact-detail small {
   display: block;
   color: var(--wise-yellow);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
-  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.wise-contact-panel__social {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.wise-contact-panel__social a {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wise-contact-panel__social a:hover {
+  background: var(--wise-yellow);
+  color: var(--wise-navy-deep);
+  border-color: var(--wise-yellow);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(245, 186, 53, 0.35);
 }
 
 .wise-contact-form {
@@ -917,22 +977,32 @@ body[lang="hy"],
 .wise-contact-form textarea {
   width: 100%;
   padding: 15px 16px;
-  border: 1px solid var(--wise-line);
-  border-radius: 10px;
+  border: 1.5px solid var(--wise-line);
+  border-radius: 12px;
   color: var(--wise-ink);
   background: #fff;
   outline: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.wise-contact-form input::placeholder,
+.wise-contact-form textarea::placeholder {
+  color: #64748b;
+  opacity: 0.85;
 }
 
 .wise-contact-form textarea {
-  min-height: 150px;
+  min-height: 140px;
   resize: vertical;
 }
 
 .wise-contact-form input:focus,
 .wise-contact-form textarea:focus {
   border-color: var(--wise-yellow);
-  box-shadow: 0 0 0 3px rgba(245,186,53,0.18);
+  box-shadow: 0 0 0 3.5px rgba(245, 186, 53, 0.25);
+  background: #fff;
 }
 
 /* Careers */
@@ -1102,8 +1172,21 @@ html[data-theme="dark"] .wise-service-card__icon {
 html[data-theme="dark"] .wise-contact-form input,
 html[data-theme="dark"] .wise-contact-form textarea {
   color: #fff;
-  border-color: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.18);
   background: #0c1d31;
+}
+
+html[data-theme="dark"] .wise-contact-form input::placeholder,
+html[data-theme="dark"] .wise-contact-form textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .wise-contact-form input:focus,
+html[data-theme="dark"] .wise-contact-form textarea:focus {
+  background: #10263f;
+  border-color: var(--wise-yellow);
+  box-shadow: 0 0 0 3.5px rgba(245, 186, 53, 0.28);
 }
 
 html[data-theme="dark"] .wise-eyebrow,
@@ -2394,6 +2477,325 @@ html[data-theme="dark"] .wise-scroll-top:hover {
   border-color: var(--wise-yellow) !important;
   transform: translateY(-2px) scale(1.02) !important;
   box-shadow: 0 4px 14px rgba(245, 186, 53, 0.35) !important;
+}
+
+/* ── Button Shimmer & Micro-Interactions ── */
+.wise-btn--gold {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background 0.2s ease;
+}
+
+.wise-btn--gold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-25deg);
+  transition: left 0.75s ease;
+}
+
+.wise-btn--gold:hover::before {
+  left: 200%;
+}
+
+.wise-btn:active {
+  transform: scale(0.97) !important;
+}
+
+/* ── Marquee Soft Gradient Edge Fade ── */
+.wise-marquee {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* ── Service Card Category Tags ── */
+.wise-card-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(245, 186, 53, 0.16);
+  color: #a16b00;
+  border: 1px solid rgba(245, 186, 53, 0.35);
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+
+html[data-theme="dark"] .wise-card-tag {
+  background: rgba(245, 186, 53, 0.18);
+  color: #f5ba35;
+  border-color: rgba(245, 186, 53, 0.35);
+}
+
+/* ── Modern Interactive Project Cards ── */
+.wise-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.wise-project-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px;
+  border-radius: var(--wise-radius);
+  border: 1.5px solid var(--wise-line);
+  background: var(--wise-surface);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.wise-project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 36px rgba(21, 55, 95, 0.09);
+  border-color: var(--wise-yellow);
+}
+
+.wise-project-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.wise-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+html[data-theme="dark"] .wise-status-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.wise-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: wisePulseDot 2s infinite ease-in-out;
+}
+
+@keyframes wisePulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.wise-project-card__arrow {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--wise-navy);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.wise-project-card:hover .wise-project-card__arrow {
+  transform: translate(3px, -3px);
+  color: var(--wise-yellow);
+}
+
+.wise-project-card h3 {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--wise-navy);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.wise-project-card p {
+  font-size: 0.92rem;
+  color: var(--wise-muted);
+  line-height: 1.65;
+}
+
+html[data-theme="dark"] .wise-project-card {
+  background: #122943;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+html[data-theme="dark"] .wise-project-card h3 {
+  color: #f8fbff;
+}
+
+html[data-theme="dark"] .wise-project-card p {
+  color: #b6c4d4;
+}
+
+html[data-theme="dark"] .wise-project-card__arrow {
+  color: #f8fbff;
+}
+
+/* ── FAQ Search Bar & Empty State ── */
+.wise-faq-search-wrap {
+  max-width: 620px;
+  margin: 0 auto 36px auto;
+}
+
+.wise-faq-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.wise-faq-search__icon {
+  position: absolute;
+  left: 18px;
+  color: var(--wise-muted);
+  pointer-events: none;
+}
+
+.wise-faq-search__input {
+  padding-left: 52px !important;
+  padding-right: 44px !important;
+  height: 52px;
+  font-size: 0.98rem;
+  border-radius: 16px !important;
+  background: var(--wise-surface) !important;
+  border: 1.5px solid var(--wise-line) !important;
+  width: 100%;
+  font-family: inherit;
+  color: var(--wise-ink);
+  transition: all 0.25s ease;
+}
+
+.wise-faq-search__input:focus {
+  border-color: var(--wise-yellow) !important;
+  box-shadow: 0 0 0 4px rgba(245, 186, 53, 0.22) !important;
+  background: #fff !important;
+}
+
+html[data-theme="dark"] .wise-faq-search__input {
+  background: #0c1d31 !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+}
+
+html[data-theme="dark"] .wise-faq-search__input:focus {
+  background: #112842 !important;
+  border-color: var(--wise-yellow) !important;
+}
+
+.wise-faq-search__clear {
+  position: absolute;
+  right: 14px;
+  background: rgba(100, 116, 139, 0.18);
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--wise-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.wise-faq-search__clear:hover {
+  background: var(--wise-yellow);
+  color: var(--wise-navy);
+}
+
+.wise-faq-no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--wise-muted);
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: none;
+}
+
+/* ── Careers Perks & Culture Grid ── */
+.wise-perks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin: 32px 0 48px 0;
+}
+
+.wise-perk-card {
+  padding: 26px;
+  border-radius: var(--wise-radius);
+  border: 1.5px solid var(--wise-line);
+  background: var(--wise-surface);
+  transition: all 0.25s ease;
+}
+
+.wise-perk-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245, 186, 53, 0.5);
+  box-shadow: 0 12px 32px rgba(21, 55, 95, 0.07);
+}
+
+.wise-perk-card__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(245, 186, 53, 0.18);
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+}
+
+.wise-perk-card__icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--wise-navy);
+  fill: none;
+  stroke-width: 2.2;
+}
+
+.wise-perk-card h3 {
+  font-size: 1.05rem;
+  color: var(--wise-navy);
+  margin-bottom: 8px;
+  font-weight: 800;
+}
+
+.wise-perk-card p {
+  font-size: 0.88rem;
+  color: var(--wise-muted);
+  line-height: 1.6;
+}
+
+html[data-theme="dark"] .wise-perk-card {
+  background: #122943;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+html[data-theme="dark"] .wise-perk-card h3 {
+  color: #f8fbff;
+}
+
+html[data-theme="dark"] .wise-perk-card p {
+  color: #b6c4d4;
+}
+
+html[data-theme="dark"] .wise-perk-card__icon {
+  background: #183552;
+}
+
+html[data-theme="dark"] .wise-perk-card__icon svg {
+  stroke: var(--wise-yellow);
 }
 
 @media (max-width: 768px) {

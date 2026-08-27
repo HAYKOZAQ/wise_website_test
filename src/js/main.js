@@ -363,8 +363,68 @@ function initScrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  window.addEventListener('scroll', check, { passive: true });
-  check();
+function initFaqSearch() {
+  const searchInput = document.getElementById('faqSearchInput');
+  const clearBtn = document.getElementById('faqSearchClear');
+  const faqList = document.getElementById('faqList');
+  const noResults = document.getElementById('faqNoResults');
+  if (!searchInput || !faqList) return;
+
+  const items = faqList.querySelectorAll('.wise-faq-item');
+
+  function filter() {
+    const q = (searchInput.value || '').trim().toLowerCase();
+    let visibleCount = 0;
+
+    if (clearBtn) {
+      clearBtn.style.display = q.length > 0 ? 'grid' : 'none';
+    }
+
+    items.forEach((item) => {
+      const summaryText = (item.querySelector('summary')?.textContent || '').toLowerCase();
+      const answerText = (item.querySelector('.wise-faq-item__answer')?.textContent || '').toLowerCase();
+      const matches = !q || summaryText.includes(q) || answerText.includes(q);
+
+      if (matches) {
+        item.style.display = '';
+        if (q.length > 1) {
+          item.setAttribute('open', '');
+        }
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+        item.removeAttribute('open');
+      }
+    });
+
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
+  searchInput.addEventListener('input', filter);
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      filter();
+      searchInput.focus();
+    });
+  }
+}
+
+function initClipboardCopy() {
+  document.querySelectorAll('.wise-contact-detail__row a').forEach((link) => {
+    link.addEventListener('click', () => {
+      const href = link.getAttribute('href') || '';
+      if (href.startsWith('mailto:') || href.startsWith('tel:')) {
+        const rawText = link.textContent.trim();
+        if (navigator.clipboard && rawText) {
+          navigator.clipboard.writeText(rawText).catch(() => {});
+        }
+      }
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -378,4 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initContactForm();
   initReadingProgress();
   initScrollToTop();
+  initFaqSearch();
+  initClipboardCopy();
 });
