@@ -50,7 +50,7 @@ class GeminiClient:
             "generationConfig": {
                 "temperature": 0.15,
                 "maxOutputTokens": 4096,
-                "thinkingConfig": {"thinkingBudget": 0},
+                "thinkingConfig": {"thinkingLevel": "minimal"},
             },
         }
 
@@ -75,24 +75,43 @@ class GeminiClient:
                         answer, finish = self.parse_response(r.json())
                         if answer:
                             return answer
-                    elif r.status_code == 400 and "thinkingConfig" in r.text:
-                        # Model does not support thinkingConfig; retry without it
-                        payload_compat = {
+                    elif r.status_code == 400 and ("thinkingLevel" in r.text or "thinkingConfig" in r.text):
+                        # Model rejects thinkingLevel (new API) — fall back to old-style thinkingBudget=0
+                        payload_budget = {
                             "contents": payload["contents"],
                             "generationConfig": {
                                 "temperature": 0.15,
                                 "maxOutputTokens": 4096,
+                                "thinkingConfig": {"thinkingBudget": 0},
                             },
                         }
-                        r_compat = requests.post(
+                        r_budget = requests.post(
                             url,
-                            json=payload_compat,
+                            json=payload_budget,
                             timeout=min(self.timeout_sec, remaining),
                         )
-                        if r_compat.status_code == 200:
-                            answer, finish = self.parse_response(r_compat.json())
+                        if r_budget.status_code == 200:
+                            answer, finish = self.parse_response(r_budget.json())
                             if answer:
                                 return answer
+                        if r_budget.status_code == 400 and "thinkingConfig" in r_budget.text:
+                            # Model rejects thinkingConfig entirely — retry without it
+                            payload_plain = {
+                                "contents": payload["contents"],
+                                "generationConfig": {
+                                    "temperature": 0.15,
+                                    "maxOutputTokens": 4096,
+                                },
+                            }
+                            r_plain = requests.post(
+                                url,
+                                json=payload_plain,
+                                timeout=min(self.timeout_sec, remaining),
+                            )
+                            if r_plain.status_code == 200:
+                                answer, finish = self.parse_response(r_plain.json())
+                                if answer:
+                                    return answer
                         break
                     elif r.status_code in (429, 500, 502, 503, 504):
                         continue

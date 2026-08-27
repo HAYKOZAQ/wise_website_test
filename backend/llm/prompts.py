@@ -201,6 +201,7 @@ STRICT SAFETY & GROUNDING RULES:
      ## Required Documents (if available in context)
      ## How to Apply (e-soc.am, USS office, hotline 114)
    - Do NOT include empty sections or speculative claims.
+4. NEVER copy or quote the CONTEXT text verbatim (no "Ակտ՝" tags, no full article text). Write a clear, concise answer in your own words, based only on the facts stated in the context. Start with a direct 1-2 sentence answer to the question, then add short sections only where the context supports them.
 
 CONTEXT:
 {context_str}
@@ -242,6 +243,7 @@ Response:"""
      ## Необходимые документы
      ## Как и куда обратиться (e-soc.am, центры ЕСС, горячая линия 114)
    - Не создавайте пустых или предположительных разделов.
+4. НИКОГДА не копируйте и не цитируйте текст КОНТЕКСТА дословно (без тегов «Ակտ՝», без полного текста статей). Напишите чёткий, краткий ответ своими словами, опираясь только на факты из контекста. Начните с прямого ответа в 1-2 предложения.
 
 КОНТЕКСТ:
 {context_str}
@@ -283,6 +285,7 @@ Response:"""
      ## Անհրաժեշտ փաստաթղթերը
      ## Ինչպե՞ս և որտե՞ղ դիմել (e-soc.am, ՄՍԾ կենտրոններ, թեժ գիծ 114)
    - Մի ավելացրեք դատարկ կամ ենթադրական բաժիններ։
+4. ԵՐԲԵՔ ՄԻ արտագրեք կամ մեջբերեք ՀԱՄԱՏԵՔՍՏԻ տեքստը բառացի (ոչ «Ակտ՝» պիտակները, ոչ հոդվածների ամբողջական տեքստը)։ Գրեք հստակ, կարճ պատասխան Ձեր իսկ խոսքերով՝ հիմնվելով միայն համատեքստի փաստերի վրա։ Սկսեք ուղիղ պատասխանից (1–2 նախադասություն)։
 
 ՀԱՄԱՏԵՔՍՏ.
 {context_str}

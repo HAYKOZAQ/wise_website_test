@@ -610,6 +610,10 @@ class RAGEngine:
     def _generate_with_ollama(self, system_prompt: str) -> str:
         return ollama_client.generate(system_prompt)
 
+    _EXTRACT_META_RE = re.compile(
+        r"^(?:Ակտ՝|Ծրագիր՝|Պաշտոնական PDF՝|Պաշտոնական էջ՝)\s*\[[^\]]*\]\s*\n?"
+    )
+
     def _extractive_answer(
         self,
         query: str,
@@ -620,18 +624,52 @@ class RAGEngine:
         if not chunks or confidence < 0.25:
             return get_standard_refusal(user_lang)
 
-        lines = []
         if user_lang == "en":
-            lines.append("### Relevant Official Information")
+            intro = "### Relevant Official Information"
         elif user_lang == "ru":
-            lines.append("### Найденная официальная информация")
+            intro = "### Найденная официальная информация"
         else:
-            lines.append("### Համապատասխան պաշտոնական տեղեկատվություն")
+            intro = "### Համապատասխան պաշտոնական տեղեկատվություն"
 
-        for c in chunks[:4]:
-            t = c.get("title") or ""
-            text = (c.get("text") or "").strip()
-            lines.append(f"**{t}**\n{text[:500]}...\n")
+        def _lead(text: str, max_chars: int = 420) -> str:
+            text = self._EXTRACT_META_RE.sub("", text or "").strip()
+            sentences = re.split(r"(?<=[.!?։])\s+", text)
+            out = ""
+            for s in sentences:
+                s = s.strip()
+                if not s:
+                    continue
+                if len(out) + len(s) + 1 > max_chars:
+                    break
+                out = f"{out} {s}".strip() if out else s
+            return out or (text[:max_chars].strip() if text else "")
+
+        lines = [intro]
+        for c in chunks[:3]:
+            title = re.sub(r"\s+", " ", (c.get("title") or "")).strip()
+            lead = _lead(c.get("text") or "")
+            if not lead:
+                continue
+            lines.append(f"- **{title}** — {lead}…")
+
+        if len(lines) == 1:
+            return get_standard_refusal(user_lang)
+
+        if user_lang == "en":
+            lines.append(
+                "For an official decision, please call the Unified Social Service hotline "
+                "**114** or visit [e-soc.am](https://e-soc.am)."
+            )
+        elif user_lang == "ru":
+            lines.append(
+                "Для официального решения обратитесь на горячую линию Единой социальной "
+                "службы **114** или посетите [e-soc.am](https://e-soc.am)."
+            )
+        else:
+            lines.append(
+                "Պաշտոնական որոշման համար դիմեք Միասնական սոցիալական ծառայության թեժ գծին՝ "
+                "**114**, կամ այցելեք [e-soc.am](https://e-soc.am):"
+            )
         return "\n\n".join(lines)
 
     def generate_response(
