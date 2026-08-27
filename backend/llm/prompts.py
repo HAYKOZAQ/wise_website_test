@@ -134,6 +134,33 @@ def build_follow_ups(query: str, lang: str, chunks: list[dict[str, Any]]) -> lis
     return base[:4]
 
 
+STANDARD_REFUSAL_HY = (
+    "Տվյալների բազայում այս հարցի վերաբերյալ հստակ տեղեկատվություն չի գտնվել: "
+    "Խնդրում ենք դիմել Միասնական սոցիալական ծառայության թեժ գծին՝ **114** հեռախոսահամարով, "
+    "կամ այցելել [e-soc.am](https://e-soc.am) պաշտոնական կայքը:"
+)
+
+STANDARD_REFUSAL_EN = (
+    "No verified information was found in the database for this specific inquiry. "
+    "Please contact the Unified Social Service hotline at **114** or visit [e-soc.am](https://e-soc.am)."
+)
+
+STANDARD_REFUSAL_RU = (
+    "В базе данных не найдено проверенной информации по данному вопросу. "
+    "Пожалуйста, обратитесь на горячую линию Единой социальной службы по номеру **114** "
+    "или посетите официальный сайт [e-soc.am](https://e-soc.am)."
+)
+
+
+def get_standard_refusal(lang: str = "hy") -> str:
+    """Return the official 114 hotline refusal message in the requested language."""
+    if lang == "en":
+        return STANDARD_REFUSAL_EN
+    if lang == "ru":
+        return STANDARD_REFUSAL_RU
+    return STANDARD_REFUSAL_HY
+
+
 def build_rag_prompt(
     query: str,
     context_str: str,
@@ -157,61 +184,23 @@ def build_rag_prompt(
             if lines:
                 hist_block = "\n\nPRIOR TURNS:\n" + "\n".join(lines)
 
-        if quick_fact:
-            return f"""You are a helpful citizen guide for Armenia's social protection programs.
-Answer the question directly and concisely (2–4 sentences or bullet points) based strictly on the CONTEXT below.
+        refusal_sample = STANDARD_REFUSAL_EN
 
-RULES:
-1) Use ONLY the CONTEXT below. Never guess phone numbers, addresses, or amounts.
-2) Cite the official contact or document name at the end.
+        return f"""You are the official citizen AI assistant for Armenia's social protection system (MLSA / Unified Social Service).
 
-CONTEXT:
-{context_str}
-{hist_block}
-
-QUESTION:
-{query}
-
-Direct Answer:"""
-
-        return f"""You are a careful citizen guide for Armenia's social protection programs (MLSA / Unified Social Service).
-
-GOAL: Give a COMPLETE, practical explanation so a person understands how the program works end-to-end.
-
-RULES:
-1) Use ONLY the CONTEXT below. Never invent amounts, ages, documents, deadlines, or article numbers.
-2) If a detail is missing in CONTEXT, write clearly: "This is not specified in the available materials" and suggest hotline 114 / e-soc.am / USS office.
-3) Write FULL sentences. Finish every section.
-4) Prefer concrete numbers and lists FROM the context. Prefer [legal] facts over [summary].
-5) For any money amount, age threshold, or deadline: if it comes only from a citizen summary, add: "Please verify the current amount with hotline 114 or e-social.am."
-
-Required markdown structure:
-## Short answer
-(2–4 sentences: what the program is and who it is for)
-
-## How the program works
-(Explain the mechanism / process in plain language)
-
-## Who is eligible
-(Bullet criteria)
-
-## Amount / calculation
-(All amounts or formula found in context)
-
-## Required documents
-(Bullet list)
-
-## How / where to apply
-(e-soc.am, USS centers, hotline 114 when relevant)
-
-## Deadlines
-(If any)
-
-## Important notes
-(Exceptions, border villages, working vs non-working, etc. if in context)
-
-## Sources
-(Titles from context only)
+STRICT SAFETY & GROUNDING RULES:
+1. Use ONLY the facts directly stated in the CONTEXT below. NEVER invent or assume numbers, age limits, dates, legal articles, or requirements.
+2. IF THE CONTEXT DOES NOT CONTAIN THE ANSWER to the user's question, or if the question is out of scope / unanswerable from the context, DO NOT GUESS OR FABRICATE. You MUST reply ONLY with:
+"{refusal_sample}"
+3. If the context contains sufficient verified information:
+   - Provide a clear, polite, and helpful explanation tailored to the citizen.
+   - Use clean Markdown with headers only where relevant:
+     ## Summary
+     ## Eligibility (if available in context)
+     ## Amount & Benefits (if available in context)
+     ## Required Documents (if available in context)
+     ## How to Apply (e-soc.am, USS office, hotline 114)
+   - Do NOT include empty sections or speculative claims.
 
 CONTEXT:
 {context_str}
@@ -220,7 +209,7 @@ CONTEXT:
 CITIZEN QUESTION:
 {query}
 
-Write a complete answer in clear English:"""
+Response:"""
 
     if user_lang == "ru":
         hist_ru = ""
@@ -236,61 +225,23 @@ Write a complete answer in clear English:"""
             if lines:
                 hist_ru = "\n\nПРЕДЫДУЩИЕ ВОПРОСЫ:\n" + "\n".join(lines)
 
-        if quick_fact:
-            return f"""Вы — гражданский гид по программам социальной защиты Армении.
-Ответьте на вопрос прямо и кратко (2–4 предложения или списком), опираясь исключительно на КОНТЕКСТ ниже.
+        refusal_sample = STANDARD_REFUSAL_RU
 
-ПРАВИЛА:
-1) Используйте ТОЛЬКО КОНТЕКСТ. Никогда не выдумывайте номера телефонов, адреса или суммы.
-2) В конце укажите официальный источник или контакт.
+        return f"""Вы — официальный гражданский ИИ-консультант по системе социальной защиты Армении (МТСЗ / Единая социальная служба).
 
-КОНТЕКСТ:
-{context_str}
-{hist_ru}
-
-ВОПРОС:
-{query}
-
-Краткий ответ:"""
-
-        return f"""Вы — гражданский гид по программам социальной защиты Армении (МТСЗ / Единая социальная служба).
-
-ЦЕЛЬ: дайте ПОЛНОЕ, практическое объяснение, чтобы человек понял, как работает программа от начала до конца.
-
-ПРАВИЛА:
-1) Используйте ТОЛЬКО КОНТЕКСТ ниже. Никогда не выдумывайте суммы, возрасты, документы, сроки или номера статей.
-2) Если деталь отсутствует в контексте, напишите ясно: «В имеющихся материалах это не указано» и предложите горячую линию 114 / e-soc.am / офис ЕСС.
-3) Пишите ПОЛНЫМИ предложениями. Завершайте каждый раздел.
-4) Предпочитайте конкретные цифры и списки ИЗ контекста. Отдавайте предпочтение [legal] фактам перед [summary].
-5) Для любой денежной суммы, возрастного порога или срока: если он указан только в [summary], добавьте: «Пожалуйста, уточните актуальный размер по горячей линии 114 или на e-social.am».
-
-Обязательная структура markdown:
-## Краткий ответ
-(2–4 предложения: что это за программа и для кого)
-
-## Как работает программа
-(Объясните механизм / процедуру простым языком)
-
-## Кто имеет право
-(Критерии списком)
-
-## Размер / расчёт
-(Все суммы или формулы из контекста)
-
-## Необходимые документы
-(Список)
-
-## Как и куда обратиться
-(e-soc.am, центры ЕСС, горячая линия 114 при необходимости)
-
-## Сроки
-(Если есть)
-
-## Важные замечания
-(Исключения, приграничные сёла, рабочие/нерабочие и т.д., если есть в контексте)
-
-## Источники
-(Только названия из контекста)
+СТРОГИЕ ПРАВИЛА ДОСТОВЕРНОСТИ:
+1. Используйте ТОЛЬКО факты, прямо указанные в КОНТЕКСТЕ ниже. Никогда не выдумывайте суммы, возрастные пороги, даты, номера статей или документы.
+2. ЕСЛИ В КОНТЕКСТЕ НЕТ ОТВЕТА на вопрос гражданина или контекст недостаточен, НЕ ПЫТАЙТЕСЬ УГАДЫВАТЬ. Ответьте ИСКЛЮЧИТЕЛЬНО следующим текстом:
+"{refusal_sample}"
+3. Если контекст содержит достоверный ответ:
+   - Дайте четкий, структурированный и понятный ответ на русском языке.
+   - Используйте заголовки Markdown только для тех разделов, по которым есть данные в контексте:
+     ## Краткий ответ
+     ## Кто имеет право
+     ## Размер и расчёт
+     ## Необходимые документы
+     ## Как и куда обратиться (e-soc.am, центры ЕСС, горячая линия 114)
+   - Не создавайте пустых или предположительных разделов.
 
 КОНТЕКСТ:
 {context_str}
@@ -299,7 +250,7 @@ Write a complete answer in clear English:"""
 ВОПРОС ГРАЖДАНИНА:
 {query}
 
-Напишите полный ответ понятным русским языком:"""
+Ответ:"""
 
     # Armenian (Default)
     hist_hy = ""
@@ -315,62 +266,23 @@ Write a complete answer in clear English:"""
         if lines:
             hist_hy = "\n\nՆԱԽՈՐԴ ՀԱՐՑՈՒՄՆԵՐ (միայն համատեքստի համար):\n" + "\n".join(lines)
 
-    if quick_fact:
-        return f"""Դուք Հայաստանի սոցիալական պաշտպանության ծրագրերի քաղաքացիական ուղեցույցն եք։
-Պատասխանեք հարցին ՈՒՂԻՂ ԵՎ ՀԱԿԻՐՃ (2–4 նախադասություն կամ ցանկով)՝ հիմնվելով ԲԱՑԱՌԱՊԵՍ ստորև տրված ՀԱՄԱՏԵՔՍՏԻ վրա։
+    refusal_sample = STANDARD_REFUSAL_HY
 
-ԿԱՆՈՆՆԵՐ.
-1) Օգտագործեք ՄԻԱՅՆ ՀԱՄԱՏԵՔՍՏԸ։ Երբեք մի հորինեք հեռախոսահամարներ, հասցեներ կամ գումարներ։
-2) Նշեք պաշտոնական կոնտակտը կամ փաստաթուղթը։
+    return f"""Դուք Հայաստանի Հանրապետության սոցիալական պաշտպանության համակարգի (ԱՍՀՆ / Միասնական սոցիալական ծառայություն) պաշտոնական քաղաքացիական ուղեցույցն եք։
 
-ՀԱՄԱՏԵՔՍՏ.
-{context_str}
-{hist_hy}
-
-ՀԱՐՑ.
-{query}
-
-Ուղիղ պատասխան՝"""
-
-    return f"""Դուք Հայաստանի սոցիալական պաշտպանության ծրագրերի (ԱՍՀՆ / Միասնական սոցիալական ծառայություն) քաղաքացիական ուղեցույցն եք։
-
-ՆՊԱՏԱԿ. տվեք ԱՄԲՈՂՋԱԿԱՆ, գործնական բացատրություն, որպեսզի մարդը հասկանա՝ ինչպես է ծրագիրն աշխատում սկզբից մինչև վերջ։
-
-ԿԱՆՈՆՆԵՐ.
-1) Օգտագործեք ՄԻԱՅՆ ստորև տրված ՀԱՄԱՏԵՔՍՏԸ։ Երբեք մի հորինեք գումարներ, տարիք, փաստաթղթեր, ժամկետներ կամ հոդվածների համարներ։
-2) Եթե որևէ մանրամասն չկա համատեքստում, գրեք հստակ՝ «Առկա նյութերում սա նշված չէ» և առաջարկեք թեժ գիծ 114 / e-soc.am / ՄՍԾ տարածքային կենտրոն։
-3) Գրեք ԼՐԻՎ նախադասություններ։ Ավարտեք յուրաքանչյուր բաժին։
-3ա) Եթե [legal] և [summary] հակասում են, նախընտրեք [legal]։ Summary-ի գումարները պայմանական են.
-3բ) Յուրաքանչյուր գումար/տարիք/ժամկետ summary-ից՝ ավելացրեք. «Ստուգեք ակտուալ չափը 114 կամ e-social.am»։
-4) Նախընտրեք համատեքստի կոնկրետ թվերն ու ցուցակները։
-
-Պարտադիր markdown կառուցվածք.
-## Կարճ պատասխան
-(2–4 նախադասություն՝ ինչ է ծրագիրը և ում համար է)
-
-## Ինչպես է աշխատում ծրագիրը
-(Պարզ լեզվով մեխանիզմը / ընթացակարգը)
-
-## Ով ունի իրավունք
-(Չափորոշիչների ցուցակ)
-
-## Չափ / հաշվարկ
-(Բոլոր գումարները կամ բանաձևը համատեքստից)
-
-## Անհրաժեշտ փաստաթղթեր
-(Ցուցակ)
-
-## Ինչպես և որտեղ դիմել
-(e-soc.am, ՄՍԾ կենտրոններ, թեժ գիծ 114)
-
-## Ժամկետներ
-(Եթե կան)
-
-## Կարևոր նշումներ
-(Բացառություններ, սահմանամերձ, աշխատող/չաշխատող և այլն՝ եթե կա համատեքստում)
-
-## Աղբյուրներ
-(Միայն համատեքստի վերնագրերը)
+ԱՆՎՏԱՆԳՈՒԹՅԱՆ ԵՎ ՓԱՍՏԱՑԻՈՒԹՅԱՆ ԽԻՍՏ ԿԱՆՈՆՆԵՐ.
+1. Օգտագործեք ԲԱՑԱՌԱՊԵՍ ստորև տրված ՀԱՄԱՏԵՔՍՏԻ փաստերը։ Երբեք մի հորինեք գումարների չափեր, տարիքային շեմեր, ժամկետներ, փաստաթղթեր կամ օրենքի հոդվածներ։
+2. ԵԹԵ ՀԱՄԱՏԵՔՍՏՈՒՄ ՉԿԱ ԼԻԱՐԺԵՔ ՊԱՏԱՍԽԱՆԸ կամ հարցը տվյալների բազայի շրջանակից դուրս է, ԵՐԲԵՔ ՄԻ ԵՆԹԱԴՐԵՔ ԿԱՄ ՀՈՐԻՆԵՔ։ Պատասխանեք ԲԱՑԱՌԱՊԵՍ հետևյալ տեքստով.
+"{refusal_sample}"
+3. Եթե համատեքստում առկա է հարցի հստակ պատասխանը.
+   - Տվեք գործնական, հստակ և մարդակենտրոն պատասխան։
+   - Օգտագործեք Markdown վերնագրեր միայն այն բաժինների համար, որոնց վերաբերյալ կան փաստեր համատեքստում.
+     ## Կարճ պատասխան
+     ## Ովքե՞ր կարող են դիմել (իրավասության չափանիշներ)
+     ## Նպաստի/վճարի չափը (եթե նշված է)
+     ## Անհրաժեշտ փաստաթղթերը
+     ## Ինչպե՞ս և որտե՞ղ դիմել (e-soc.am, ՄՍԾ կենտրոններ, թեժ գիծ 114)
+   - Մի ավելացրեք դատարկ կամ ենթադրական բաժիններ։
 
 ՀԱՄԱՏԵՔՍՏ.
 {context_str}
@@ -379,4 +291,4 @@ Write a complete answer in clear English:"""
 ՔԱՂԱՔԱՑՈՒ ՀԱՐՑ.
 {query}
 
-Գրեք ամբողջական պատասխանը պարզ հայերենով՝"""
+Պատասխան՝"""

@@ -220,7 +220,39 @@ def claim_supported(claim: str, context: str) -> bool:
     return False
 
 
+def is_refusal_response(text: str) -> bool:
+    """Detect if the answer is a safe refusal pointing the citizen to Hotline 114."""
+    if not text:
+        return False
+    low = text.lower()
+    has_114 = "114" in text
+    has_refusal_hint = any(
+        h in low
+        for h in (
+            "չի գտնվել", "չկա", "չկան", "տեղեկատվություն",
+            "not found", "no verified information", "not specified",
+            "не найдено", "нет информации", "не указано",
+            "թեժ գիծ", "hotline", "горячая линия", "e-soc",
+        )
+    )
+    return has_114 and has_refusal_hint
+
+
 def evaluate_grounding(answer: str, context: str) -> dict[str, Any]:
+    if is_refusal_response(answer):
+        return {
+            "grounding_score": 1.0,
+            "hallucination_rate": 0.0,
+            "risk": "low",
+            "is_refusal": True,
+            "claims_total": 0,
+            "claims_supported": 0,
+            "claims_unsupported": 0,
+            "supported_claims": [],
+            "unsupported_claims": [],
+            "method": "verified_refusal",
+        }
+
     claims = extract_numeric_claims(answer)
     if not claims:
         # Semantic grounding: compare answer to context via sentence-transformers
@@ -242,6 +274,7 @@ def evaluate_grounding(answer: str, context: str) -> dict[str, Any]:
             "grounding_score": round(score, 3),
             "hallucination_rate": round(1.0 - score, 3),
             "risk": risk,
+            "is_refusal": False,
             "claims_total": 0,
             "claims_supported": 0,
             "claims_unsupported": 0,
@@ -273,6 +306,7 @@ def evaluate_grounding(answer: str, context: str) -> dict[str, Any]:
         "grounding_score": round(score, 3),
         "hallucination_rate": round(hall, 3),
         "risk": risk,
+        "is_refusal": False,
         "claims_total": total,
         "claims_supported": n_sup,
         "claims_unsupported": len(unsupported),
@@ -284,7 +318,11 @@ def evaluate_grounding(answer: str, context: str) -> dict[str, Any]:
 
 def is_answer_incomplete(answer: str) -> bool:
     """Heuristic: truncated / too short / cut mid-sentence."""
-    if not answer or len(answer.strip()) < 280:
+    if not answer or not answer.strip():
+        return True
+    if is_refusal_response(answer):
+        return False
+    if len(answer.strip()) < 180:
         return True
     a = answer.strip()
     # ends mid-word without punctuation (includes Western and Armenian marks)
@@ -292,9 +330,6 @@ def is_answer_incomplete(answer: str) -> bool:
         if re.search(r"[\w\u0531-\u0587]{2,}$", a) and len(a) < 1500:
             return True
     if re.search(r"(Մինչև|մինչև|դրամ|տարեկան|Հոդված|Հայաստ)\s*$", a):
-        return True
-    headers = len(re.findall(r"^##\s+", a, re.M))
-    if headers < 3 and len(a) < 900:
         return True
     low = a.lower()
     has_apply = any(x in low for x in ("դիմել", "e-soc", "մսծ", "114", "apply", "hotline"))

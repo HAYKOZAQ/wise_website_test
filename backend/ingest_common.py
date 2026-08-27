@@ -173,8 +173,13 @@ def hard_split(text: str, max_chars: int = 1400, overlap: int = 120) -> list[str
 
 
 def normalize_text(text: str, drop_lines: tuple[str, ...] | None = None) -> str:
-    """Basic whitespace cleanup plus optional chrome-line removal."""
-    text = (text or "").replace("\u00a0", " ")
+    """Robust Unicode and Armenian text hygiene."""
+    if not text:
+        return ""
+    # Strip zero-width and invisible characters
+    text = re.sub(r"[\u200b\u200c\u200d\u200e\u200f\ufeff]", "", text)
+    # Normalize non-breaking spaces and irregular spaces
+    text = text.replace("\u00a0", " ").replace("\u202f", " ")
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     if drop_lines:

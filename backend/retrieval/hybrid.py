@@ -31,6 +31,74 @@ def query_prefers_summary(query: str) -> bool:
     return any(h in q for h in SUMMARY_QUERY_HINTS)
 
 
+def reciprocal_rank_fusion(
+    ranked_lists: list[list[tuple[int, float]]],
+    weights: list[float] | None = None,
+    k: int = 60,
+) -> list[tuple[int, float]]:
+    """
+    Standard Reciprocal Rank Fusion (RRF) combining sparse and dense rankings.
+    RRF(d) = sum_i( weight_i / (k + rank_i(d)) )
+    """
+    if not ranked_lists:
+        return []
+    if weights is None:
+        weights = [1.0 / len(ranked_lists)] * len(ranked_lists)
+
+    scores: dict[int, float] = defaultdict(float)
+    for ranked, weight in zip(ranked_lists, weights):
+        for rank, (doc_id, _) in enumerate(ranked, start=1):
+            scores[doc_id] += weight / (k + rank)
+
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return sorted_scores
+
+
+_RETRIEVAL_STOP_WORDS = {
+    "the", "and", "for", "how", "what", "with", "from", "this", "that", "are", "was", "can", "you",
+    "որ", "եւ", "և", "ինչ", "ինչպես", "համար", "այս", "այն", "մասին", "նաև", "եթե", "որտեղ", "երբ", "կամ", "նրա", "իր", "ինչքան", "որքան",
+    "что", "как", "для", "или", "где", "когда", "если", "это", "этот", "эти", "все",
+}
+
+
+def compute_retrieval_confidence(
+    query: str,
+    picked_chunks: list[dict[str, Any]],
+    min_keyword_overlap: int = 1,
+) -> float:
+    """
+    Evaluates whether the retrieved chunks have genuine lexical/semantic support for the query.
+    Returns confidence between 0.0 and 1.0.
+    """
+    if not picked_chunks or not query or not query.strip():
+        return 0.0
+
+    raw_tokens = re.findall(r"[\w\u0531-\u0587]{2,}", query.lower())
+    q_tokens = {t for t in raw_tokens if t not in _RETRIEVAL_STOP_WORDS and len(t) >= 3}
+    if not q_tokens:
+        q_tokens = set(raw_tokens)
+        if not q_tokens:
+            return 0.0
+
+    # Calculate token overlap across top chunks
+    combined_chunk_text = " ".join((c.get("text") or "").lower() for c in picked_chunks[:5])
+    chunk_tokens = set(re.findall(r"[\w\u0531-\u0587]{3,}", combined_chunk_text))
+    overlap = len(q_tokens & chunk_tokens)
+
+    # For queries with 3+ content tokens, require at least 2 distinct token matches
+    if len(q_tokens) >= 3 and overlap < 2:
+        return 0.0
+
+    overlap_ratio = overlap / len(q_tokens)
+    if overlap_ratio < 0.35:
+        return 0.0
+
+    top_score = float(picked_chunks[0].get("hybrid_score", 0.0))
+
+    confidence = 0.5 * min(1.0, top_score * 10.0) + 0.5 * overlap_ratio
+    return round(max(0.0, min(1.0, confidence)), 3)
+
+
 def diversify_and_pick(
     candidates: list[dict[str, Any]],
     acts_with_legal: set[str],

@@ -252,6 +252,19 @@ class TestRetrievalEngine(unittest.TestCase):
         out = self.engine.generate_response("որքա՞ն է չափը", "hy", history=hist)
         self.assertTrue(len(out.get("answer") or "") > 10)
 
+    def test_out_of_domain_query_triggers_refusal_hy(self):
+        # Nonsensical / out-of-domain query
+        res = self.engine.generate_response("Ինչպե՞ս գնել տիեզերանավ Մարս թռչելու համար", "hy")
+        self.assertIn("114", res["answer"])
+        self.assertIn("e-soc.am", res["answer"])
+        self.assertEqual(res["generation_mode"], "guardrail_refusal")
+
+    def test_out_of_domain_query_triggers_refusal_en(self):
+        res = self.engine.generate_response("How to build a supersonic warp drive in space?", "en")
+        self.assertIn("114", res["answer"])
+        self.assertIn("e-soc.am", res["answer"])
+        self.assertEqual(res["generation_mode"], "guardrail_refusal")
+
 
 class TestCanonicalAct(unittest.TestCase):
     def test_canonical(self):
@@ -315,6 +328,69 @@ class TestArmenianNLPAndRAGPerfection(unittest.TestCase):
         self.assertTrue(is_quick_factual_query("ՄՍԾ թեժ գիծ"))
         self.assertTrue(is_quick_factual_query("hotline phone number"))
         self.assertFalse(is_quick_factual_query("Ինչպես դիմել մինչև 2 տարեկան երեխայի խնամքի նպաստ ստանալու համար ամբողջական ընթացակարգով"))
+
+
+class TestStrictGuardrailAndRefusal(unittest.TestCase):
+    def test_standard_refusal_messages(self):
+        from llm.prompts import (
+            STANDARD_REFUSAL_HY,
+            STANDARD_REFUSAL_EN,
+            STANDARD_REFUSAL_RU,
+            get_standard_refusal,
+        )
+
+        for text in (STANDARD_REFUSAL_HY, STANDARD_REFUSAL_EN, STANDARD_REFUSAL_RU):
+            self.assertIn("114", text)
+            self.assertIn("e-soc.am", text)
+
+        self.assertEqual(get_standard_refusal("hy"), STANDARD_REFUSAL_HY)
+        self.assertEqual(get_standard_refusal("en"), STANDARD_REFUSAL_EN)
+        self.assertEqual(get_standard_refusal("ru"), STANDARD_REFUSAL_RU)
+
+    def test_is_refusal_detection(self):
+        from fidelity import is_refusal_response, is_answer_incomplete, evaluate_grounding
+        from llm.prompts import STANDARD_REFUSAL_HY
+
+        self.assertTrue(is_refusal_response(STANDARD_REFUSAL_HY))
+        self.assertTrue(is_refusal_response("Տեղեկատվություն չկա: Խնդրում ենք զանգահարել 114 թեժ գիծ:"))
+        self.assertFalse(is_refusal_response("Կենսաթոշակի չափը 37500 դրամ է:"))
+
+        # A refusal must not be flagged as an incomplete answer
+        self.assertFalse(is_answer_incomplete(STANDARD_REFUSAL_HY))
+
+        # Grounding on refusal should be evaluated as low risk / verified
+        res = evaluate_grounding(STANDARD_REFUSAL_HY, "")
+        self.assertTrue(res.get("is_refusal"))
+        self.assertEqual(res.get("risk"), "low")
+
+
+class TestRRFAndConfidence(unittest.TestCase):
+    def test_reciprocal_rank_fusion(self):
+        from retrieval.hybrid import reciprocal_rank_fusion
+
+        list1 = [(1, 0.9), (2, 0.8), (3, 0.7)]
+        list2 = [(2, 0.95), (1, 0.7), (4, 0.6)]
+        fused = reciprocal_rank_fusion([list1, list2], weights=[0.5, 0.5])
+        # Doc 2 is rank 2 in list1 and rank 1 in list2; doc 1 is rank 1 in list1 and rank 2 in list2
+        top_doc_ids = [doc_id for doc_id, _ in fused]
+        self.assertIn(1, top_doc_ids[:2])
+        self.assertIn(2, top_doc_ids[:2])
+
+    def test_compute_retrieval_confidence(self):
+        from retrieval.hybrid import compute_retrieval_confidence
+
+        query = "կենսաթոշակ տարիք"
+        matching_chunks = [
+            {"text": "տարիքային կենսաթոշակ ստանալու իրավունք", "hybrid_score": 0.85},
+        ]
+        conf_high = compute_retrieval_confidence(query, matching_chunks)
+        self.assertGreater(conf_high, 0.3)
+
+        irrelevant_chunks = [
+            {"text": "սպորտային մրցաշար ֆուտբոլ", "hybrid_score": 0.01},
+        ]
+        conf_low = compute_retrieval_confidence("տիեզերանավ գնել", irrelevant_chunks)
+        self.assertLess(conf_low, 0.15)
 
 
 if __name__ == "__main__":

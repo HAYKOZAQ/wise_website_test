@@ -37,12 +37,15 @@ from llm.prompts import (
     build_follow_ups,
     expand_colloquial_query,
     reorder_context_chunks,
+    get_standard_refusal,
 )
 from retrieval.hybrid import (
     canonical_act_id,
     query_prefers_legal,
     query_prefers_summary,
     diversify_and_pick,
+    reciprocal_rank_fusion,
+    compute_retrieval_confidence,
 )
 
 try:
@@ -178,6 +181,39 @@ class RAGEngine:
         text = (text or "").strip()
         if len(text) <= max_chars:
             return [text] if text else []
+
+        # Check for structural section breaks: Articles, numbered clauses, and bullet points
+        section_matches = list(re.finditer(r"(?:\n|^)(?:Հոդված\s+\d+|Article\s+\d+|Статья\s+\d+|\d+\.\s+[Ա-ՖA-ZА-Я])", text))
+        if len(section_matches) >= 2:
+            raw_sections: list[str] = []
+            prev_idx = 0
+            for m in section_matches[1:]:
+                raw_sections.append(text[prev_idx:m.start()].strip())
+                prev_idx = m.start()
+            raw_sections.append(text[prev_idx:].strip())
+
+            chunks: list[str] = []
+            for sec in raw_sections:
+                if not sec:
+                    continue
+                if len(sec) <= max_chars:
+                    chunks.append(sec)
+                else:
+                    # Further split large sections by paragraphs
+                    paragraphs = [p.strip() for p in sec.split("\n\n") if p.strip()]
+                    cur = ""
+                    for p in paragraphs:
+                        if len(cur) + len(p) + 2 <= max_chars:
+                            cur = f"{cur}\n\n{p}".strip() if cur else p
+                        else:
+                            if cur:
+                                chunks.append(cur)
+                            cur = p
+                    if cur:
+                        chunks.append(cur)
+            if chunks:
+                return chunks
+
         paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
         if not paragraphs:
             paragraphs = [text]
@@ -214,6 +250,8 @@ class RAGEngine:
             title = doc.get("title", "")
             content = doc.get("content", "")
             doc_type = doc.get("doc_type", "summary")
+            category = doc.get("category") or ""
+            article = doc.get("article") or ""
             if not content:
                 continue
 
@@ -224,14 +262,21 @@ class RAGEngine:
 
             for p in pieces:
                 cleaned = strip_image_refs(p)
+                meta_tag = f"[{title}"
+                if article:
+                    meta_tag += f" | {article}"
+                if category:
+                    meta_tag += f" | {category}"
+                meta_tag += "]"
+
                 if doc_type == "legal":
-                    chunk_text = f"Ակտ՝ {title}\n{cleaned}"
+                    chunk_text = f"Ակտ՝ {meta_tag}\n{cleaned}"
                 elif doc_type == "pdf":
-                    chunk_text = f"Պաշտոնական PDF՝ {title}\n{cleaned}"
+                    chunk_text = f"Պաշտոնական PDF՝ {meta_tag}\n{cleaned}"
                 elif doc_type == "web":
-                    chunk_text = f"Պաշտոնական էջ՝ {title}\n{cleaned}"
+                    chunk_text = f"Պաշտոնական էջ՝ {meta_tag}\n{cleaned}"
                 else:
-                    chunk_text = f"Ծրագիր՝ {title}\nՆկարագրություն՝ {cleaned}"
+                    chunk_text = f"Ծրագիր՝ {meta_tag}\nՆկարագրություն՝ {cleaned}"
 
                 self.chunks.append({
                     "chunk_id": len(self.chunks),
@@ -315,7 +360,7 @@ class RAGEngine:
         embeddings: list[tuple[int, list[float]]] = []
         backend_name = "none"
 
-        if settings.use_local_embedder:
+        if settings.use_local_embedder and (force_embed or len(self.chunks) <= max_auto):
             try:
                 embeddings = self._embed_with_local_backend()
                 backend_name = "local_embedder" if embeddings else "none"
@@ -332,6 +377,16 @@ class RAGEngine:
                 return
             except Exception as e:
                 print(f"Failed constructing index from embeddings: {e}")
+        else:
+            try:
+                self._rag_index.build_sparse(self.chunks, self.corpus_hash)
+                self.vector_enabled = False
+                self.vector_backend = "bm25"
+                self.cache_ok = True
+                print(f"Constructed compact BM25 index ({len(self.chunks)} chunks).")
+                return
+            except Exception as e:
+                print(f"Failed constructing sparse index: {e}")
 
         if prefer_local:
             try:
@@ -440,6 +495,7 @@ class RAGEngine:
         if dense_available:
             variant_vectors = self._embed_queries_batch(query_variants)
 
+        variant_rankings: list[list[tuple[int, float]]] = []
         for i, q in enumerate(query_variants):
             if use_hybrid:
                 q_vec = variant_vectors[i] if dense_available and i < len(variant_vectors) else None
@@ -449,27 +505,12 @@ class RAGEngine:
             else:
                 vec = self._vector_scores(q)
                 kw = self._keyword_scores(q)
+                pairs = reciprocal_rank_fusion([vec[:40], kw[:40]], weights=[0.5, 0.5])[:initial_k]
+            variant_rankings.append(pairs)
 
-                def normalize(pairs: list[tuple[int, float]]) -> dict[int, float]:
-                    if not pairs:
-                        return {}
-                    mx = max(s for _, s in pairs) or 1.0
-                    mn = min(s for _, s in pairs)
-                    span = (mx - mn) or 1.0
-                    return {cid: (s - mn) / span for cid, s in pairs}
-
-                vmap = normalize(vec[:40])
-                kmap = normalize(kw[:40])
-                pairs = []
-                all_ids = set(vmap) | set(kmap)
-                for cid in all_ids:
-                    score = 0.50 * vmap.get(cid, 0.0) + 0.50 * kmap.get(cid, 0.0)
-                    pairs.append((cid, score))
-                pairs.sort(key=lambda x: x[1], reverse=True)
-                pairs = pairs[:initial_k]
-
-            for cid, score in pairs:
-                candidate_scores[cid] = max(candidate_scores.get(cid, 0.0), score)
+        merged_pairs = reciprocal_rank_fusion(variant_rankings)
+        for cid, score in merged_pairs:
+            candidate_scores[cid] = score
 
         acts_with_legal: set[str] = set()
         for ch in self.chunks:
@@ -480,30 +521,33 @@ class RAGEngine:
 
         candidates: list[dict[str, Any]] = []
         for cid, score in candidate_scores.items():
+            if cid < 0 or cid >= len(self.chunks) or score <= 0.0:
+                continue
             chunk = self.chunks[cid]
             dtype = chunk.get("doc_type") or "summary"
             ca = canonical_act_id(chunk.get("act_id"))
-            adjusted = score
+            multiplier = 1.0
             if dtype == "legal":
-                adjusted += 0.20
+                multiplier += 0.20
             elif dtype == "pdf":
                 if ca and ca in acts_with_legal:
-                    adjusted -= 0.28
+                    multiplier -= 0.30
                 else:
-                    adjusted += 0.06
+                    multiplier += 0.10
             if prefer_legal and dtype == "legal":
-                adjusted += 0.18
+                multiplier += 0.30
             if prefer_legal and dtype == "pdf" and not (ca and ca in acts_with_legal):
-                adjusted += 0.10
+                multiplier += 0.15
             if prefer_summary and dtype == "summary":
-                adjusted += 0.18
+                multiplier += 0.30
             if dtype == "summary" and not prefer_legal:
-                adjusted += 0.06
+                multiplier += 0.10
             if dtype == "web" and not prefer_legal:
-                adjusted += 0.05
+                multiplier += 0.08
             pr = chunk.get("priority") or 2
-            adjusted += max(0, (3 - pr)) * 0.02
-            candidates.append({**chunk, "hybrid_score": adjusted})
+            multiplier += max(0, (3 - pr)) * 0.05
+
+            candidates.append({**chunk, "hybrid_score": score * multiplier})
 
         candidates.sort(key=lambda x: x["hybrid_score"], reverse=True)
 
@@ -571,21 +615,18 @@ class RAGEngine:
         query: str,
         chunks: list[dict[str, Any]],
         user_lang: str = "hy",
+        confidence: float = 0.5,
     ) -> str:
-        if not chunks:
-            if user_lang == "en":
-                return "No matching materials were found in the database."
-            if user_lang == "ru":
-                return "В базе данных не найдено подходящих материалов."
-            return "Տվյալների բազայում համապատասխան նյութեր չեն գտնվել:"
+        if not chunks or confidence < 0.25:
+            return get_standard_refusal(user_lang)
 
         lines = []
         if user_lang == "en":
-            lines.append("### Relevant Information")
+            lines.append("### Relevant Official Information")
         elif user_lang == "ru":
-            lines.append("### Найденная информация")
+            lines.append("### Найденная официальная информация")
         else:
-            lines.append("### Համապատասխան տեղեկատվություն")
+            lines.append("### Համապատասխան պաշտոնական տեղեկատվություն")
 
         for c in chunks[:4]:
             t = c.get("title") or ""
@@ -612,6 +653,22 @@ class RAGEngine:
                 search_query = prior_user[-1] + " " + query
 
         relevant = self.retrieve(search_query, top_n=12)
+        confidence = compute_retrieval_confidence(search_query, relevant)
+
+        # Tier 3 & 5 Pre-LLM Guardrail:
+        # If retrieval confidence is zero or below threshold, return safe 114 refusal
+        if not relevant or confidence < 0.10:
+            refusal_text = get_standard_refusal(user_lang)
+            fidelity = evaluate_grounding(refusal_text, "")
+            return {
+                "answer": refusal_text,
+                "sources": [],
+                "vector_search": self.vector_enabled,
+                "follow_ups": [],
+                "fidelity": fidelity,
+                "generation_mode": "guardrail_refusal",
+                "retrieval_confidence": confidence,
+            }
         ordered_chunks = reorder_context_chunks(relevant)
         context_parts = []
         for c in ordered_chunks:
@@ -641,7 +698,7 @@ class RAGEngine:
                 mode = "ollama"
 
         if not answer:
-            answer = self._extractive_answer(query, relevant, user_lang=user_lang)
+            answer = self._extractive_answer(query, relevant, user_lang=user_lang, confidence=confidence)
             mode = "extractive"
 
         sources = self._build_sources(relevant)
@@ -666,6 +723,7 @@ class RAGEngine:
             "follow_ups": follow_ups,
             "fidelity": fidelity,
             "generation_mode": mode,
+            "retrieval_confidence": confidence,
         }
 
 
