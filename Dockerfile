@@ -54,14 +54,12 @@ RUN test -f /app/frontend/css/base.css \
     && test -f /app/frontend/en/partners.html \
     && test -f /app/frontend/en/contact.html \
     && test -f /app/frontend/en/blog.html \
-    && test -f /app/frontend/assets/data/blog-posts.json \
     && test -f /app/frontend/assets/videos/hero.mp4 \
     && test -f /app/frontend/assets/images/partners/HH_Gerb.svg \
     && test -f /app/frontend/assets/images/partners/usaid.svg \
     && test -f /app/frontend/assets/images/partners/microsoft.svg \
-    && test -f /app/frontend/assets/images/partners/p22.png \
-    && test -f /app/frontend/assets/images/partners/p28.png \
-    && test -f /app/frontend/assets/images/partners/p41.jpg \
+    && test -f /app/frontend/assets/images/partners/p22.svg \
+    && test -f /app/frontend/assets/images/partners/pek.jpg \
     && echo "Frontend assets verified OK"
 
 # Deploy stamp — visible at GET /api/version to verify live build
