@@ -160,11 +160,12 @@ def favicon():
     return Response(status_code=204)
 
 
-# Static Site Mounting (Eleventy output)
+# Static Site Mounting (Eleventy output with Clean URLs)
 if FRONTEND_DIR and FRONTEND_DIR.is_dir():
     _css = FRONTEND_DIR / "css"
     _js = FRONTEND_DIR / "js"
     _assets = FRONTEND_DIR / "assets"
+    _well_known = FRONTEND_DIR / ".well-known"
 
     if _css.is_dir():
         app.mount("/css", StaticFiles(directory=str(_css)), name="css")
@@ -172,18 +173,88 @@ if FRONTEND_DIR and FRONTEND_DIR.is_dir():
         app.mount("/js", StaticFiles(directory=str(_js)), name="js")
     if _assets.is_dir():
         app.mount("/assets", StaticFiles(directory=str(_assets)), name="assets")
+    if _well_known.is_dir():
+        app.mount("/.well-known", StaticFiles(directory=str(_well_known)), name="well_known")
+
+    @app.get("/robots.txt", include_in_schema=False)
+    def robots_txt():
+        f = FRONTEND_DIR / "robots.txt"
+        if f.is_file():
+            return FileResponse(f, media_type="text/plain; charset=utf-8")
+        return Response(status_code=404)
+
+    @app.get("/sitemap.xml", include_in_schema=False)
+    def sitemap_xml():
+        f = FRONTEND_DIR / "sitemap.xml"
+        if f.is_file():
+            return FileResponse(f, media_type="application/xml; charset=utf-8")
+        return Response(status_code=404)
 
     @app.api_route("/pages", methods=["GET", "HEAD"], include_in_schema=False)
     @app.api_route("/pages/", methods=["GET", "HEAD"], include_in_schema=False)
     def pages_root_compat():
-        return RedirectResponse(url="/index.html", status_code=301)
+        return RedirectResponse(url="/", status_code=301)
 
     @app.api_route("/pages/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
     def pages_compat(path: str):
-        target = (path or "index.html").lstrip("/")
-        return RedirectResponse(url=f"/{target}", status_code=301)
+        cleaned = (path or "").lstrip("/")
+        if cleaned.endswith(".html"):
+            cleaned = cleaned[:-5]
+        if cleaned in ("", "index"):
+            return RedirectResponse(url="/", status_code=301)
+        return RedirectResponse(url=f"/{cleaned}", status_code=301)
 
-    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="site")
+    @app.get("/index.html", include_in_schema=False)
+    def index_html_redirect():
+        return RedirectResponse(url="/", status_code=301)
+
+    @app.get("/en/index.html", include_in_schema=False)
+    def en_index_html_redirect():
+        return RedirectResponse(url="/en/", status_code=301)
+
+    @app.get("/", include_in_schema=False)
+    def serve_root():
+        index_file = FRONTEND_DIR / "index.html"
+        if index_file.is_file():
+            return FileResponse(index_file, media_type="text/html; charset=utf-8")
+        return HTMLResponse(content=_api_dashboard_html())
+
+    @app.get("/en", include_in_schema=False)
+    @app.get("/en/", include_in_schema=False)
+    def serve_en_root():
+        en_index = FRONTEND_DIR / "en" / "index.html"
+        if en_index.is_file():
+            return FileResponse(en_index, media_type="text/html; charset=utf-8")
+        return RedirectResponse(url="/", status_code=302)
+
+    # Clean URL handler for all extensionless and .html pages
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def serve_clean_page(full_path: str):
+        cleaned = (full_path or "").strip().lstrip("/")
+
+        # If .html is explicitly requested, redirect to clean URL
+        if cleaned.endswith(".html"):
+            stem = cleaned[:-5]
+            if stem in ("", "index"):
+                return RedirectResponse(url="/", status_code=301)
+            return RedirectResponse(url=f"/{stem}", status_code=301)
+
+        # Look for matching .html file
+        candidate_html = FRONTEND_DIR / f"{cleaned}.html"
+        if candidate_html.is_file():
+            return FileResponse(candidate_html, media_type="text/html; charset=utf-8")
+
+        # Look for directory index.html
+        candidate_dir_index = FRONTEND_DIR / cleaned / "index.html"
+        if candidate_dir_index.is_file():
+            return FileResponse(candidate_dir_index, media_type="text/html; charset=utf-8")
+
+        # Fallback to direct static file (e.g. downloads, custom assets)
+        candidate_static = FRONTEND_DIR / cleaned
+        if candidate_static.is_file():
+            return FileResponse(candidate_static)
+
+        return Response(status_code=404)
 else:
     @app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
     def root_api_only():

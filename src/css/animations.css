@@ -175,10 +175,10 @@ html[data-theme="dark"] .wise-tilt:hover {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -4px;
+  bottom: -10px;
   width: 100%;
-  height: 2px;
-  border-radius: 2px;
+  height: 3px;
+  border-radius: 0;
   background: var(--wise-yellow);
   transform: scaleX(0);
   transform-origin: right;
@@ -188,6 +188,18 @@ html[data-theme="dark"] .wise-tilt:hover {
 .nav__link:hover::before {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+.nav__link--active::before,
+.nav__link--active:hover::before,
+.site-header .nav__link--active::before,
+.site-header .nav__link--active:hover::before,
+.nav__link--contact::before,
+.nav__link--contact:hover::before,
+.site-header .nav__link--contact::before,
+.site-header .nav__link--contact:hover::before {
+  display: none !important;
+  transform: scaleX(0) !important;
 }
 
 /* ── 6. Marquee band ── */
