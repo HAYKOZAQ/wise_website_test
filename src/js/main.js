@@ -43,6 +43,15 @@ function initHeaderScroll() {
 }
 
 function initScrollReveal() {
+  const revealElement = (el) => {
+    el.classList.add('visible');
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .fade-in-scale').forEach(revealElement);
+    return;
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -51,12 +60,17 @@ function initScrollReveal() {
       }
     });
   }, {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.05,
+    rootMargin: '50px 0px 50px 0px'
   });
 
   document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .fade-in-scale').forEach(el => {
-    observer.observe(el);
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      revealElement(el);
+    } else {
+      observer.observe(el);
+    }
   });
 }
 
@@ -362,6 +376,10 @@ function initScrollToTop() {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+
+  window.addEventListener('scroll', check, { passive: true });
+  check();
+}
 
 function initFaqSearch() {
   const searchInput = document.getElementById('faqSearchInput');
