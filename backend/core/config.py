@@ -81,7 +81,7 @@ class Settings(BaseModel):
     # LLM Settings
     gemini_api_key: str = Field(default_factory=lambda: os.environ.get("GEMINI_API_KEY", ""))
     gemini_generate_models: list[str] = Field(
-        default_factory=lambda: _env_list("GEMINI_GENERATE_MODELS", "gemini-2.5-flash,gemini-2.5-flash-lite")
+        default_factory=lambda: _env_list("GEMINI_GENERATE_MODELS", "gemini-3.5-flash-lite")
     )
     gemini_max_retries: int = Field(default_factory=lambda: _env_int("GEMINI_MAX_RETRIES", 1))
     gemini_deadline_sec: float = Field(default_factory=lambda: _env_float("GEMINI_DEADLINE_SEC", 45.0))
