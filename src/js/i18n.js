@@ -385,6 +385,9 @@
     'chat.thinking':       { hy: 'Մտածում եմ…', en: 'Thinking…' },
     'chat.sources_label':  { hy: 'Աղբյուրներ', en: 'Sources' },
     'chat.new':            { hy: 'Նոր զրույց', en: 'New chat' },
+    'chat.mic_title':      { hy: 'Ձայնային մուտքագրում (հայերեն, English, русский)', en: 'Voice input (Armenian, English, Russian)' },
+    'chat.mic_listening':  { hy: 'Լսում եմ… Խոսեք միկրոֆոնով (սեղմեք դադարեցնելու համար)', en: 'Listening… Speak into microphone (click to stop)' },
+    'chat.mic_not_supported': { hy: 'Ձեր բրաուզերը չի աջակցում ձայնային մուտքագրում', en: 'Voice input is not supported in this browser' },
 
     /* Topic buttons */
     'chat.q1': { hy: 'Մինչև 2 տարեկան երեխայի նպաստ', en: 'Childcare allowance under 2' },
@@ -849,6 +852,9 @@
     'chat.thinking': 'Думаю…',
     'chat.sources_label': 'Источники',
     'chat.new': 'Новый чат',
+    'chat.mic_title': 'Голосовой ввод (армянский, русский, английский)',
+    'chat.mic_listening': 'Слушаю… Говорите в микрофон (нажмите для остановки)',
+    'chat.mic_not_supported': 'Голосовой ввод не поддерживается вашим браузером',
     'chat.q1': 'Пособие на ребёнка до 2 лет',
     'chat.q2': 'Единовременное пособие при рождении ребёнка',
     'chat.q3': 'Семейное пособие',

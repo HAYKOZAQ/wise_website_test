@@ -410,64 +410,126 @@
     if (!micBtn) return;
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      micBtn.style.display = 'none';
+      micBtn.setAttribute('title', t('chat.mic_not_supported', loc(
+        'Ձայնային մուտքագրումը չի աջակցվում այս բրաուզերում',
+        'Voice input is not supported in this browser',
+        'Голосовой ввод не поддерживается вашим браузером'
+      )));
+      micBtn.style.opacity = '0.45';
+      micBtn.style.cursor = 'not-allowed';
+      micBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        alert(t('chat.mic_not_supported', loc(
+          'Ձեր բրաուզերը չի աջակցում Web Speech API: Խնդրում ենք օգտագործել Chrome, Edge կամ Safari:',
+          'Your browser does not support Web Speech API. Please use Chrome, Edge, or Safari.',
+          'Ваш браузер не поддерживает Web Speech API. Пожалуйста, используйте Chrome, Edge или Safari.'
+        )));
+      });
       return;
     }
 
     var recognition = null;
     var isRecording = false;
 
+    function getVoiceLang() {
+      var cur = lang();
+      if (cur === 'ru') return 'ru-RU';
+      if (cur === 'en') return 'en-US';
+      return 'hy-AM';
+    }
+
+    function getMicTitle() {
+      return t('chat.mic_title', loc(
+        'Ձայնային մուտքագրում (հայերեն, English, русский)',
+        'Voice input (Armenian, English, Russian)',
+        'Голосовой ввод (армянский, русский, английский)'
+      ));
+    }
+
+    function getListeningTitle() {
+      return t('chat.mic_listening', loc(
+        'Լսում եմ… Խոսեք միկրոֆոնով (սեղմեք դադարեցնելու համար)',
+        'Listening… Speak into microphone (click to stop)',
+        'Слушаю… Говорите в микрофон (нажмите для остановки)'
+      ));
+    }
+
     function stopRecording() {
       isRecording = false;
       micBtn.classList.remove('wise-help__mic--recording');
-      micBtn.setAttribute('title', loc('Ձայնային մուտքագրում', 'Voice input', 'Голосовой ввод'));
+      var title = getMicTitle();
+      micBtn.setAttribute('title', title);
+      micBtn.setAttribute('aria-label', title);
+      if (inputEl && inputEl.placeholder === getListeningTitle()) {
+        inputEl.placeholder = t('chat.placeholder', loc('Օրինակ՝ տարիքային կենսաթոշակ', 'e.g. age pension', 'Например, возрастная пенсия'));
+      }
       try {
-        if (recognition) recognition.stop();
+        if (recognition) {
+          recognition.stop();
+          recognition = null;
+        }
       } catch (_) {}
     }
 
     function startRecording() {
+      stopRecording();
       try {
-        if (!recognition) {
-          recognition = new SpeechRecognition();
-          recognition.continuous = false;
-          recognition.interimResults = true;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        recognition.lang = getVoiceLang();
 
-          recognition.onstart = function () {
-            isRecording = true;
-            micBtn.classList.add('wise-help__mic--recording');
-            micBtn.setAttribute('title', loc('Լսում եմ… (սեղմեք դադարեցնելու համար)', 'Listening… (click to stop)', 'Слушаю… (нажмите для остановки)'));
-          };
+        recognition.onstart = function () {
+          isRecording = true;
+          micBtn.classList.add('wise-help__mic--recording');
+          var listenText = getListeningTitle();
+          micBtn.setAttribute('title', listenText);
+          micBtn.setAttribute('aria-label', listenText);
+          if (inputEl) {
+            inputEl.placeholder = listenText;
+          }
+        };
 
-          recognition.onresult = function (event) {
-            var transcript = '';
-            for (var i = event.resultIndex; i < event.results.length; i++) {
-              transcript += event.results[i][0].transcript;
-            }
-            if (inputEl && transcript) {
-              inputEl.value = transcript;
-            }
-          };
+        recognition.onresult = function (event) {
+          var transcript = '';
+          for (var i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          if (inputEl && transcript) {
+            inputEl.value = transcript;
+          }
+        };
 
-          recognition.onerror = function (event) {
-            console.warn('[wise-chat] voice error:', event.error);
-            stopRecording();
-          };
+        recognition.onerror = function (event) {
+          console.warn('[wise-chat] voice recognition error:', event.error);
+          if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+            alert(loc(
+              'Միկրոֆոնի հասանելիությունը մերժված է: Խնդրում ենք բրաուզերի կարգավորումներում թույլատրել միկրոֆոնի օգտագործումը:',
+              'Microphone access was denied. Please allow microphone permissions in your browser settings.',
+              'Доступ к микрофону запрещен. Пожалуйста, разрешите использование микрофона в настройках браузера.'
+            ));
+          }
+          stopRecording();
+        };
 
-          recognition.onend = function () {
-            stopRecording();
-          };
-        }
+        recognition.onend = function () {
+          stopRecording();
+          if (inputEl) {
+            inputEl.focus();
+          }
+        };
 
-        var curLang = lang();
-        var langMap = { 'hy': 'hy-AM', 'en': 'en-US', 'ru': 'ru-RU' };
-        recognition.lang = langMap[curLang] || 'hy-AM';
         recognition.start();
       } catch (e) {
         console.warn('[wise-chat] voice start error', e);
         stopRecording();
       }
     }
+
+    var defaultTitle = getMicTitle();
+    micBtn.setAttribute('title', defaultTitle);
+    micBtn.setAttribute('aria-label', defaultTitle);
 
     micBtn.addEventListener('click', function (e) {
       e.preventDefault();
@@ -530,6 +592,12 @@
     if (newChatBtn) {
       newChatBtn.setAttribute('title', t('chat.new', loc('Նոր զրույց', 'New chat', 'Новый чат')));
       newChatBtn.setAttribute('aria-label', t('chat.new', loc('Նոր զրույց', 'New chat', 'Новый чат')));
+    }
+    var micBtn = root.querySelector('[data-mic]');
+    if (micBtn && !micBtn.classList.contains('wise-help__mic--recording')) {
+      var micTitle = t('chat.mic_title', loc('Ձայնային մուտքագրում (հայերեն, English, русский)', 'Voice input (Armenian, English, Russian)', 'Голосовой ввод (армянский, русский, английский)'));
+      micBtn.setAttribute('title', micTitle);
+      micBtn.setAttribute('aria-label', micTitle);
     }
   }
 
